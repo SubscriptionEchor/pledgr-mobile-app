@@ -13,10 +13,11 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: { display: 'none' },
         }}>
-        <Tabs.Screen name="home" />
-        <Tabs.Screen name="explore" />
+        <Tabs.Screen name="index" />
         <Tabs.Screen name="membership" />
         <Tabs.Screen name="chat" />
+        <Tabs.Screen name="explore" />
+        <Tabs.Screen name="menu" />
       </Tabs>
       <Footer />
     </View>

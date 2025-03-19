@@ -1,22 +1,18 @@
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Menu, Chrome as Home, Compass, Crown, MessageCircle } from 'lucide-react-native';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { useRouter, usePathname } from 'expo-router';
+import { useRouter, usePathname, Link } from 'expo-router';
 
 export function Footer() {
   const { colors } = useTheme();
-  const navigation = useNavigation();
   const router = useRouter();
   const pathname = usePathname();
-
-  const openDrawer = () => {
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
 
   const isActive = (path: string) => {
     return pathname.includes(path);
   };
+
+  console.log(pathname, "path");
 
   return (
     <View
@@ -29,15 +25,15 @@ export function Footer() {
       ]}>
       <TouchableOpacity 
         style={styles.tab}
-        onPress={() => router.push('/(drawer)/(tabs)/home')}>
+        onPress={() => router.push('/(tabs)')}>
         <Home 
           size={24} 
-          color={isActive('home') ? colors.primary : colors.textSecondary} 
+          color={pathname === '/' ? colors.primary : colors.textSecondary} 
         />
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.tab}
-        onPress={() => router.push('/(drawer)/(tabs)/explore')}>
+        onPress={() => router.push('/(tabs)/explore')}>
         <Compass 
           size={24} 
           color={isActive('explore') ? colors.primary : colors.textSecondary} 
@@ -45,7 +41,7 @@ export function Footer() {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.tab}
-        onPress={() => router.push('/(drawer)/(tabs)/membership')}>
+        onPress={() => router.push('/(tabs)/membership')}>
         <Crown 
           size={24} 
           color={isActive('membership') ? colors.primary : colors.textSecondary} 
@@ -53,18 +49,18 @@ export function Footer() {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.tab}
-        onPress={() => router.push('/(drawer)/(tabs)/chat')}>
+        onPress={() => router.push('/(tabs)/chat')}>
         <MessageCircle 
           size={24} 
           color={isActive('chat') ? colors.primary : colors.textSecondary} 
         />
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={openDrawer}
-        style={styles.tab}>
+      <TouchableOpacity 
+        style={styles.tab}
+        onPress={() => router.push('/(tabs)/menu')}>
         <Menu 
           size={24} 
-          color={colors.textSecondary} 
+          color={isActive('menu') ? colors.primary : colors.textSecondary} 
         />
       </TouchableOpacity>
     </View>

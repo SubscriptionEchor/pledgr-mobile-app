@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { User } from 'lucide-react-native';
 
@@ -20,7 +20,7 @@ export function Header() {
           Pledgr
         </Text>
       </View>
-      <TouchableOpacity
+      <View
         style={[
           styles.profileButton,
           {
@@ -28,7 +28,7 @@ export function Header() {
           },
         ]}>
         <User size={24} color={colors.textPrimary} />
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }
