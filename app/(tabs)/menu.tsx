@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useRouter } from 'expo-router';
 import { Header } from '@/components/Header';
-import { Download, History, Heart, Bell, Wallet, Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { Download, History, Heart, Bell, Wallet, Settings, CircleHelp as HelpCircle, UserX } from 'lucide-react-native';
 
 const MENU_ITEMS = [
   {
@@ -35,6 +36,12 @@ const MENU_ITEMS = [
     color: '#9333ea',
   },
   {
+    icon: UserX,
+    label: 'Blocked Users',
+    description: 'Manage blocked accounts',
+    color: '#dc2626',
+  },
+  {
     icon: Settings,
     label: 'Settings',
     description: 'Customize your experience',
@@ -50,6 +57,13 @@ const MENU_ITEMS = [
 
 export default function MenuScreen() {
   const { colors } = useTheme();
+  const router = useRouter();
+
+  const handleItemPress = (label: string) => {
+    if (label === 'Settings') {
+      router.push('/(tabs)/settings');
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -60,6 +74,7 @@ export default function MenuScreen() {
             {MENU_ITEMS.map((item) => (
               <TouchableOpacity
                 key={item.label}
+                onPress={() => handleItemPress(item.label)}
                 style={[
                   styles.card,
                   { backgroundColor: colors.surface },
@@ -94,14 +109,15 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  grid: {
+  grid: { 
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 16,
+    gap: 12,
   },
   card: {
-    width: '48%',
+    flex: 1,
+    minWidth: 160,
+    maxWidth: '48%',
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -112,6 +128,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+    marginBottom: 4,
   },
   iconContainer: {
     width: 48,

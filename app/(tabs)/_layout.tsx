@@ -1,10 +1,19 @@
 import { Tabs } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import { Footer } from '@/components/Footer';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
+import { usePathname } from 'expo-router';
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const pathname = usePathname();
+
+  // Only show footer on main tab screens
+  const showFooter = pathname === '/' || 
+                    pathname === '/explore' || 
+                    pathname === '/membership' || 
+                    pathname === '/chat' || 
+                    pathname === '/menu';
 
   return (
     <View style={{ flex: 1 }}>
@@ -19,7 +28,7 @@ export default function TabLayout() {
         <Tabs.Screen name="explore" />
         <Tabs.Screen name="menu" />
       </Tabs>
-      <Footer />
+      {showFooter && <Footer />}
     </View>
   );
 }
