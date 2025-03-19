@@ -2,57 +2,48 @@ import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { 
-  User, 
-  Shield, 
-  Moon,
-  Bell,
-  Globe,
-  Lock,
-  Key,
-  Languages,
-  Palette,
-  ChevronRight,
-  FileText,
-  Lightbulb
-} from 'lucide-react-native';
+import { useState } from 'react';
+import { ProfileVisibilityModal } from '@/components/ProfileVisibilityModal';
+import { AdultContentModal } from '@/components/AdultContentModal';
+import { LanguagePicker } from '@/components/LanguagePicker';
+import { User, Key, Languages, Bell, Shield, Smartphone, Crown, FileText, Lightbulb, Lock, ChevronRight, Eye, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 
 const SETTINGS_SECTIONS = [
   {
     title: 'Account',
-    icon: User,
-    color: '#60a5fa',
     items: [
-      { label: 'Profile Information', icon: User },
-      { label: 'Language', icon: Languages },
-      { label: 'Notifications', icon: Bell },
+      { label: 'Profile', icon: User, route: '/settings/profile' },
+      { label: 'Change Password', icon: Key, route: '/settings/change-password' }
     ]
   },
   {
     title: 'Preferences',
-    icon: Palette,
-    color: '#f59e0b',
     items: [
-      { label: 'Appearance', icon: Moon },
-      { label: 'Region', icon: Globe },
+      { label: 'Profile Visibility', icon: Eye, action: 'visibility' },
+      { label: 'Adult Content', icon: AlertTriangle, action: 'adult-content' },
+      { label: 'Language', icon: Languages, action: 'language' },
+      { label: 'Notifications', icon: Bell, route: '/settings/notifications' }
     ]
   },
   {
     title: 'Security',
-    icon: Shield,
-    color: '#ef4444',
     items: [
-      { label: 'Password', icon: Key },
-      { label: 'Privacy', icon: Lock },
+      { label: 'Authenticator', icon: Shield, route: '/settings/authenticator' },
+      { label: 'Device Management', icon: Smartphone, route: '/settings/devices' }
     ]
   },
   {
-    title: 'Support',
-    icon: FileText,
-    color: '#22c55e',
+    title: 'Memberships',
     items: [
-      { label: 'Terms of Service', icon: FileText },
-      { label: 'Feature Request', icon: Lightbulb },
+      { label: 'Subscription', icon: Crown, route: '/settings/subscription' }
+    ]
+  },
+  {
+    title: 'Others',
+    items: [
+      { label: 'Feature Request', icon: Lightbulb, route: '/settings/feature-request' },
+      { label: 'Terms of Service', icon: FileText, route: '/settings/terms' },
+      { label: 'Privacy Policy', icon: Lock, route: '/settings/privacy' }
     ]
   }
 ];
@@ -60,20 +51,27 @@ const SETTINGS_SECTIONS = [
 export default function SettingsScreen() {
   const { colors } = useTheme();
   const router = useRouter();
+  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
+  const [showAdultContentModal, setShowAdultContentModal] = useState(false);
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [selectedVisibility, setSelectedVisibility] = useState('public');
+  const [selectedLanguage, setSelectedLanguage] = useState({
+    code: 'en',
+    name: 'English'
+  });
+  const [adultContentSettings, setAdultContentSettings] = useState({
+    enabled: false
+  });
 
-  const handleNavigation = (label: string) => {
-    switch (label) {
-      case 'Profile Information':
-        router.push('/settings/profile');
-        break;
-      case 'Terms of Service':
-        // Implement terms of service navigation
-        break;
-      case 'Feature Request':
-        // Implement feature request navigation
-        break;
-      default:
-        break;
+  const handleNavigation = (route?: string, action?: string) => {
+    if (action === 'visibility') {
+      setShowVisibilityModal(true);
+    } else if (action === 'adult-content') {
+      setShowAdultContentModal(true);
+    } else if (action === 'language') {
+      setShowLanguagePicker(true);
+    } else if (route) {
+      router.push(route);
     }
   };
 
@@ -84,19 +82,14 @@ export default function SettingsScreen() {
         <View style={styles.content}>
           {SETTINGS_SECTIONS.map((section) => (
             <View key={section.title} style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <View style={[styles.sectionIconContainer, { backgroundColor: `${section.color}20` }]}>
-                  <section.icon size={20} color={section.color} />
-                </View>
-                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-                  {section.title}
-                </Text>
-              </View>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+                {section.title}
+              </Text>
               <View style={[styles.sectionContent, { backgroundColor: colors.surface }]}>
                 {section.items.map((item, index) => (
                   <TouchableOpacity
                     key={item.label}
-                    onPress={() => handleNavigation(item.label)}
+                    onPress={() => handleNavigation(item.route, item.action)}
                     style={[
                       styles.settingItem,
                       index !== section.items.length - 1 && {
@@ -105,7 +98,9 @@ export default function SettingsScreen() {
                       },
                     ]}>
                     <View style={styles.settingItemLeft}>
-                      <item.icon size={20} color={colors.textSecondary} />
+                      <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                        <item.icon size={20} color={colors.textPrimary} />
+                      </View>
                       <Text style={[styles.settingItemLabel, { color: colors.textPrimary }]}>
                         {item.label}
                       </Text>
@@ -118,6 +113,30 @@ export default function SettingsScreen() {
           ))}
         </View>
       </ScrollView>
+
+      <ProfileVisibilityModal
+        visible={showVisibilityModal}
+        onClose={() => setShowVisibilityModal(false)}
+        selectedVisibility={selectedVisibility}
+        onSelect={setSelectedVisibility}
+      />
+
+      <AdultContentModal
+        visible={showAdultContentModal}
+        onClose={() => setShowAdultContentModal(false)}
+        initialSettings={adultContentSettings}
+        onSave={setAdultContentSettings}
+      />
+
+      <LanguagePicker
+        visible={showLanguagePicker}
+        onClose={() => setShowLanguagePicker(false)}
+        onSelect={(language) => {
+          setSelectedLanguage(language);
+          setShowLanguagePicker(false);
+        }}
+        selectedCode={selectedLanguage.code}
+      />
     </View>
   );
 }
@@ -136,22 +155,10 @@ const styles = StyleSheet.create({
   section: {
     gap: 12,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 4,
-  },
-  sectionIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
+    paddingHorizontal: 4,
   },
   sectionContent: {
     borderRadius: 16,
@@ -170,5 +177,12 @@ const styles = StyleSheet.create({
   },
   settingItemLabel: {
     fontSize: 15,
+  },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

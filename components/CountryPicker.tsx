@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, X } from 'lucide-react-native';
 import { TextInput } from 'react-native';
@@ -74,7 +74,7 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: Platform.OS === 'ios' ? 50 : 0
   },
   header: {
     flexDirection: 'row',

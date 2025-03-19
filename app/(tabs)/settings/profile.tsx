@@ -6,7 +6,6 @@ import { Camera, ChevronLeft, MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { CountryPicker } from '@/components/CountryPicker';
-import { ChangePasswordModal } from '@/components/ChangePasswordModal';
 
 interface ProfileForm {
   name: string;
@@ -19,7 +18,6 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [form, setForm] = useState<ProfileForm>({
     name: 'John Doe',
     email: 'john@example.com',
@@ -33,15 +31,6 @@ export default function ProfileScreen() {
 
   const handleSave = () => {
     // Implement save logic
-  };
-
-  const handleChangePassword = () => {
-    setShowPasswordModal(true);
-  };
-
-  const handlePasswordChange = (passwords: { currentPassword: string; newPassword: string }) => {
-    // Implement password change logic
-    setShowPasswordModal(false);
   };
 
   return (
@@ -86,15 +75,6 @@ export default function ProfileScreen() {
               />
             </View>
 
-            <TouchableOpacity
-              onPress={handleChangePassword}
-              style={[styles.passwordButton, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.passwordButtonText, { color: colors.textPrimary }]}>
-                Change Password
-              </Text>
-              <ChevronLeft size={20} color={colors.textSecondary} style={{ transform: [{ rotate: '180deg' }] }} />
-            </TouchableOpacity>
-
             <View style={styles.locationSection}>
               <View style={styles.locationHeader}>
                 <MapPin size={20} color={colors.textSecondary} />
@@ -132,11 +112,6 @@ export default function ProfileScreen() {
           setShowCountryPicker(false);
         }}
       />
-      <ChangePasswordModal
-        visible={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onSubmit={handlePasswordChange}
-      />
     </View>
   );
 }
@@ -151,15 +126,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 32,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  backText: {
-    fontSize: 16,
-    fontWeight: '500',
   },
   imageSection: {
     alignItems: 'center',
@@ -201,18 +167,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 15,
-  },
-  passwordButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-  },
-  passwordButtonText: {
-    fontSize: 15,
-    fontWeight: '500',
   },
   locationSection: {
     gap: 12,
