@@ -77,7 +77,7 @@ export function AdultContentModal({
                     Content Filtering
                   </Text>
                   <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    Adult content will be automatically filtered from your feed
+                    Users will see explicit content like nudity or sexual themes from adult creators in their feed, per the platform's definition.
                   </Text>
                 </View>
               </View>
@@ -91,7 +91,7 @@ export function AdultContentModal({
                     Safe Browsing
                   </Text>
                   <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    Content warnings and blur effects are automatically applied
+                    Automatic filtering, warnings, and blur effects for adult content will be turned off, showing unfiltered material.
                   </Text>
                 </View>
               </View>
@@ -105,7 +105,7 @@ export function AdultContentModal({
                     Recommendations
                   </Text>
                   <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    Your content recommendations will be adjusted accordingly
+                    This will include adult content, tailoring the feed to mature themes based on user interactions.
                   </Text>
                 </View>
               </View>

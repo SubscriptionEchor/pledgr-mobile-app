@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
@@ -6,6 +6,7 @@ import { Camera, ChevronLeft, MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { CountryPicker } from '@/components/CountryPicker';
+import { showToast } from '@/components/Toast';
 
 interface ProfileForm {
   name: string;
@@ -18,6 +19,7 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState<ProfileForm>({
     name: 'John Doe',
     email: 'john@example.com',
@@ -29,8 +31,25 @@ export default function ProfileScreen() {
     // Implement image upload logic
   };
 
-  const handleSave = () => {
-    // Implement save logic
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      showToast.success(
+        'Profile updated',
+        'Your changes have been saved successfully'
+      );
+    } catch (error) {
+      showToast.error(
+        'Update failed',
+        'Please try again later'
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -100,7 +119,13 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Button label="Save Changes" onPress={handleSave} variant="primary" />
+          {isSaving ? (
+            <View style={[styles.loadingButton, { backgroundColor: colors.primary }]}>
+              <ActivityIndicator color={colors.buttonText} />
+            </View>
+          ) : (
+            <Button label="Save Changes" onPress={handleSave} variant="primary" />
+          )}
         </View>
       </ScrollView>
 
@@ -187,5 +212,11 @@ const styles = StyleSheet.create({
   },
   pickerButtonText: {
     fontSize: 15,
+  },
+  loadingButton: {
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

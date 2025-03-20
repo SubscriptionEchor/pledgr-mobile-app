@@ -6,6 +6,9 @@ export default function SettingsLayout() {
     <View style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="subscription" />
+        <Stack.Screen name="change-password" />
+        <Stack.Screen name="profile" />
       </Stack>
     </View>
   );

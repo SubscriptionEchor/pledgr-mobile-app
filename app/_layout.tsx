@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { ThemeProvider } from '@/lib/theme';
 import { StatusBarComponent } from '@/components/StatusBarComponent';
+import { ToastMessage } from '@/components/Toast';
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -14,6 +15,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
       </Stack>
+      <ToastMessage />
     </ThemeProvider>
   );
 }
