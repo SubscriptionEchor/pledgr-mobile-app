@@ -20,3 +20,9 @@ export enum DeviceTypes {
   MOBILE = 'mobile',
   TABLET = 'tablet'
 }
+
+export enum UserRole {
+  MEMBER = 'member',
+  CREATOR = 'creator',
+  CREATOR_ASSOCIATE = 'creator_associate'
+}
