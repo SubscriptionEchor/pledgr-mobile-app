@@ -17,7 +17,7 @@ export function AdultContentModal({
   initialSettings,
   onSave
 }: AdultContentModalProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   const handleToggle = (value: boolean) => {
     onSave({ enabled: value });
@@ -32,7 +32,16 @@ export function AdultContentModal({
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Adult Content</Text>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Adult Content
+          </Text>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
@@ -45,17 +54,38 @@ export function AdultContentModal({
         >
           <View style={[styles.warningBox, { backgroundColor: `${colors.warning}15` }]}>
             <AlertTriangle size={24} color={colors.warning} />
-            <Text style={[styles.warningText, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.warningText, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               These settings control how adult content is displayed in your feed. Please adjust according to your preferences.
             </Text>
           </View>
 
           <View style={[styles.mainSetting, { backgroundColor: colors.surface }]}>
             <View style={styles.settingContent}>
-              <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.settingTitle, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 Show Adult Content
               </Text>
-              <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              <Text style={[
+                styles.settingDescription, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
                 Allow adult content to appear in your feed
               </Text>
             </View>
@@ -68,7 +98,14 @@ export function AdultContentModal({
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={[styles.infoTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.infoTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               What this means:
             </Text>
             
@@ -78,10 +115,24 @@ export function AdultContentModal({
                   <Eye size={20} color={colors.primary} />
                 </View>
                 <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
+                  <Text style={[
+                    styles.infoCardTitle, 
+                    { 
+                      color: colors.textPrimary,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
                     Content Filtering
                   </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
+                  <Text style={[
+                    styles.infoCardDescription, 
+                    { 
+                      color: colors.textSecondary,
+                      fontFamily: fonts.regular,
+                      fontSize: fontSize.sm,
+                    }
+                  ]}>
                     Users will see explicit content like nudity or sexual themes from adult creators in their feed, per the platform's definition.
                   </Text>
                 </View>
@@ -92,10 +143,24 @@ export function AdultContentModal({
                   <Shield size={20} color={colors.primary} />
                 </View>
                 <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
+                  <Text style={[
+                    styles.infoCardTitle, 
+                    { 
+                      color: colors.textPrimary,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
                     Safe Browsing
                   </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
+                  <Text style={[
+                    styles.infoCardDescription, 
+                    { 
+                      color: colors.textSecondary,
+                      fontFamily: fonts.regular,
+                      fontSize: fontSize.sm,
+                    }
+                  ]}>
                     Automatic filtering, warnings, and blur effects for adult content will be turned off, showing unfiltered material.
                   </Text>
                 </View>
@@ -106,10 +171,24 @@ export function AdultContentModal({
                   <Globe size={20} color={colors.primary} />
                 </View>
                 <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
+                  <Text style={[
+                    styles.infoCardTitle, 
+                    { 
+                      color: colors.textPrimary,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
                     Recommendations
                   </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
+                  <Text style={[
+                    styles.infoCardDescription, 
+                    { 
+                      color: colors.textSecondary,
+                      fontFamily: fonts.regular,
+                      fontSize: fontSize.sm,
+                    }
+                  ]}>
                     This will include adult content, tailoring the feed to mature themes based on user interactions.
                   </Text>
                 </View>
@@ -135,10 +214,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
   scrollView: {
     flex: 1,
   },
@@ -155,7 +230,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     flex: 1,
-    fontSize: 14,
     lineHeight: 20,
   },
   mainSetting: {
@@ -169,20 +243,16 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     marginBottom: 2,
   },
   settingDescription: {
-    fontSize: 14,
     lineHeight: 20,
   },
   infoSection: {
     gap: 16,
   },
   infoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    marginBottom: 4,
   },
   infoCards: {
     gap: 12,
@@ -204,12 +274,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoCardTitle: {
-    fontSize: 15,
-    fontWeight: '600',
     marginBottom: 2,
   },
   infoCardDescription: {
-    fontSize: 14,
     lineHeight: 20,
   },
 });

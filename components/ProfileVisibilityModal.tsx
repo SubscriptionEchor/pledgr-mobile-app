@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Switch, Platform, Scro
 import { useTheme } from '@/hooks/useTheme';
 import { X, Globe, Users, Lock, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { useState } from 'react';
+import { ProfileVisibility } from '@/lib/enums';
 
 interface ProfileVisibilityModalProps {
   visible: boolean;
@@ -16,12 +17,12 @@ export function ProfileVisibilityModal({
   selectedVisibility,
   onSelect 
 }: ProfileVisibilityModalProps) {
-  const { colors } = useTheme();
-  const [isPublic, setIsPublic] = useState(selectedVisibility === 'public');
+  const { colors, fonts, fontSize } = useTheme();
+  const [isPublic, setIsPublic] = useState(selectedVisibility === ProfileVisibility.PUBLIC);
 
   const handleToggle = (value: boolean) => {
     setIsPublic(value);
-    onSelect(value ? 'public' : 'private');
+    onSelect(value ? ProfileVisibility.PUBLIC : ProfileVisibility.PRIVATE);
   };
 
   return (
@@ -32,31 +33,61 @@ export function ProfileVisibilityModal({
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Profile Visibility</Text>
+        <View style={styles.header}>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Profile Visibility
+          </Text>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
         <ScrollView 
-          style={styles.scrollView} 
-          showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.warningBox, { backgroundColor: `${colors.warning}15` }]}>
-            <AlertTriangle size={24} color={colors.warning} />
-            <Text style={[styles.warningText, { color: colors.textPrimary }]}>
+          <View style={[styles.warningBox, { backgroundColor: '#FFF9F0' }]}>
+            <AlertTriangle size={24} color="#F59E0B" />
+            <Text style={[
+              styles.warningText, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Choose who can see your profile and content. You can change this at any time.
             </Text>
           </View>
 
-          <View style={[styles.mainSetting, { backgroundColor: colors.surface }]}>
-            <View style={styles.settingContent}>
-              <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>
+          <View style={[styles.toggleContainer, { backgroundColor: colors.surface }]}>
+            <View style={styles.toggleContent}>
+              <Text style={[
+                styles.toggleTitle, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.lg,
+                }
+              ]}>
                 Public Profile
               </Text>
-              <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              <Text style={[
+                styles.toggleDescription, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 Allow anyone to view your profile and content
               </Text>
             </View>
@@ -64,56 +95,104 @@ export function ProfileVisibilityModal({
               value={isPublic}
               onValueChange={handleToggle}
               trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={isPublic ? colors.buttonText : colors.surface}
+              thumbColor={Platform.OS === 'ios' ? '#FFFFFF' : isPublic ? colors.primary : colors.surface}
             />
           </View>
 
-          <View style={styles.infoSection}>
-            <Text style={[styles.infoTitle, { color: colors.textPrimary }]}>
-              What this means:
-            </Text>
-            
-            <View style={styles.infoCards}>
-              <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                  <Globe size={20} color={colors.primary} />
-                </View>
-                <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
-                    Public Profile
-                  </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    Your profile, posts, and activity are visible to everyone
-                  </Text>
-                </View>
-              </View>
+          <Text style={[
+            styles.sectionTitle, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.lg,
+              marginTop: 24,
+            }
+          ]}>
+            What this means:
+          </Text>
 
-              <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                  <Users size={20} color={colors.primary} />
-                </View>
-                <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
-                    Engagement
-                  </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    Anyone can follow you and interact with your content
-                  </Text>
-                </View>
+          <View style={styles.infoCards}>
+            <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
+              <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
+                <Globe size={24} color="#0EA5E9" />
               </View>
+              <View style={styles.infoContent}>
+                <Text style={[
+                  styles.infoTitle, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Public Profile
+                </Text>
+                <Text style={[
+                  styles.infoDescription, 
+                  { 
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Your profile, posts, and activity are visible to everyone
+                </Text>
+              </View>
+            </View>
 
-              <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                  <Lock size={20} color={colors.primary} />
-                </View>
-                <View style={styles.infoCardContent}>
-                  <Text style={[styles.infoCardTitle, { color: colors.textPrimary }]}>
-                    Privacy Control
-                  </Text>
-                  <Text style={[styles.infoCardDescription, { color: colors.textSecondary }]}>
-                    You can still block specific users and control who can message you
-                  </Text>
-                </View>
+            <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
+              <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
+                <Users size={24} color="#0EA5E9" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={[
+                  styles.infoTitle, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Engagement
+                </Text>
+                <Text style={[
+                  styles.infoDescription, 
+                  { 
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Anyone can follow you and interact with your content
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
+              <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
+                <Lock size={24} color="#0EA5E9" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={[
+                  styles.infoTitle, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Privacy Control
+                </Text>
+                <Text style={[
+                  styles.infoDescription, 
+                  { 
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  You can still block specific users and control who can message you
+                </Text>
               </View>
             </View>
           </View>
@@ -126,7 +205,7 @@ export function ProfileVisibilityModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 50 : 0
+    marginTop: Platform.OS === 'ios' ? 44 : 0,
   },
   header: {
     flexDirection: 'row',
@@ -134,56 +213,43 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
-    gap: 24,
   },
   warningBox: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: 16,
     borderRadius: 12,
+    marginBottom: 24,
     gap: 12,
   },
   warningText: {
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 24,
   },
-  mainSetting: {
+  toggleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderRadius: 12,
   },
-  settingContent: {
+  toggleContent: {
     flex: 1,
     marginRight: 12,
   },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 2,
+  toggleTitle: {
+    marginBottom: 4,
   },
-  settingDescription: {
-    fontSize: 14,
+  toggleDescription: {
     lineHeight: 20,
   },
-  infoSection: {
-    gap: 16,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  sectionTitle: {
+    marginBottom: 16,
   },
   infoCards: {
     gap: 12,
@@ -192,25 +258,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     borderRadius: 12,
-    gap: 12,
+    alignItems: 'center',
   },
   iconContainer: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 16,
   },
-  infoCardContent: {
+  infoContent: {
     flex: 1,
   },
-  infoCardTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 2,
+  infoTitle: {
+    marginBottom: 4,
   },
-  infoCardDescription: {
-    fontSize: 14,
-    lineHeight: 20,
+  infoDescription: {
+    lineHeight: 22,
   },
 });

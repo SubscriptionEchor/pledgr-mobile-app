@@ -8,7 +8,7 @@ interface ButtonProps {
 }
 
 export function Button({ label, onPress, variant = 'primary' }: ButtonProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   const getBackgroundColor = () => {
     switch (variant) {
@@ -34,7 +34,14 @@ export function Button({ label, onPress, variant = 'primary' }: ButtonProps) {
         { backgroundColor: getBackgroundColor() },
       ]}
       onPress={onPress}>
-      <Text style={[styles.label, { color: colors.buttonText }]}>
+      <Text style={[
+        styles.label, 
+        { 
+          color: colors.buttonText,
+          fontFamily: fonts.semibold,
+          fontSize: fontSize.md,
+        }
+      ]}>
         {label}
       </Text>
     </TouchableOpacity>

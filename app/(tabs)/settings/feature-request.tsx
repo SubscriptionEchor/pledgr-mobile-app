@@ -7,7 +7,7 @@ import { showToast } from '@/components/Toast';
 import { Lightbulb, Sparkles, Zap } from 'lucide-react-native';
 
 export default function FeatureRequestScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,10 +54,24 @@ export default function FeatureRequestScreen() {
       >
         <View style={styles.header}>
           <Lightbulb size={32} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.bold,
+              fontSize: fontSize['2xl'],
+            }
+          ]}>
             Share Your Ideas
           </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[
+            styles.subtitle, 
+            { 
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+            }
+          ]}>
             Help us improve by suggesting new features or improvements
           </Text>
         </View>
@@ -67,10 +81,24 @@ export default function FeatureRequestScreen() {
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
               <Sparkles size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.featureTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.featureTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Innovation Welcome
             </Text>
-            <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
+            <Text style={[
+              styles.featureDescription, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               We value fresh ideas that can make the platform better for everyone
             </Text>
           </View>
@@ -79,10 +107,24 @@ export default function FeatureRequestScreen() {
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
               <Zap size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.featureTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.featureTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Quick Implementation
             </Text>
-            <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
+            <Text style={[
+              styles.featureDescription, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               Popular requests may be implemented in upcoming updates
             </Text>
           </View>
@@ -90,7 +132,14 @@ export default function FeatureRequestScreen() {
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>
+            <Text style={[
+              styles.label, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               Feature Title
             </Text>
             <TextInput
@@ -100,14 +149,26 @@ export default function FeatureRequestScreen() {
               placeholderTextColor={colors.textSecondary}
               style={[
                 styles.input,
-                { backgroundColor: colors.surface, color: colors.textPrimary }
+                { 
+                  backgroundColor: colors.surface, 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
               ]}
               editable={!isSubmitting}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>
+            <Text style={[
+              styles.label, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               Description
             </Text>
             <TextInput
@@ -121,7 +182,12 @@ export default function FeatureRequestScreen() {
               style={[
                 styles.input,
                 styles.textArea,
-                { backgroundColor: colors.surface, color: colors.textPrimary }
+                { 
+                  backgroundColor: colors.surface, 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
               ]}
               editable={!isSubmitting}
             />
@@ -153,15 +219,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: 'center',
-  },
   features: {
     flexDirection: 'row',
     gap: 12,
@@ -180,16 +237,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  featureDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
   form: {
     gap: 20,
   },
@@ -197,15 +244,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
     marginLeft: 4,
   },
   input: {
     height: 48,
     borderRadius: 12,
     paddingHorizontal: 16,
-    fontSize: 15,
   },
   textArea: {
     height: 120,

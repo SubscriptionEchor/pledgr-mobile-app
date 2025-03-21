@@ -8,7 +8,7 @@ interface SubHeaderProps {
 }
 
 export function SubHeader({ title }: SubHeaderProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   return (
     <View style={[styles.header, { 
@@ -22,7 +22,14 @@ export function SubHeader({ title }: SubHeaderProps) {
       > 
         <ChevronLeft size={24} color={colors.textPrimary} /> 
       </TouchableOpacity>
-      <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <Text style={[
+        styles.title, 
+        { 
+          color: colors.textPrimary,
+          fontFamily: fonts.semibold,
+          fontSize: fontSize.xl,
+        }
+      ]}>
         {title}
       </Text>
     </View>

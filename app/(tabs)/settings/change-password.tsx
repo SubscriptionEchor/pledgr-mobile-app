@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { showToast } from '@/components/Toast';
 
 export default function ChangePasswordScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [form, setForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -70,24 +70,54 @@ export default function ChangePasswordScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SubHeader title="Change Password" />
       <View style={styles.content}>
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
+        <Text style={[
+          styles.description, 
+          { 
+            color: colors.textSecondary,
+            fontFamily: fonts.regular,
+            fontSize: fontSize.md,
+          }
+        ]}>
           Choose a strong password that you haven't used before. A good password is at least 8 characters long and includes a mix of letters, numbers, and symbols.
         </Text>
 
         {error && (
-          <Text style={[styles.error, { color: colors.error }]}>
+          <Text style={[
+            styles.error, 
+            { 
+              color: colors.error,
+              fontFamily: fonts.medium,
+              fontSize: fontSize.sm,
+            }
+          ]}>
             {error}
           </Text>
         )}
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Current Password</Text>
+            <Text style={[
+              styles.label, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+              }
+            ]}>
+              Current Password
+            </Text>
             <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
               <TextInput
                 value={form.currentPassword}
                 onChangeText={(text) => setForm({ ...form, currentPassword: text })}
-                style={[styles.input, { color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}
                 secureTextEntry={!showPasswords.current}
                 placeholderTextColor={colors.textSecondary}
                 editable={!isUpdating}
@@ -106,12 +136,28 @@ export default function ChangePasswordScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>New Password</Text>
+            <Text style={[
+              styles.label, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+              }
+            ]}>
+              New Password
+            </Text>
             <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
               <TextInput
                 value={form.newPassword}
                 onChangeText={(text) => setForm({ ...form, newPassword: text })}
-                style={[styles.input, { color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}
                 secureTextEntry={!showPasswords.new}
                 placeholderTextColor={colors.textSecondary}
                 editable={!isUpdating}
@@ -130,12 +176,28 @@ export default function ChangePasswordScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Confirm New Password</Text>
+            <Text style={[
+              styles.label, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+              }
+            ]}>
+              Confirm New Password
+            </Text>
             <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
               <TextInput
                 value={form.confirmPassword}
                 onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
-                style={[styles.input, { color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}
                 secureTextEntry={!showPasswords.confirm}
                 placeholderTextColor={colors.textSecondary}
                 editable={!isUpdating}
@@ -175,12 +237,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   description: {
-    fontSize: 15,
     lineHeight: 22,
-  },
-  error: {
-    fontSize: 14,
-    fontWeight: '500',
   },
   form: {
     gap: 20,
@@ -189,8 +246,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
     marginLeft: 4,
   },
   inputContainer: {
@@ -203,7 +258,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     paddingHorizontal: 16,
-    fontSize: 15,
   },
   eyeButton: {
     width: 48,

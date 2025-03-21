@@ -25,7 +25,7 @@ interface CountryPickerProps {
 }
 
 export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [search, setSearch] = useState('');
 
   const filteredCountries = useMemo(() => {
@@ -34,17 +34,36 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
     );
   }, [search]);
 
+  const handleClose = () => {
+    setSearch('');
+    onClose();
+  };
+
+  const handleSelect = (country: string) => {
+    setSearch('');
+    onSelect(country);
+  };
+
   return (
     <Modal 
       visible={visible} 
       animationType="slide" 
       transparent
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Select Country</Text>
-          <TouchableOpacity onPress={onClose}>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Select Country
+          </Text>
+          <TouchableOpacity onPress={handleClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -56,7 +75,14 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
             onChangeText={setSearch}
             placeholder="Search countries"
             placeholderTextColor={colors.textSecondary}
-            style={[styles.searchInput, { color: colors.textPrimary }]}
+            style={[
+              styles.searchInput, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.md,
+              }
+            ]}
           />
         </View>
 
@@ -66,8 +92,17 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.countryItem, { borderBottomColor: colors.border }]}
-              onPress={() => onSelect(item)}>
-              <Text style={[styles.countryName, { color: colors.textPrimary }]}>{item}</Text>
+              onPress={() => handleSelect(item)}>
+              <Text style={[
+                styles.countryName, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
+              ]}>
+                {item}
+              </Text>
             </TouchableOpacity>
           )}
         />
@@ -88,10 +123,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -103,14 +134,10 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 12,
-    fontSize: 16,
   },
   countryItem: {
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-  },
-  countryName: {
-    fontSize: 16,
   },
 });

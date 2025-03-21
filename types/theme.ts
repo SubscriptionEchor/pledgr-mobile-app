@@ -23,8 +23,29 @@ export interface Shadow {
   lg: string;
 }
 
+export interface FontFamily {
+  light: string;
+  regular: string;
+  medium: string;
+  semibold: string;
+  bold: string;
+}
+
+export interface FontSize {
+  xs: number;
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  '2xl': number;
+  '3xl': number;
+  '4xl': number;
+}
+
 export interface Theme {
   colors: ThemeColors;
   shadows: Shadow;
+  fonts: FontFamily;
+  fontSize: FontSize;
   isDark: boolean;
 }

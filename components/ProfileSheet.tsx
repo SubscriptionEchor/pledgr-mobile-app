@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Image } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
-import { Settings, LogOut, Crown, ChevronRight, Sparkles, Star } from 'lucide-react-native';
+import { Settings, LogOut, Crown, ChevronRight, Sparkles, Pencil } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useBottomSheet } from '@/lib/context/BottomSheetContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,7 +14,7 @@ interface ProfileSheetProps {
 }
 
 export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
-  const { colors, isDark, toggleTheme } = useTheme();
+  const { colors, fonts, fontSize, isDark, toggleTheme } = useTheme();
   const router = useRouter();
   const translateY = useRef(new Animated.Value(500)).current;
   const { setSheetVisible } = useBottomSheet();
@@ -47,7 +47,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   };
 
   const handleSignOutConfirm = () => {
-    // Implement sign out logic here
     setShowSignOutConfirmation(false);
     onClose();
     showToast.success('Signed out successfully', 'See you next time!');
@@ -77,25 +76,51 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
         <View style={styles.handle} />
 
         <View style={styles.content}>
-          {/* Profile Section */}
           <View style={[styles.profileSection, { backgroundColor: colors.surface }]}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
-              style={styles.avatar}
-            />
-            <View style={styles.profileInfo}>
-              <Text style={[styles.profileName, { color: colors.textPrimary }]}>
-                John Doe
-              </Text>
-              <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>
-                john@example.com
-              </Text>
+            <View style={styles.profileLeft}>
+              <Image 
+                source={{ uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
+                style={styles.avatar}
+              />
+              <View style={styles.profileInfo}>
+                <Text style={[
+                  styles.profileName, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.lg,
+                  }
+                ]}>
+                  John Doe
+                </Text>
+                <Text style={[
+                  styles.profileEmail, 
+                  { 
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                  }
+                ]}>
+                  john@example.com
+                </Text>
+              </View>
             </View>
+            <TouchableOpacity 
+              style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
+              onPress={() => handleNavigation('/settings/profile')}>
+              <Pencil size={20} color={colors.primary} />
+            </TouchableOpacity>
           </View>
 
-          {/* Theme Section */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.sectionTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Appearance
             </Text>
             <View style={[styles.themeSelector, { backgroundColor: colors.surface }]}>
@@ -107,7 +132,11 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 onPress={() => !isDark || toggleTheme()}>
                 <Text style={[
                   styles.themeText, 
-                  { color: !isDark ? colors.primary : colors.textSecondary }
+                  { 
+                    color: !isDark ? colors.primary : colors.textSecondary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
                 ]}>
                   Light
                 </Text>
@@ -120,7 +149,11 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 onPress={() => isDark || toggleTheme()}>
                 <Text style={[
                   styles.themeText,
-                  { color: isDark ? colors.primary : colors.textSecondary }
+                  { 
+                    color: isDark ? colors.primary : colors.textSecondary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
                 ]}>
                   Dark
                 </Text>
@@ -128,7 +161,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             </View>
           </View>
 
-          {/* Creator Section */}
           <TouchableOpacity 
             style={styles.creatorCardWrapper}
             onPress={() => handleNavigation('/creator')}>
@@ -148,26 +180,33 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     </View>
                   </View>
                   <View style={styles.creatorText}>
-                    <Text style={styles.creatorTitle}>
+                    <Text style={[
+                      styles.creatorTitle,
+                      {
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.lg,
+                        color: '#fff',
+                      }
+                    ]}>
                       Become a Creator
                     </Text>
-                    <Text style={styles.creatorDescription}>
+                    <Text style={[
+                      styles.creatorDescription,
+                      {
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.sm,
+                        color: 'rgba(255, 255, 255, 0.9)',
+                      }
+                    ]}>
                       Share your content with the world
                     </Text>
                   </View>
                 </View>
-                <View style={styles.creatorStats}>
-                  <View style={styles.statItem}>
-                    <Star size={14} color="#fff" />
-                    <Text style={styles.statText}>10K+ Creators</Text>
-                  </View>
-                  <ChevronRight size={20} color="#fff" style={styles.chevronIcon} />
-                </View>
+                <ChevronRight size={20} color="#fff" />
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Settings Section */}
           <TouchableOpacity 
             style={[styles.settingsButton, { backgroundColor: colors.surface }]}
             onPress={() => handleNavigation('/settings')}>
@@ -175,7 +214,14 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
               <View style={[styles.settingsIcon, { backgroundColor: `${colors.primary}15` }]}>
                 <Settings size={20} color={colors.primary} />
               </View>
-              <Text style={[styles.settingsText, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.settingsText, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.medium,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 Settings
               </Text>
             </View>
@@ -184,12 +230,18 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             </View>
           </TouchableOpacity>
 
-          {/* Sign Out Button */}
           <TouchableOpacity
             style={[styles.signOutButton, { backgroundColor: `${colors.error}15` }]}
             onPress={() => setShowSignOutConfirmation(true)}>
             <LogOut size={20} color={colors.error} />
-            <Text style={[styles.signOutText, { color: colors.error }]}>
+            <Text style={[
+              styles.signOutText, 
+              { 
+                color: colors.error,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Sign out
             </Text>
           </TouchableOpacity>
@@ -251,8 +303,13 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 16,
     borderRadius: 16,
+  },
+  profileLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 16,
   },
   avatar: {
@@ -261,22 +318,19 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   profileInfo: {
-    flex: 1,
+    gap: 4,
   },
-  profileName: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  profileEmail: {
-    fontSize: 14,
+  editButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   section: {
     gap: 12,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     marginLeft: 4,
   },
   themeSelector: {
@@ -341,35 +395,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   creatorTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
     marginBottom: 4,
   },
   creatorDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
-  creatorStats: {
-    alignItems: 'flex-end',
-    gap: 12,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '500',
-  },
-  chevronIcon: {
-    marginRight: -4,
+    lineHeight: 20,
   },
   settingsButton: {
     flexDirection: 'row',

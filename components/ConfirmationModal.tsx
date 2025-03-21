@@ -21,7 +21,7 @@ export function ConfirmationModal({
   confirmLabel = 'Confirm',
   confirmVariant = 'primary',
 }: ConfirmationModalProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   return (
     <Modal 
@@ -33,10 +33,24 @@ export function ConfirmationModal({
       <View style={styles.overlay}>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <View style={styles.content}>
-            <Text style={[styles.title, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.title, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.xl,
+              }
+            ]}>
               {title}
             </Text>
-            <Text style={[styles.description, { color: colors.textSecondary }]}>
+            <Text style={[
+              styles.description, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.md,
+              }
+            ]}>
               {description}
             </Text>
           </View>
@@ -45,7 +59,14 @@ export function ConfirmationModal({
             <TouchableOpacity
               onPress={onClose}
               style={[styles.cancelButton, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.cancelButtonText, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.cancelButtonText, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 Cancel
               </Text>
             </TouchableOpacity>

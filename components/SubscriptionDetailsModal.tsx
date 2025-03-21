@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Switch, Platform } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Switch, Platform, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { X, Bell, Check } from 'lucide-react-native';
+import { Bell, Check, X } from 'lucide-react-native';
 import { Button } from './Button';
 import { useState } from 'react';
+import { SubscriptionStatus, NotificationTypes } from '@/lib/enums';
 
 interface Subscriber {
   id: string;
@@ -12,7 +13,7 @@ interface Subscriber {
   isPremium: boolean;
   followingSince: string;
   nextPayment?: string;
-  status: 'subscribed' | 'following';
+  status: SubscriptionStatus;
 }
 
 interface SubscriptionDetailsModalProps {
@@ -30,12 +31,12 @@ export function SubscriptionDetailsModal({
   onUnfollow,
   onCancelSubscription,
 }: SubscriptionDetailsModalProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [notificationSettings, setNotificationSettings] = useState({
-    newPosts: true,
-    comments: true,
-    liveStreams: true,
-    creatorUpdates: true,
+    [NotificationTypes.NEW_POSTS]: true,
+    [NotificationTypes.COMMENTS]: true,
+    [NotificationTypes.LIVE_STREAMS]: true,
+    [NotificationTypes.CREATOR_UPDATES]: true,
   });
 
   const handleNotificationToggle = (key: keyof typeof notificationSettings) => {
@@ -54,40 +55,95 @@ export function SubscriptionDetailsModal({
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-            {subscriber.status === 'subscribed' ? 'Subscription Details' : 'Following Details'}
+          <Text style={[
+            styles.headerTitle, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Subscription Details' : 'Following Details'}
           </Text>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.content}>
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.creatorInfo}>
             <Image source={{ uri: subscriber.avatar }} style={styles.avatar} />
             <View style={styles.creatorText}>
-              <Text style={[styles.creatorName, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.creatorName, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.lg,
+                }
+              ]}>
                 {subscriber.name}
               </Text>
-              <Text style={[styles.creatorTitle, { color: colors.textSecondary }]}>
+              <Text style={[
+                styles.creatorTitle, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
                 {subscriber.title}
               </Text>
             </View>
           </View>
 
           <View style={[styles.membershipCard, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.membershipTitle, { color: colors.textPrimary }]}>
-              {subscriber.status === 'subscribed' ? 'Premium' : 'Free Membership'}
+            <Text style={[
+              styles.membershipTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.xl,
+              }
+            ]}>
+              {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Premium' : 'Free Membership'}
             </Text>
             <View style={styles.membershipDetails}>
-              {subscriber.status === 'subscribed' && (
+              {subscriber.status === SubscriptionStatus.SUBSCRIBED && (
                 <View style={styles.priceRow}>
-                  <Text style={[styles.price, { color: colors.textPrimary }]}>$9.99/month</Text>
+                  <Text style={[
+                    styles.price, 
+                    { 
+                      color: colors.textPrimary,
+                      fontFamily: fonts.bold,
+                      fontSize: fontSize['2xl'],
+                    }
+                  ]}>
+                    $9.99/month
+                  </Text>
                   <View style={styles.nextPaymentWrapper}>
-                    <Text style={[styles.nextPaymentLabel, { color: colors.textSecondary }]}>
+                    <Text style={[
+                      styles.nextPaymentLabel, 
+                      { 
+                        color: colors.textSecondary,
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.xs,
+                      }
+                    ]}>
                       Next payment
                     </Text>
-                    <Text style={[styles.nextPaymentDate, { color: colors.primary }]}>
+                    <Text style={[
+                      styles.nextPaymentDate, 
+                      { 
+                        color: colors.primary,
+                        fontFamily: fonts.medium,
+                        fontSize: fontSize.sm,
+                      }
+                    ]}>
                       {subscriber.nextPayment}
                     </Text>
                   </View>
@@ -95,8 +151,15 @@ export function SubscriptionDetailsModal({
               )}
               <View style={[styles.statusBadge, { backgroundColor: `${colors.success}15` }]}>
                 <Check size={16} color={colors.success} />
-                <Text style={[styles.statusText, { color: colors.success }]}>
-                  {subscriber.status === 'subscribed' 
+                <Text style={[
+                  styles.statusText, 
+                  { 
+                    color: colors.success,
+                    fontFamily: fonts.medium,
+                    fontSize: fontSize.sm,
+                  }
+                ]}>
+                  {subscriber.status === SubscriptionStatus.SUBSCRIBED 
                     ? 'Your subscription is active'
                     : "You're following this creator"}
                 </Text>
@@ -107,7 +170,14 @@ export function SubscriptionDetailsModal({
           <View style={styles.notificationSection}>
             <View style={styles.notificationHeader}>
               <Bell size={20} color={colors.textPrimary} />
-              <Text style={[styles.notificationTitle, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.notificationTitle, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.lg,
+                }
+              ]}>
                 Notification Preferences
               </Text>
             </View>
@@ -121,11 +191,25 @@ export function SubscriptionDetailsModal({
                     index !== array.length - 1 && { borderBottomColor: colors.border, borderBottomWidth: 1 }
                   ]}>
                   <View style={styles.notificationItemContent}>
-                    <Text style={[styles.notificationItemTitle, { color: colors.textPrimary }]}>
+                    <Text style={[
+                      styles.notificationItemTitle, 
+                      { 
+                        color: colors.textPrimary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.md,
+                      }
+                    ]}>
                       {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </Text>
-                    <Text style={[styles.notificationItemDescription, { color: colors.textSecondary }]}>
-                      {getNotificationDescription(key)}
+                    <Text style={[
+                      styles.notificationItemDescription, 
+                      { 
+                        color: colors.textSecondary,
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.sm,
+                      }
+                    ]}>
+                      {getNotificationDescription(key as NotificationTypes)}
                     </Text>
                   </View>
                   <Switch
@@ -138,32 +222,41 @@ export function SubscriptionDetailsModal({
               ))}
             </View>
           </View>
-        </View>
+        </ScrollView>
 
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <TouchableOpacity
             style={[styles.cancelButton, { backgroundColor: `${colors.error}15` }]}
-            onPress={subscriber.status === 'subscribed' ? onCancelSubscription : onUnfollow}>
-            <Text style={[styles.cancelButtonText, { color: colors.error }]}>
-              {subscriber.status === 'subscribed' ? 'Cancel Subscription' : 'Unfollow'}
+            onPress={subscriber.status === SubscriptionStatus.SUBSCRIBED ? onCancelSubscription : onUnfollow}>
+            <Text style={[
+              styles.cancelButtonText, 
+              { 
+                color: colors.error,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
+              {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Cancel Subscription' : 'Unfollow'}
             </Text>
           </TouchableOpacity>
-          <Button label="Close" onPress={onClose} variant="primary" />
+          <View style={styles.closeButton}>
+            <Button label="Close" onPress={onClose} variant="primary" />
+          </View>
         </View>
       </View>
     </Modal>
   );
 }
 
-function getNotificationDescription(key: string): string {
+function getNotificationDescription(key: NotificationTypes): string {
   switch (key) {
-    case 'newPosts':
+    case NotificationTypes.NEW_POSTS:
       return 'Get notified when new content is posted';
-    case 'comments':
+    case NotificationTypes.COMMENTS:
       return 'Get notified about new comments';
-    case 'liveStreams':
+    case NotificationTypes.LIVE_STREAMS:
       return 'Get notified when creator goes live';
-    case 'creatorUpdates':
+    case NotificationTypes.CREATOR_UPDATES:
       return 'Get notified about creator announcements';
     default:
       return '';
@@ -173,21 +266,23 @@ function getNotificationDescription(key: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Platform.OS === 'ios' ? 50 : 0,
+    marginTop: Platform.OS === 'ios' ? 44 : 0,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '600',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 20,
     gap: 24,
   },
@@ -205,25 +300,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   creatorName: {
-    fontSize: 18,
-    fontWeight: '600',
     marginBottom: 4,
   },
   creatorTitle: {
-    fontSize: 14,
     lineHeight: 20,
   },
   membershipCard: {
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
   },
   membershipTitle: {
-    fontSize: 20,
-    fontWeight: '600',
     marginBottom: 16,
   },
   membershipDetails: {
-    gap: 12,
+    gap: 16,
   },
   priceRow: {
     flexDirection: 'row',
@@ -231,20 +321,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   price: {
-    fontSize: 24,
-    fontWeight: '700',
+    letterSpacing: -0.5,
   },
   nextPaymentWrapper: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
   },
   nextPaymentLabel: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   nextPaymentDate: {
-    fontSize: 14,
-    fontWeight: '500',
+    letterSpacing: -0.5,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -256,8 +342,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   statusText: {
-    fontSize: 14,
-    fontWeight: '500',
+    letterSpacing: -0.3,
   },
   notificationSection: {
     gap: 16,
@@ -268,8 +353,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   notificationTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    letterSpacing: -0.3,
   },
   notificationList: {
     borderRadius: 16,
@@ -286,12 +370,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   notificationItemTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   notificationItemDescription: {
-    fontSize: 14,
     lineHeight: 20,
   },
   footer: {
@@ -307,10 +388,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+  closeButton: {
+    width: 100, // Fixed width for the close button
   },
 });
-
-export { SubscriptionDetailsModal }

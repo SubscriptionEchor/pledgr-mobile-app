@@ -1,15 +1,22 @@
-import { View,Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 
 export default function ChatScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
+        <Text style={[
+          styles.title, 
+          { 
+            color: colors.textPrimary,
+            fontFamily: fonts.bold,
+            fontSize: fontSize['2xl'],
+          }
+        ]}>
           Chat
         </Text>
       </View>
@@ -28,8 +35,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 20,
   },
 });

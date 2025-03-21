@@ -2,7 +2,7 @@ import Toast, { BaseToast, ErrorToast, ToastConfig } from 'react-native-toast-me
 import { useTheme } from '@/hooks/useTheme';
 
 export function ToastMessage() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   const toastConfig: ToastConfig = {
     success: (props) => (
@@ -11,6 +11,14 @@ export function ToastMessage() {
         style={{
           borderLeftColor: colors.success,
         }}
+        text1Style={{
+          fontFamily: fonts.semibold,
+          fontSize: fontSize.sm,
+        }}
+        text2Style={{
+          fontFamily: fonts.regular,
+          fontSize: fontSize.xs,
+        }}
       />
     ),
     error: (props) => (
@@ -18,6 +26,14 @@ export function ToastMessage() {
         {...props}
         style={{
           borderLeftColor: colors.error
+        }}
+        text1Style={{
+          fontFamily: fonts.semibold,
+          fontSize: fontSize.sm,
+        }}
+        text2Style={{
+          fontFamily: fonts.regular,
+          fontSize: fontSize.xs,
         }}
       />
     ),

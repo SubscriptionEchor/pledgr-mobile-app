@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ProfileSheet } from './ProfileSheet';
 
 export function Header() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [showProfileSheet, setShowProfileSheet] = useState(false);
 
   return (
@@ -20,7 +20,14 @@ export function Header() {
           },
         ]}>
         <View style={styles.leftContainer}>
-          <Text style={[styles.logoText, { color: colors.textPrimary }]}>
+          <Text style={[
+            styles.logoText, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.bold,
+              fontSize: fontSize['2xl'],
+            }
+          ]}>
             Pledgr
           </Text>
         </View>

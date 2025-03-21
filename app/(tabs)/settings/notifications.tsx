@@ -19,7 +19,7 @@ interface NotificationSetting {
 }
 
 export default function NotificationsScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [settings, setSettings] = useState<NotificationSetting[]>([
     {
       id: 'marketing',
@@ -73,10 +73,24 @@ export default function NotificationsScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.headerText}>
-              <Text style={[styles.title, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.title, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.xl,
+                }
+              ]}>
                 Notification Preferences
               </Text>
-              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              <Text style={[
+                styles.subtitle, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
                 Choose what notifications you want to receive
               </Text>
             </View>
@@ -95,10 +109,24 @@ export default function NotificationsScreen() {
                     <setting.icon size={20} color={colors.primary} />
                   </View>
                   <View style={styles.settingText}>
-                    <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>
+                    <Text style={[
+                      styles.settingTitle, 
+                      { 
+                        color: colors.textPrimary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.md,
+                      }
+                    ]}>
                       {setting.title}
                     </Text>
-                    <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                    <Text style={[
+                      styles.settingDescription, 
+                      { 
+                        color: colors.textSecondary,
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.sm,
+                      }
+                    ]}>
                       {setting.description}
                     </Text>
                   </View>
@@ -113,7 +141,14 @@ export default function NotificationsScreen() {
             ))}
           </View>
 
-          <Text style={[styles.footer, { color: colors.textSecondary }]}>
+          <Text style={[
+            styles.footer, 
+            { 
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.sm,
+            }
+          ]}>
             You can change these preferences at any time. Email notifications will be sent to your registered email address.
           </Text>
         </View>
@@ -142,13 +177,7 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
   subtitle: {
-    fontSize: 14,
     lineHeight: 20,
   },
   settings: {
@@ -179,16 +208,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     marginBottom: 2,
   },
   settingDescription: {
-    fontSize: 14,
     lineHeight: 20,
   },
   footer: {
-    fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',
     paddingHorizontal: 20,

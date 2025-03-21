@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Header } from '@/components/Header';
@@ -61,16 +61,18 @@ const MENU_ITEMS = [
     description: 'Get assistance',
     color: '#0ea5e9',
   },
-];
+] as const;
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CONTENT_PADDING = 20;
+const NUM_COLUMNS = 2;
+const CARD_GAP = 16;
+const CARD_WIDTH = (SCREEN_WIDTH - (CONTENT_PADDING * 2) - CARD_GAP) / NUM_COLUMNS;
+const CARD_HEIGHT = 150; // Fixed height for all cards
 
 export default function MenuScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const numColumns = 2;
-  const screenWidth = Dimensions.get('window').width;
-  const padding = 20;
-  const gap = 12;
-  const itemWidth = (screenWidth - (padding * 2) - (gap * (numColumns - 1))) / numColumns;
 
   const handleItemPress = (id: string) => {
     if (id === 'settings') {
@@ -78,26 +80,47 @@ export default function MenuScreen() {
     }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: typeof MENU_ITEMS[number] }) => (
     <TouchableOpacity
-      onPress={() => handleItemPress(item.id)}
       style={[
         styles.card,
         { 
           backgroundColor: colors.surface,
-          width: itemWidth,
+          width: CARD_WIDTH,
+          height: CARD_HEIGHT,
         },
-      ]}>
-      <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
-        <item.icon size={24} color={item.color} />
-      </View>
-      <View style={styles.cardContent}>
-        <Text style={[styles.menuItemLabel, { color: colors.textPrimary }]}>
-          {item.label}
-        </Text>
-        <Text style={[styles.menuItemDescription, { color: colors.textSecondary }]}>
-          {item.description}
-        </Text>
+      ]}
+      onPress={() => handleItemPress(item.id)}>
+      <View style={styles.cardInner}>
+        <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
+          <item.icon size={24} color={item.color} />
+        </View>
+        <View style={styles.cardContent}>
+          <Text 
+            style={[
+              styles.menuItemLabel, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}
+            numberOfLines={1}>
+            {item.label}
+          </Text>
+          <Text 
+            style={[
+              styles.menuItemDescription, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.xs,
+              }
+            ]}
+            numberOfLines={2}>
+            {item.description}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -108,11 +131,11 @@ export default function MenuScreen() {
       <FlatList
         data={MENU_ITEMS}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
+        keyExtractor={item => item.id}
+        numColumns={NUM_COLUMNS}
         contentContainerStyle={styles.content}
-        columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
+        columnWrapperStyle={styles.columnWrapper}
       />
     </View>
   );
@@ -123,15 +146,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    padding: CONTENT_PADDING,
   },
-  row: {
-    gap: 12,
-    marginBottom: 12,
+  columnWrapper: {
+    gap: CARD_GAP,
+    marginBottom: CARD_GAP,
   },
   card: {
-    borderRadius: 16,
     padding: 16,
+    borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -140,6 +163,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+  },
+  cardInner: {
+    flex: 1,
+    height: '100%',
   },
   iconContainer: {
     width: 48,
@@ -150,14 +177,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardContent: {
-    gap: 4,
+    flex: 1,
+    justifyContent: 'flex-start',
+    gap: 6,
   },
   menuItemLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+    lineHeight: 22,
   },
   menuItemDescription: {
-    fontSize: 12,
     lineHeight: 16,
   },
 });

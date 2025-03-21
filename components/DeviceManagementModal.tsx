@@ -30,7 +30,7 @@ export function DeviceManagementModal({
   onLogoutDevice,
   onLogoutAllDevices
 }: DeviceManagementModalProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [logoutConfirmation, setLogoutConfirmation] = useState<{
     visible: boolean;
     deviceId?: string;
@@ -81,7 +81,16 @@ export function DeviceManagementModal({
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Device Management</Text>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Device Management
+          </Text>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
@@ -94,7 +103,14 @@ export function DeviceManagementModal({
         >
           <View style={[styles.warningBox, { backgroundColor: `${colors.primary}15` }]}>
             <Smartphone size={24} color={colors.primary} />
-            <Text style={[styles.warningText, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.warningText, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               Review and manage all devices that are currently signed in to your account. You can log out of any device remotely.
             </Text>
           </View>
@@ -107,12 +123,26 @@ export function DeviceManagementModal({
               >
                 <View style={styles.deviceInfo}>
                   <View style={styles.deviceHeader}>
-                    <Text style={[styles.deviceName, { color: colors.textPrimary }]}>
+                    <Text style={[
+                      styles.deviceName, 
+                      { 
+                        color: colors.textPrimary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.md,
+                      }
+                    ]}>
                       {device.name}
                     </Text>
                     {device.isCurrentDevice && (
                       <View style={[styles.currentDevice, { backgroundColor: colors.success }]}>
-                        <Text style={[styles.currentDeviceText, { color: colors.buttonText }]}>
+                        <Text style={[
+                          styles.currentDeviceText, 
+                          { 
+                            color: colors.buttonText,
+                            fontFamily: fonts.medium,
+                            fontSize: fontSize.xs,
+                          }
+                        ]}>
                           Current Device
                         </Text>
                       </View>
@@ -122,13 +152,27 @@ export function DeviceManagementModal({
                   <View style={styles.deviceDetails}>
                     <View style={styles.detailItem}>
                       <Globe size={16} color={colors.textSecondary} />
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>
+                      <Text style={[
+                        styles.detailText, 
+                        { 
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                        }
+                      ]}>
                         {device.location}
                       </Text>
                     </View>
                     <View style={styles.detailItem}>
                       <Clock size={16} color={colors.textSecondary} />
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>
+                      <Text style={[
+                        styles.detailText, 
+                        { 
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                        }
+                      ]}>
                         {device.lastActive}
                       </Text>
                     </View>
@@ -191,10 +235,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
   scrollView: {
     flex: 1,
   },
@@ -211,7 +251,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     flex: 1,
-    fontSize: 14,
     lineHeight: 20,
   },
   deviceList: {
@@ -232,18 +271,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  deviceName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
   currentDevice: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-  },
-  currentDeviceText: {
-    fontSize: 12,
-    fontWeight: '500',
   },
   deviceDetails: {
     flexDirection: 'row',
@@ -253,9 +284,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-  },
-  detailText: {
-    fontSize: 14,
   },
   logoutButton: {
     width: 40,

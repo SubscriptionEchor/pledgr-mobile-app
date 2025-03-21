@@ -5,6 +5,7 @@ import { Crown, Clock, Calendar } from 'lucide-react-native';
 import { useState } from 'react';
 import { SubscriptionDetailsModal } from '@/components/SubscriptionDetailsModal';
 import { showToast } from '@/components/Toast';
+import { SubscriptionStatus } from '@/lib/enums';
 
 interface Subscriber {
   id: string;
@@ -14,7 +15,7 @@ interface Subscriber {
   isPremium: boolean;
   followingSince: string;
   nextPayment?: string;
-  status: 'subscribed' | 'following';
+  status: SubscriptionStatus;
 }
 
 const SUBSCRIBERS: Subscriber[] = [
@@ -26,7 +27,7 @@ const SUBSCRIBERS: Subscriber[] = [
     isPremium: true,
     followingSince: '3/15/2024',
     nextPayment: '4/15/2024',
-    status: 'subscribed',
+    status: SubscriptionStatus.SUBSCRIBED,
   },
   {
     id: '2',
@@ -35,7 +36,7 @@ const SUBSCRIBERS: Subscriber[] = [
     title: 'Web3 educator & community builder',
     isPremium: false,
     followingSince: '2/28/2024',
-    status: 'following',
+    status: SubscriptionStatus.FOLLOWING,
   },
   {
     id: '3',
@@ -45,7 +46,7 @@ const SUBSCRIBERS: Subscriber[] = [
     isPremium: true,
     followingSince: '1/15/2024',
     nextPayment: '4/1/2024',
-    status: 'subscribed',
+    status: SubscriptionStatus.SUBSCRIBED,
   }
 ];
 
@@ -62,7 +63,7 @@ const CONTENT_PADDING = 16;
 const CARD_MARGIN = SCREEN_WIDTH <= 375 ? 12 : 16;
 
 export default function SubscriptionScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [selectedSubscriber, setSelectedSubscriber] = useState<Subscriber | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -102,7 +103,16 @@ export default function SubscriptionScreen() {
       <View style={[styles.premiumIconContainer, { backgroundColor: colors.primary }]}>
         <Crown size={12} color={colors.buttonText} style={{ transform: [{ translateY: -0.5 }] }} />
       </View>
-      <Text style={[styles.premiumText, { color: colors.primary }]}>PRO</Text>
+      <Text style={[
+        styles.premiumText, 
+        { 
+          color: colors.primary,
+          fontFamily: fonts.semibold,
+          fontSize: fontSize.xs,
+        }
+      ]}>
+        PRO
+      </Text>
     </View>
   );
 
@@ -121,19 +131,27 @@ export default function SubscriptionScreen() {
           <View style={styles.nameContainer}>
             <View style={styles.nameRow}>
               <View style={styles.nameWithIcon}>
-                <Text 
-                  style={[styles.name, { color: colors.textPrimary }]}
-                  numberOfLines={1}
-                >
+                <Text style={[
+                  styles.name, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
                   {subscriber.name}
                 </Text>
                 {subscriber.isPremium && renderPremiumBadge()}
               </View>
             </View>
-            <Text 
-              style={[styles.title, { color: colors.textSecondary }]}
-              numberOfLines={2}
-            >
+            <Text style={[
+              styles.title, 
+              { 
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               {subscriber.title}
             </Text>
           </View>
@@ -142,10 +160,10 @@ export default function SubscriptionScreen() {
         <View style={[
           styles.status, 
           { 
-            backgroundColor: subscriber.status === 'subscribed' 
+            backgroundColor: subscriber.status === SubscriptionStatus.SUBSCRIBED 
               ? `${colors.success}15` 
               : `${colors.primary}15`,
-            borderColor: subscriber.status === 'subscribed'
+            borderColor: subscriber.status === SubscriptionStatus.SUBSCRIBED
               ? colors.success
               : colors.primary
           }
@@ -153,12 +171,14 @@ export default function SubscriptionScreen() {
           <Text style={[
             styles.statusText,
             { 
-              color: subscriber.status === 'subscribed' 
+              color: subscriber.status === SubscriptionStatus.SUBSCRIBED 
                 ? colors.success 
-                : colors.primary 
+                : colors.primary,
+              fontFamily: fonts.medium,
+              fontSize: fontSize.xs,
             }
           ]}>
-            {subscriber.status === 'subscribed' ? 'Subscribed' : 'Following'}
+            {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Subscribed' : 'Following'}
           </Text>
         </View>
       </View>
@@ -166,14 +186,28 @@ export default function SubscriptionScreen() {
       <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
         <View style={styles.metaInfo}>
           <Clock size={14} color={colors.textSecondary} />
-          <Text style={[styles.metaText, { color: colors.textSecondary }]}>
+          <Text style={[
+            styles.metaText, 
+            { 
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.xs,
+            }
+          ]}>
             Since {subscriber.followingSince}
           </Text>
         </View>
         {subscriber.nextPayment && (
           <View style={styles.metaInfo}>
             <Calendar size={14} color={colors.primary} />
-            <Text style={[styles.metaText, { color: colors.primary }]}>
+            <Text style={[
+              styles.metaText, 
+              { 
+                color: colors.primary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.xs,
+              }
+            ]}>
               Next: {subscriber.nextPayment}
             </Text>
           </View>
@@ -191,10 +225,24 @@ export default function SubscriptionScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+          <Text style={[
+            styles.headerTitle, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.bold,
+              fontSize: fontSize['2xl'],
+            }
+          ]}>
             Your Subscriptions
           </Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+          <Text style={[
+            styles.headerSubtitle, 
+            { 
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.sm,
+            }
+          ]}>
             Manage your subscriptions and following list
           </Text>
         </View>
@@ -220,16 +268,16 @@ export default function SubscriptionScreen() {
               ]}
               onPress={() => setActiveFilter(option.value)}
             >
-              <Text 
-                style={[
-                  styles.filterText,
-                  { 
-                    color: activeFilter === option.value 
-                      ? colors.primary
-                      : colors.textSecondary
-                  }
-                ]}
-              >
+              <Text style={[
+                styles.filterText,
+                { 
+                  color: activeFilter === option.value 
+                    ? colors.primary
+                    : colors.textSecondary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
                 {option.label}
               </Text>
             </TouchableOpacity>
@@ -271,12 +319,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headerTitle: {
-    fontSize: SCREEN_WIDTH <= 375 ? 24 : 28,
-    fontWeight: '700',
     letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: 14,
     lineHeight: 20,
   },
   filterScrollContent: {
@@ -288,10 +333,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   list: {
     gap: CARD_MARGIN,
@@ -332,14 +373,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    fontSize: SCREEN_WIDTH <= 375 ? 15 : 16,
-    fontWeight: '600',
-  },
-  crownIcon: {
-    marginTop: 1,
+    marginBottom: 2,
   },
   title: {
-    fontSize: 13,
     lineHeight: 18,
   },
   cardFooter: {
@@ -355,7 +391,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   metaText: {
-    fontSize: 12,
     lineHeight: 16,
   },
   status: {
@@ -363,10 +398,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '500',
   },
   premiumBadge: {
     flexDirection: 'row',
@@ -384,10 +415,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 4,
-  },
-  premiumText: {
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.5,
   },
 });

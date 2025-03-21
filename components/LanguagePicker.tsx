@@ -26,7 +26,7 @@ interface LanguagePickerProps {
 }
 
 export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: LanguagePickerProps) {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const [search, setSearch] = useState('');
 
   const filteredLanguages = useMemo(() => {
@@ -35,17 +35,36 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
     );
   }, [search]);
 
+  const handleClose = () => {
+    setSearch('');
+    onClose();
+  };
+
+  const handleSelect = (language: { code: string; name: string }) => {
+    setSearch('');
+    onSelect(language);
+  };
+
   return (
     <Modal 
       visible={visible} 
       animationType="slide" 
       transparent
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Select Language</Text>
-          <TouchableOpacity onPress={onClose}>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Select Language
+          </Text>
+          <TouchableOpacity onPress={handleClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -57,7 +76,14 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
         >
           <View style={[styles.warningBox, { backgroundColor: `${colors.primary}15` }]}>
             <Globe2 size={24} color={colors.primary} />
-            <Text style={[styles.warningText, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.warningText, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+              }
+            ]}>
               Choose your preferred language. This will change the language of the app interface.
             </Text>
           </View>
@@ -69,7 +95,14 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
               onChangeText={setSearch}
               placeholder="Search languages"
               placeholderTextColor={colors.textSecondary}
-              style={[styles.searchInput, { color: colors.textPrimary }]}
+              style={[
+                styles.searchInput, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
+              ]}
             />
           </View>
 
@@ -84,8 +117,15 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
                     borderBottomColor: colors.border 
                   }
                 ]}
-                onPress={() => onSelect(language)}>
-                <Text style={[styles.languageName, { color: colors.textPrimary }]}>
+                onPress={() => handleSelect(language)}>
+                <Text style={[
+                  styles.languageName, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: language.code === selectedCode ? fonts.semibold : fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
                   {language.name}
                 </Text>
                 {language.code === selectedCode && (
@@ -113,10 +153,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
   scrollView: {
     flex: 1,
   },
@@ -133,7 +169,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     flex: 1,
-    fontSize: 14,
     lineHeight: 20,
   },
   searchContainer: {
@@ -146,7 +181,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 12,
-    fontSize: 16,
   },
   languageList: {
     gap: 2,
@@ -159,10 +193,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderRadius: 8,
-  },
-  languageName: {
-    fontSize: 16,
-    fontWeight: '500',
   },
   selectedIndicator: {
     width: 8,

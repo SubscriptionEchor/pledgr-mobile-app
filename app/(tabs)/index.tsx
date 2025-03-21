@@ -3,13 +3,20 @@ import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 
 export default function HomeScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={[
+          styles.title, 
+          { 
+            color: colors.textPrimary,
+            fontFamily: fonts.bold,
+            fontSize: fontSize['2xl'],
+          }
+        ]}>
           Home
         </Text>
       </View>
@@ -28,8 +35,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 20,
   },
 });

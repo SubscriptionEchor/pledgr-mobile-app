@@ -4,7 +4,7 @@ import { SubHeader } from '@/components/SubHeader';
 import { Lock, Shield, Eye, Trash2 } from 'lucide-react-native';
 
 export default function PrivacyScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -16,10 +16,24 @@ export default function PrivacyScreen() {
       >
         <View style={styles.header}>
           <Lock size={32} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
+          <Text style={[
+            styles.title, 
+            { 
+              color: colors.textPrimary,
+              fontFamily: fonts.bold,
+              fontSize: fontSize['2xl'],
+            }
+          ]}>
             Privacy Policy
           </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[
+            styles.subtitle, 
+            { 
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+            }
+          ]}>
             Last updated: March 15, 2024
           </Text>
         </View>
@@ -29,11 +43,15 @@ export default function PrivacyScreen() {
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
               <Shield size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.principleTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.principleTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Data Protection
-            </Text>
-            <Text style={[styles.principleDescription, { color: colors.textSecondary }]}>
-              Your personal information is encrypted and securely stored
             </Text>
           </View>
 
@@ -41,11 +59,15 @@ export default function PrivacyScreen() {
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
               <Eye size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.principleTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.principleTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Transparency
-            </Text>
-            <Text style={[styles.principleDescription, { color: colors.textSecondary }]}>
-              Clear information about how your data is used
             </Text>
           </View>
 
@@ -53,11 +75,15 @@ export default function PrivacyScreen() {
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
               <Trash2 size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.principleTitle, { color: colors.textPrimary }]}>
+            <Text style={[
+              styles.principleTitle, 
+              { 
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
               Data Control
-            </Text>
-            <Text style={[styles.principleDescription, { color: colors.textSecondary }]}>
-              You can request deletion of your data at any time
             </Text>
           </View>
         </View>
@@ -65,10 +91,24 @@ export default function PrivacyScreen() {
         <View style={styles.sections}>
           {PRIVACY_SECTIONS.map((section, index) => (
             <View key={index} style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.sectionTitle, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.lg,
+                }
+              ]}>
                 {section.title}
               </Text>
-              <Text style={[styles.sectionContent, { color: colors.textSecondary }]}>
+              <Text style={[
+                styles.sectionContent, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 {section.content}
               </Text>
             </View>
@@ -129,14 +169,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#94a3b8',
-  },
   principles: {
     gap: 12,
   },
@@ -154,28 +186,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  principleTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  principleDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    flex: 1,
-  },
   sections: {
     gap: 24,
   },
   section: {
     gap: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
   sectionContent: {
-    fontSize: 15,
     lineHeight: 24,
   },
 });

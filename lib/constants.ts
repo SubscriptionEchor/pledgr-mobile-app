@@ -1,14 +1,28 @@
-export const APP_NAME = 'Pledgr';
+import { DeviceTypes } from '@/lib/enums';
 
-export const SCREEN_PADDING = 20;
-
-export const FONT_SIZES = {
-  xs: 12,
-  sm: 14,
-  md: 16,
-  lg: 18,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 30,
-  '4xl': 36,
-} as const;
+export const MOCK_DEVICES = [
+  {
+    id: '1',
+    name: 'MacBook Pro',
+    type: DeviceTypes.DESKTOP,
+    location: 'San Francisco, US',
+    lastActive: 'Active now',
+    isCurrentDevice: true,
+  },
+  {
+    id: '2',
+    name: 'iPhone 14',
+    type: DeviceTypes.MOBILE,
+    location: 'San Francisco, US',
+    lastActive: '2 hours ago',
+    isCurrentDevice: false,
+  },
+  {
+    id: '3',
+    name: 'iPad Pro',
+    type: DeviceTypes.TABLET,
+    location: 'New York, US',
+    lastActive: '3 days ago',
+    isCurrentDevice: false,
+  },
+] as const;

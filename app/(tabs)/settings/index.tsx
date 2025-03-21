@@ -8,34 +8,8 @@ import { AdultContentModal } from '@/components/AdultContentModal';
 import { LanguagePicker } from '@/components/LanguagePicker';
 import { AuthenticatorModal } from '@/components/AuthenticatorModal';
 import { DeviceManagementModal } from '@/components/DeviceManagementModal';
-import { User, Key, Languages, Bell, Shield, Smartphone, Crown, FileText, Lightbulb, Lock, ChevronRight, Eye, TriangleAlert as AlertTriangle } from 'lucide-react-native';
-
-const MOCK_DEVICES = [
-  {
-    id: '1',
-    name: 'MacBook Pro',
-    type: 'desktop',
-    location: 'San Francisco, US',
-    lastActive: 'Active now',
-    isCurrentDevice: true,
-  },
-  {
-    id: '2',
-    name: 'iPhone 14',
-    type: 'mobile',
-    location: 'San Francisco, US',
-    lastActive: '2 hours ago',
-    isCurrentDevice: false,
-  },
-  {
-    id: '3',
-    name: 'iPad Pro',
-    type: 'tablet',
-    location: 'New York, US',
-    lastActive: '3 days ago',
-    isCurrentDevice: false,
-  },
-];
+import { User, Key, Languages, Bell, Shield, Smartphone, Crown, FileText, Lightbulb, Lock, ChevronRight, Eye, TriangleAlert as AlertTriangle, X } from 'lucide-react-native';
+import { MOCK_DEVICES } from '@/lib/constants';
 
 const SETTINGS_SECTIONS = [
   {
@@ -78,7 +52,7 @@ const SETTINGS_SECTIONS = [
 ];
 
 export default function SettingsScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
   const [showVisibilityModal, setShowVisibilityModal] = useState(false);
   const [showAdultContentModal, setShowAdultContentModal] = useState(false);
@@ -127,7 +101,14 @@ export default function SettingsScreen() {
         <View style={styles.content}>
           {SETTINGS_SECTIONS.map((section) => (
             <View key={section.title} style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              <Text style={[
+                styles.sectionTitle, 
+                { 
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                }
+              ]}>
                 {section.title}
               </Text>
               <View style={[styles.sectionContent, { backgroundColor: colors.surface }]}>
@@ -146,7 +127,14 @@ export default function SettingsScreen() {
                       <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
                         <item.icon size={20} color={colors.textPrimary} />
                       </View>
-                      <Text style={[styles.settingItemLabel, { color: colors.textPrimary }]}>
+                      <Text style={[
+                        styles.settingItemLabel, 
+                        { 
+                          color: colors.textPrimary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.md,
+                        }
+                      ]}>
                         {item.label}
                       </Text>
                     </View>
@@ -216,8 +204,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     paddingHorizontal: 4,
   },
   sectionContent: {
@@ -234,9 +220,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  settingItemLabel: {
-    fontSize: 15,
   },
   iconContainer: {
     width: 36,

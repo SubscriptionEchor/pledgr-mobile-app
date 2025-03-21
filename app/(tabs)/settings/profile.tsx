@@ -16,7 +16,7 @@ interface ProfileForm {
 }
 
 export default function ProfileScreen() {
-  const { colors } = useTheme();
+  const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -73,21 +73,53 @@ export default function ProfileScreen() {
 
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>Name</Text>
+              <Text style={[
+                styles.label, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.medium,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
+                Name
+              </Text>
               <TextInput
                 value={form.name}
                 onChangeText={(text) => setForm({ ...form, name: text })}
-                style={[styles.input, { backgroundColor: colors.surface, color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    backgroundColor: colors.surface, 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                  }
+                ]}
                 placeholderTextColor={colors.textSecondary}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>Email</Text>
+              <Text style={[
+                styles.label, 
+                { 
+                  color: colors.textSecondary,
+                  fontFamily: fonts.medium,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
+                Email
+              </Text>
               <TextInput
                 value={form.email}
                 onChangeText={(text) => setForm({ ...form, email: text })}
-                style={[styles.input, { backgroundColor: colors.surface, color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    backgroundColor: colors.surface, 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                  }
+                ]}
                 placeholderTextColor={colors.textSecondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -97,13 +129,28 @@ export default function ProfileScreen() {
             <View style={styles.locationSection}>
               <View style={styles.locationHeader}>
                 <MapPin size={20} color={colors.textSecondary} />
-                <Text style={[styles.locationTitle, { color: colors.textPrimary }]}>Location</Text>
+                <Text style={[
+                  styles.locationTitle, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                  }
+                ]}>
+                  Location
+                </Text>
               </View>
 
               <TouchableOpacity
                 onPress={() => setShowCountryPicker(true)}
                 style={[styles.input, styles.pickerButton, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.pickerButtonText, { color: colors.textPrimary }]}>
+                <Text style={[
+                  styles.pickerButtonText, 
+                  { 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                  }
+                ]}>
                   {form.country}
                 </Text>
                 <ChevronLeft size={20} color={colors.textSecondary} style={{ transform: [{ rotate: '180deg' }] }} />
@@ -112,7 +159,14 @@ export default function ProfileScreen() {
               <TextInput
                 value={form.state}
                 onChangeText={(text) => setForm({ ...form, state: text })}
-                style={[styles.input, { backgroundColor: colors.surface, color: colors.textPrimary }]}
+                style={[
+                  styles.input, 
+                  { 
+                    backgroundColor: colors.surface, 
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                  }
+                ]}
                 placeholder="State/Province"
                 placeholderTextColor={colors.textSecondary}
               />
@@ -183,8 +237,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
     marginLeft: 4,
   },
   input: {
@@ -202,7 +254,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   locationTitle: {
-    fontSize: 16,
     fontWeight: '600',
   },
   pickerButton: {
