@@ -1,35 +1,46 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { User } from 'lucide-react-native';
+import { useState } from 'react';
+import { ProfileSheet } from './ProfileSheet';
 
 export function Header() {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
+  const [showProfileSheet, setShowProfileSheet] = useState(false);
 
   return (
-    <View
-      style={[
-        styles.header,
-        {
-          backgroundColor: colors.background,
-          borderBottomColor: colors.border,
-          shadowColor: colors.textPrimary,
-        },
-      ]}>
-      <View style={styles.leftContainer}>
-        <Text style={[styles.logoText, { color: colors.textPrimary }]}>
-          Pledgr
-        </Text>
-      </View>
+    <>
       <View
         style={[
-          styles.profileButton,
+          styles.header,
           {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+            shadowColor: colors.textPrimary,
           },
         ]}>
-        <User size={24} color={colors.textPrimary} />
+        <View style={styles.leftContainer}>
+          <Text style={[styles.logoText, { color: colors.textPrimary }]}>
+            Pledgr
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => setShowProfileSheet(true)}
+          style={[
+            styles.profileButton,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}>
+          <User size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
       </View>
-    </View>
+
+      <ProfileSheet 
+        visible={showProfileSheet}
+        onClose={() => setShowProfileSheet(false)}
+      />
+    </>
   );
 }
 

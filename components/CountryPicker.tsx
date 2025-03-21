@@ -35,7 +35,12 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
   }, [search]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal 
+      visible={visible} 
+      animationType="slide" 
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>Select Country</Text>

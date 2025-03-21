@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Switch, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { X, Crown, Bell, Check } from 'lucide-react-native';
+import { X, Bell, Check } from 'lucide-react-native';
 import { Button } from './Button';
 import { useState } from 'react';
 
@@ -46,21 +46,17 @@ export function SubscriptionDetailsModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal 
+      visible={visible} 
+      animationType="slide" 
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <View style={styles.headerContent}>
-            {subscriber.status === 'subscribed' ? (
-              <Crown size={24} color={colors.primary} />
-            ) : (
-              <View style={[styles.heartIcon, { backgroundColor: `${colors.primary}15` }]}>
-                <Check size={16} color={colors.primary} />
-              </View>
-            )}
-            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-              {subscriber.status === 'subscribed' ? 'Subscription Details' : 'Following Details'}
-            </Text>
-          </View>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+            {subscriber.status === 'subscribed' ? 'Subscription Details' : 'Following Details'}
+          </Text>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
@@ -87,9 +83,14 @@ export function SubscriptionDetailsModal({
               {subscriber.status === 'subscribed' && (
                 <View style={styles.priceRow}>
                   <Text style={[styles.price, { color: colors.textPrimary }]}>$9.99/month</Text>
-                  <Text style={[styles.nextPayment, { color: colors.primary }]}>
-                    Next payment: {subscriber.nextPayment}
-                  </Text>
+                  <View style={styles.nextPaymentWrapper}>
+                    <Text style={[styles.nextPaymentLabel, { color: colors.textSecondary }]}>
+                      Next payment
+                    </Text>
+                    <Text style={[styles.nextPaymentDate, { color: colors.primary }]}>
+                      {subscriber.nextPayment}
+                    </Text>
+                  </View>
                 </View>
               )}
               <View style={[styles.statusBadge, { backgroundColor: `${colors.success}15` }]}>
@@ -181,21 +182,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
   },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-  },
-  heartIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -239,13 +228,21 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   price: {
     fontSize: 24,
     fontWeight: '700',
   },
-  nextPayment: {
+  nextPaymentWrapper: {
+    alignItems: 'flex-start',
+  },
+  nextPaymentLabel: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginBottom: 2,
+  },
+  nextPaymentDate: {
     fontSize: 14,
     fontWeight: '500',
   },
@@ -315,3 +312,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export { SubscriptionDetailsModal }
