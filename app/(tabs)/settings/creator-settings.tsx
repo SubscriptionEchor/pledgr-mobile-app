@@ -12,6 +12,9 @@ import {
   Ban, 
   ChevronRight 
 } from 'lucide-react-native';
+import { useState } from 'react';
+import { ProfileVisibilityModal } from '@/components/ProfileVisibilityModal';
+import { ProfileVisibility } from '@/lib/enums';
 
 const SETTINGS_SECTIONS = [
   {
@@ -49,7 +52,7 @@ const SETTINGS_SECTIONS = [
         id: 'visibility',
         label: 'Profile Visibility',
         icon: Eye,
-        route: '/settings/profile-visibility',
+        action: 'visibility',
       },
       {
         id: 'notifications',
@@ -70,9 +73,15 @@ const SETTINGS_SECTIONS = [
 export default function CreatorSettingsScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
+  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
+  const [visibility, setVisibility] = useState(ProfileVisibility.PUBLIC);
 
-  const handleNavigation = (route: string) => {
-    router.push(route);
+  const handleNavigation = (route: string | undefined, action: string | undefined) => {
+    if (action === 'visibility') {
+      setShowVisibilityModal(true);
+    } else if (route) {
+      router.push(route);
+    }
   };
 
   return (
@@ -107,7 +116,7 @@ export default function CreatorSettingsScreen() {
                       borderBottomColor: colors.border,
                     },
                   ]}
-                  onPress={() => handleNavigation(item.route)}>
+                  onPress={() => handleNavigation(item.route, item.action)}>
                   <View style={styles.settingItemLeft}>
                     <View style={[
                       styles.iconContainer, 
@@ -133,6 +142,13 @@ export default function CreatorSettingsScreen() {
           </View>
         ))}
       </ScrollView>
+
+      <ProfileVisibilityModal
+        visible={showVisibilityModal}
+        onClose={() => setShowVisibilityModal(false)}
+        selectedVisibility={visibility}
+        onSelect={setVisibility}
+      />
     </View>
   );
 }

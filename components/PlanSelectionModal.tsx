@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     maxWidth: 500,
-    borderRadius: 24,
+    borderRadius: 12,
     padding: 24,
   },
   header: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   planCard: {
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 12,
     gap: 16,
   },
   currentPlan: {
