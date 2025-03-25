@@ -19,7 +19,7 @@ function convertToUrlFriendly(text: string): string {
 
 export default function CreatePageScreen() {
   const { colors, fonts, fontSize } = useTheme();
-  const { updateUserRole, isLoading } = useAuth();
+  const { updateUserRole, isLoading, setIsCreatorCreated } = useAuth();
   const router = useRouter();
   const [pageName, setPageName] = useState('');
   const [pageUrl, setPageUrl] = useState('');
@@ -51,6 +51,8 @@ export default function CreatePageScreen() {
     try {
       // Update user role to creator
       await updateUserRole(UserRole.CREATOR);
+      // Set creator created flag
+      await setIsCreatorCreated(true);
 
       showToast.success(
         'Page created successfully',
@@ -194,7 +196,7 @@ export default function CreatePageScreen() {
                   ]}
                   autoCapitalize="none"
                   autoCorrect={false}
-                  editable={!isCreating}
+                  editable={false}
                 />
               </View>
               <Text style={[

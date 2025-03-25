@@ -25,7 +25,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   const { setSheetVisible } = useBottomSheet();
   const [showSignOutConfirmation, setShowSignOutConfirmation] = useState(false);
   const [showRolePicker, setShowRolePicker] = useState(false);
-  const { user, updateUserRole } = useAuth();
+  const { user, updateUserRole, logout, isCreatorCreated } = useAuth();
 
   const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
 
@@ -60,10 +60,15 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     }
   };
 
-  const handleSignOutConfirm = () => {
-    setShowSignOutConfirmation(false);
-    onClose();
-    showToast.success('Signed out successfully', 'See you next time!');
+  const handleSignOutConfirm = async () => {
+    try {
+      await logout();
+      setShowSignOutConfirmation(false);
+      onClose();
+      showToast.success('Signed out successfully', 'See you next time!');
+    } catch (error) {
+      showToast.error('Sign out failed', 'Please try again');
+    }
   };
 
   const handleClose = () => {
@@ -247,7 +252,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
               </TouchableOpacity>
             </View>
 
-            {isCreator ? (
+            {isCreatorCreated ? (
               <View style={styles.section}>
                 <Text style={[
                   styles.sectionTitle, 

@@ -127,7 +127,12 @@ export default function MenuScreen() {
 
   const handleItemPress = (id: string) => {
     if (id === 'settings') {
-      router.push('/(tabs)/settings');
+      // Navigate to creator settings if user is a creator
+      if (isCreator) {
+        router.push('/settings/creator-settings');
+      } else {
+        router.push('/settings');
+      }
     }
   };
 

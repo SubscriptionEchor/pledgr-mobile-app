@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserRole } from '@/lib/enums';
+import { router } from 'expo-router';
 
 interface User {
   id: string;
@@ -12,38 +14,86 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   logout: () => Promise<void>;
   updateUserRole: (role: UserRole) => Promise<void>;
+  checkAuth: () => Promise<void>;
+  isCreatorCreated: boolean;
+  setIsCreatorCreated: (value: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const TOKEN_KEY = '@auth_token';
+const USER_KEY = '@user_data';
+const REMEMBER_ME_KEY = '@remember_me';
+const USER_ROLE_KEY = '@user_role';
+const IS_CREATOR_CREATED_KEY = '@is_creator_created';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreatorCreated, setIsCreatorCreated] = useState(false);
 
   useEffect(() => {
-    // Initialize with mock user immediately
-    setUser({
-      id: '1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: UserRole.MEMBER,
-      avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
+    // Load isCreatorCreated flag from storage on mount
+    AsyncStorage.getItem(IS_CREATOR_CREATED_KEY).then(value => {
+      setIsCreatorCreated(value === 'true');
     });
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const checkAuth = async () => {
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+      const userRole = await AsyncStorage.getItem(USER_ROLE_KEY);
+      const userData = await AsyncStorage.getItem(USER_KEY);
+      const creatorCreated = await AsyncStorage.getItem(IS_CREATOR_CREATED_KEY);
+
+      if (token && userRole) {
+        const parsedUser = userData ? JSON.parse(userData) : null;
+        const user = {
+          ...parsedUser,
+          role: userRole as UserRole
+        };
+        setUser(user);
+        setIsCreatorCreated(creatorCreated === 'true');
+        router.replace('/(tabs)');
+      } else {
+        // Clear any stored data if token or role is missing
+        await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
+        router.replace('/(auth)/sign-in');
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      router.replace('/(auth)/sign-in');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string, rememberMe: boolean) => {
     setIsLoading(true);
     try {
-      setUser({
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const mockUser = {
         id: '1',
         name: 'John Doe',
         email,
         role: UserRole.MEMBER,
         avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
-      });
+      };
+
+      // Store auth data
+      await AsyncStorage.setItem(TOKEN_KEY, 'mock_token');
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser));
+      await AsyncStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
+      await AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER);
+      await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false');
+
+      setUser(mockUser);
+      setIsCreatorCreated(false);
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +102,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
+      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, REMEMBER_ME_KEY, USER_ROLE_KEY, IS_CREATOR_CREATED_KEY]);
       setUser(null);
+      setIsCreatorCreated(false);
+      router.replace('/(auth)/sign-in');
     } finally {
       setIsLoading(false);
     }
@@ -61,11 +114,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateUserRole = async (role: UserRole) => {
     if (!user) return;
     
-    setUser({ ...user, role });
+    const updatedUser = { ...user, role };
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    await AsyncStorage.setItem(USER_ROLE_KEY, role);
+    setUser(updatedUser);
+  };
+
+  const handleSetIsCreatorCreated = async (value: boolean) => {
+    await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, value.toString());
+    setIsCreatorCreated(value);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, updateUserRole }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      login, 
+      logout, 
+      updateUserRole, 
+      checkAuth,
+      isCreatorCreated,
+      setIsCreatorCreated: handleSetIsCreatorCreated
+    }}>
       {children}
     </AuthContext.Provider>
   );
