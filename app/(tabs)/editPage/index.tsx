@@ -1,9 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { useState } from 'react';
-import { Settings, FileText, MessageSquare, Store } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
+import { Settings, FileText, MessageSquare, Store, Plus, X } from 'lucide-react-native';
 import { BasicInformation } from '@/components/BasicInformation';
+import { PageSettings } from '@/components/PageSettings';
+import { WelcomeNote } from '@/components/WelcomeNote';
+import { PostAndProduct } from '@/components/PostAndProduct';
 
 type TabType = 'basics' | 'settings' | 'welcome' | 'content';
 
@@ -13,6 +16,13 @@ interface Tab {
   icon: any;
 }
 
+interface TagModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (tags: string[]) => void;
+  selectedTags: string[];
+}
+
 const TABS: Tab[] = [
   { id: 'basics', label: 'Basics', icon: FileText },
   { id: 'settings', label: 'Page Settings', icon: Settings },
@@ -20,89 +30,156 @@ const TABS: Tab[] = [
   { id: 'content', label: 'Posts & Products', icon: Store },
 ];
 
+const AVAILABLE_TAGS = [
+  'Manga',
+  'Action',
+  'Fantasy',
+  'Adventure',
+  'Drama',
+  'Comedy',
+];
+
+function TagModal({ visible, onClose, onSelect, selectedTags }: TagModalProps) {
+  const { colors, fonts, fontSize } = useTheme();
+  const [selected, setSelected] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSelected(selectedTags);
+  }, [selectedTags]);
+
+  const handleSelect = (tag: string) => {
+    setSelected(prev => {
+      if (prev.includes(tag)) {
+        return prev.filter(t => t !== tag);
+      }
+      return [...prev, tag];
+    });
+  };
+
+  const handleAddTags = () => {
+    onSelect(selected);
+    onClose();
+  };
+
+  if (!visible) return null;
+
+  return (
+    <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+      <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+        <View style={styles.modalHeader}>
+          <Text style={[
+            styles.modalTitle,
+            {
+              color: colors.textPrimary,
+              fontFamily: fonts.bold,
+              fontSize: fontSize.xl,
+            }
+          ]}>
+            Add Featured Tags
+          </Text>
+        </View>
+
+        <ScrollView style={styles.tagList}>
+          {AVAILABLE_TAGS.map(tag => (
+            <TouchableOpacity
+              key={tag}
+              style={[
+                styles.tagOption,
+                { backgroundColor: colors.surface }
+              ]}
+              onPress={() => handleSelect(tag)}>
+              <View style={[
+                styles.checkbox,
+                {
+                  borderColor: selected.includes(tag) ? colors.primary : colors.border,
+                  backgroundColor: selected.includes(tag) ? colors.primary : 'transparent',
+                }
+              ]}>
+                {selected.includes(tag) && (
+                  <View style={[styles.checkmark, { borderColor: colors.buttonText }]} />
+                )}
+              </View>
+              <Text style={[
+                styles.tagOptionText,
+                {
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                }
+              ]}>
+                {tag}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <View style={styles.modalFooter}>
+          <TouchableOpacity
+            style={[styles.cancelButton, { backgroundColor: colors.surface }]}
+            onPress={onClose}>
+            <Text style={[
+              styles.cancelButtonText,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            onPress={handleAddTags}>
+            <Text style={[
+              styles.addButtonText,
+              {
+                color: colors.buttonText,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+              }
+            ]}>
+              Add selected tags
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export default function EditPageScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const [activeTab, setActiveTab] = useState<TabType>('basics');
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const handleTagSelect = (tags: string[]) => {
+    setSelectedTags(tags);
+  };
+
+  const handleTagRemove = (tagToRemove: string) => {
+    setSelectedTags(prev => prev.filter(tag => tag !== tagToRemove));
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'basics':
         return <BasicInformation />;
       case 'settings':
-        return (
-          <View style={styles.tabContent}>
-            <Text style={[
-              styles.tabTitle,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.xl,
-              }
-            ]}>
-              Page Settings
-            </Text>
-            <Text style={[
-              styles.tabDescription,
-              {
-                color: colors.textSecondary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-              }
-            ]}>
-              Configure your page settings, visibility, and preferences.
-            </Text>
-          </View>
-        );
+        return <PageSettings />;
       case 'welcome':
-        return (
-          <View style={styles.tabContent}>
-            <Text style={[
-              styles.tabTitle,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.xl,
-              }
-            ]}>
-              Welcome Note
-            </Text>
-            <Text style={[
-              styles.tabDescription,
-              {
-                color: colors.textSecondary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-              }
-            ]}>
-              Create a personalized welcome message for your visitors.
-            </Text>
-          </View>
-        );
+        return <WelcomeNote />;
       case 'content':
         return (
-          <View style={styles.tabContent}>
-            <Text style={[
-              styles.tabTitle,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.xl,
-              }
-            ]}>
-              Posts & Products
-            </Text>
-            <Text style={[
-              styles.tabDescription,
-              {
-                color: colors.textSecondary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-              }
-            ]}>
-              Manage your content, posts, and product listings.
-            </Text>
-          </View>
+          <PostAndProduct
+            onAddTags={() => setShowTagModal(true)}
+            selectedTags={selectedTags}
+            onRemoveTag={handleTagRemove}
+          />
         );
+      default:
+        return null;
     }
   };
 
@@ -149,13 +226,16 @@ export default function EditPageScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.content}>
         {renderTabContent()}
-      </ScrollView>
+      </View>
+
+      <TagModal
+        visible={showTagModal}
+        onClose={() => setShowTagModal(false)}
+        onSelect={handleTagSelect}
+        selectedTags={selectedTags}
+      />
     </View>
   );
 }
@@ -201,16 +281,83 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  contentContainer: {
-    padding: Platform.OS === 'web' ? 40 : 20,
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
   },
-  tabContent: {
-    gap: 8,
+  modalContent: {
+    width: '90%',
+    maxWidth: 500,
+    borderRadius: 16,
+    padding: 24,
   },
-  tabTitle: {
-    marginBottom: 4,
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
   },
-  tabDescription: {
-    lineHeight: 24,
+  modalTitle: {
+    fontSize: 20,
+  },
+  tagList: {
+    maxHeight: 400,
+  },
+  tagOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    gap: 12,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkmark: {
+    width: 10,
+    height: 5,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    transform: [{ rotate: '-45deg' }],
+  },
+  tagOptionText: {
+    fontSize: 16,
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 24,
+  },
+  cancelButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+  },
+  addButton: {
+    flex: 2,
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    fontSize: 16,
   },
 });

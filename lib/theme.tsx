@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   useFonts,
   Outfit_300Light,
@@ -8,6 +9,10 @@ import {
   Outfit_700Bold,
 } from '@expo-google-fonts/outfit';
 import { SplashScreen } from 'expo-router';
+import { useAuth } from '@/lib/context/AuthContext';
+import { UserRole } from '@/lib/enums';
+
+const BRAND_COLOR_KEY = '@brand_color';
 
 interface ThemeColors {
   primary: string;
@@ -60,45 +65,29 @@ interface ThemeContextType {
   fontSize: FontSize;
   isDark: boolean;
   toggleTheme: () => void;
+  updateBrandColor: (color: string) => Promise<void>;
 }
 
-const lightColors: ThemeColors = {
-  primary: '#1e88e5',
-  primaryHover: '#1976d2',
-  primaryLight: '#bbdefb',
-  primaryDark: '#1565c0',
-  secondary: '#9c27b0',
-  background: '#ffffff',
-  surface: '#f0f4f3',
-  surfaceHover: '#e8eceb',
-  border: '#e3e6ea',
-  textPrimary: '#131313',
-  textSecondary: '#6b7b8a',
-  error: '#ef4444',
-  success: '#22c55e',
-  warning: '#f59e0b',
-  info: '#0ea5e9',
-  buttonText: '#ffffff',
-};
+const DEFAULT_PRIMARY_COLOR = '#1e88e5';
 
-const darkColors: ThemeColors = {
-  primary: '#3b82f6',
-  primaryHover: '#2563eb',
-  primaryLight: '#60a5fa',
-  primaryDark: '#1d4ed8',
-  secondary: '#a855f7',
-  background: '#0f1011',
-  surface: '#18191a',
-  surfaceHover: '#242526',
-  border: '#2f3336',
-  textPrimary: '#fcfcfc',
-  textSecondary: '#a1a1aa',
+const getBaseColors = (isDark: boolean, primaryColor: string = DEFAULT_PRIMARY_COLOR): ThemeColors => ({
+  primary: primaryColor,
+  primaryHover: isDark ? '#2563eb' : '#1976d2',
+  primaryLight: isDark ? '#60a5fa' : '#bbdefb',
+  primaryDark: isDark ? '#1d4ed8' : '#1565c0',
+  secondary: isDark ? '#a855f7' : '#9c27b0',
+  background: isDark ? '#0f1011' : '#ffffff',
+  surface: isDark ? '#18191a' : '#f0f4f3',
+  surfaceHover: isDark ? '#242526' : '#e8eceb',
+  border: isDark ? '#2f3336' : '#e3e6ea',
+  textPrimary: isDark ? '#fcfcfc' : '#131313',
+  textSecondary: isDark ? '#a1a1aa' : '#6b7b8a',
   error: '#ef4444',
   success: '#22c55e',
   warning: '#f59e0b',
-  info: '#3b82f6',
+  info: isDark ? '#3b82f6' : '#0ea5e9',
   buttonText: '#ffffff',
-};
+});
 
 const lightShadows: Shadow = {
   sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
@@ -135,6 +124,8 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(undefine
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
+  const [brandColor, setBrandColor] = useState(DEFAULT_PRIMARY_COLOR);
+  const { user } = useAuth();
 
   const [fontsLoaded, fontError] = useFonts({
     'Outfit-Light': Outfit_300Light,
@@ -144,8 +135,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     'Outfit-Bold': Outfit_700Bold,
   });
 
-  // Prevent splash screen from auto-hiding
-  React.useEffect(() => {
+  useEffect(() => {
+    const loadBrandColor = async () => {
+      try {
+        if (user?.role === UserRole.CREATOR) {
+          const savedColor = await AsyncStorage.getItem(BRAND_COLOR_KEY);
+          if (savedColor) {
+            setBrandColor(savedColor);
+          }
+        } else {
+          setBrandColor(DEFAULT_PRIMARY_COLOR);
+        }
+      } catch (error) {
+        console.error('Error loading brand color:', error);
+      }
+    };
+
+    loadBrandColor();
+  }, [user?.role]);
+
+  useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
@@ -155,18 +164,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setIsDark((prev) => !prev);
   }, []);
 
-  // Return null while fonts are loading
+  const updateBrandColor = async (color: string) => {
+    if (user?.role === UserRole.CREATOR) {
+      try {
+        await AsyncStorage.setItem(BRAND_COLOR_KEY, color);
+        setBrandColor(color);
+      } catch (error) {
+        console.error('Error saving brand color:', error);
+      }
+    }
+  };
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
+  const colors = getBaseColors(isDark, brandColor);
+
   const value = {
-    colors: isDark ? darkColors : lightColors,
+    colors,
     shadows: isDark ? darkShadows : lightShadows,
     fonts,
     fontSize,
     isDark,
     toggleTheme,
+    updateBrandColor,
   };
 
   return (
