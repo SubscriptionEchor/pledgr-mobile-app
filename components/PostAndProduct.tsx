@@ -44,16 +44,33 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={[
-            styles.title,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.bold,
-              fontSize: fontSize['2xl'],
-            }
-          ]}>
-            Featured Tags
-          </Text>
+          <View style={styles.titleContainer}>
+            <Text style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.bold,
+                fontSize: fontSize['2xl'],
+              }
+            ]}>
+              Featured Tags
+            </Text>
+            <TouchableOpacity
+              style={[styles.addButton, { backgroundColor: colors.primary }]}
+              onPress={onAddTags}>
+              <Plus size={20} color={colors.buttonText} />
+              <Text style={[
+                styles.addButtonText,
+                {
+                  color: colors.buttonText,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
+                Add Tags
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={[
@@ -90,21 +107,6 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
             ]}>
               Add tags to help organize and categorize your content
             </Text>
-            <TouchableOpacity
-              style={[styles.addTagButton, { backgroundColor: colors.primary }]}
-              onPress={onAddTags}>
-              <Plus size={20} color={colors.buttonText} />
-              <Text style={[
-                styles.addTagButtonText,
-                {
-                  color: colors.buttonText,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
-                }
-              ]}>
-                Add Tags
-              </Text>
-            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.tagGrid}>
@@ -150,17 +152,6 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
           </View>
         )}
       </ScrollView>
-
-      {featuredTags.length > 0 && (
-        <TouchableOpacity
-          style={[
-            styles.floatingButton,
-            { backgroundColor: colors.primary }
-          ]}
-          onPress={onAddTags}>
-          <Plus size={24} color={colors.buttonText} />
-        </TouchableOpacity>
-      )}
     </View>
   );
 }
@@ -174,13 +165,28 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: Platform.OS === 'web' ? 100 : 80, // Extra padding for FAB
   },
   header: {
     marginBottom: 8,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   title: {
     marginBottom: 4,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  addButtonText: {
+    fontSize: 14,
   },
   description: {
     marginBottom: 24,
@@ -199,18 +205,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 300,
     lineHeight: 24,
-  },
-  addTagButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    marginTop: 8,
-    gap: 8,
-  },
-  addTagButtonText: {
-    fontSize: 16,
   },
   tagGrid: {
     gap: 12,
@@ -235,23 +229,5 @@ const styles = StyleSheet.create({
   },
   tagPosts: {
     fontSize: 14,
-  },
-  floatingButton: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
 });
