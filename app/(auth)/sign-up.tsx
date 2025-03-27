@@ -1,17 +1,18 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, KeyboardAvoidingView, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, KeyboardAvoidingView, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Eye, EyeOff, ChevronRight, ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { showToast } from '@/components/Toast';
+import { emailRegex, validatePassword } from '@/lib/utils/validation';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function SignUpScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -20,10 +21,22 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!form.email || !form.password || !form.confirmPassword) {
       showToast.error('Missing fields', 'Please fill in all fields');
+      return;
+    }
+
+    if (!emailRegex.test(form.email)) {
+      showToast.error('Invalid email', 'Please enter a valid email address');
+      return;
+    }
+
+    const passwordValidation = validatePassword(form.password);
+    if (!passwordValidation.isValid) {
+      showToast.error('Invalid password', passwordValidation.error || 'Please check password requirements');
       return;
     }
 
@@ -41,6 +54,17 @@ export default function SignUpScreen() {
       showToast.error('Sign up failed', 'Please try again');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      showToast.error('Google sign up failed', 'Please try again');
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -168,6 +192,16 @@ export default function SignUpScreen() {
                   )}
                 </TouchableOpacity>
               </View>
+              <Text style={[
+                styles.passwordHint,
+                {
+                  color: colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.xs,
+                }
+              ]}>
+                Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character
+              </Text>
             </View>
 
             <View style={styles.inputGroup}>
@@ -224,17 +258,23 @@ export default function SignUpScreen() {
               ]}
               onPress={handleSignUp}
               disabled={isLoading}>
-              <Text style={[
-                styles.buttonText,
-                {
-                  color: colors.buttonText,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
-                }
-              ]}>
-                Create account
-              </Text>
-              <ChevronRight size={20} color={colors.buttonText} />
+              {isLoading ? (
+                <ActivityIndicator color={colors.buttonText} />
+              ) : (
+                <>
+                  <Text style={[
+                    styles.buttonText,
+                    {
+                      color: colors.buttonText,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
+                    Create account
+                  </Text>
+                  <ChevronRight size={20} color={colors.buttonText} />
+                </>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -255,22 +295,31 @@ export default function SignUpScreen() {
 
           <TouchableOpacity
             style={[styles.socialButton, { backgroundColor: colors.surface }]}
-            disabled={isLoading}>
-            <Image
-              source={{ uri: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={[
-              styles.socialButtonText,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-              }
-            ]}>
-              Sign up with Google
-            </Text>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            onPress={handleGoogleSignUp}
+            disabled={isLoading || isGoogleLoading}>
+            <View style={styles.socialButtonContent}>
+              {isGoogleLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <>
+                  <Image
+                    source={{ uri: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png' }}
+                    style={styles.socialIcon}
+                  />
+                  <Text style={[
+                    styles.socialButtonText,
+                    {
+                      color: colors.textPrimary,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
+                    Sign up with Google
+                  </Text>
+                  <ChevronRight size={20} color={colors.textSecondary} />
+                </>
+              )}
+            </View>
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -370,6 +419,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  passwordHint: {
+    marginLeft: 4,
+  },
   button: {
     height: Platform.OS === 'web' ? 48 : 44,
     borderRadius: 12,
@@ -397,9 +449,14 @@ const styles = StyleSheet.create({
   socialButton: {
     height: Platform.OS === 'web' ? 48 : 44,
     borderRadius: 12,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  socialButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    flex: 1,
   },
   socialIcon: {
     width: 24,

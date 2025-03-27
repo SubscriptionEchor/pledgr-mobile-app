@@ -1,9 +1,10 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Send } from 'lucide-react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { showToast } from '@/components/Toast';
+import { emailRegex } from '@/lib/utils/validation';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -16,6 +17,11 @@ export default function ForgotPasswordScreen() {
   const handleSubmit = async () => {
     if (!email) {
       showToast.error('Missing email', 'Please enter your email address');
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      showToast.error('Invalid email', 'Please enter a valid email address');
       return;
     }
 
@@ -133,17 +139,23 @@ export default function ForgotPasswordScreen() {
               ]}
               onPress={handleSubmit}
               disabled={isLoading}>
-              <Send size={20} color={colors.buttonText} />
-              <Text style={[
-                styles.buttonText,
-                {
-                  color: colors.buttonText,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
-                }
-              ]}>
-                Send reset link
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color={colors.buttonText} />
+              ) : (
+                <>
+                  <Send size={20} color={colors.buttonText} />
+                  <Text style={[
+                    styles.buttonText,
+                    {
+                      color: colors.buttonText,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
+                    Send reset link
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </View>

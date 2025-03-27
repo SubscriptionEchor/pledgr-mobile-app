@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, KeyboardAvoidingView, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, KeyboardAvoidingView, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Eye, EyeOff, ChevronRight, Check } from 'lucide-react-native';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export default function SignInScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -19,6 +19,7 @@ export default function SignInScreen() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSignIn = async () => {
     if (!form.email || !form.password) {
@@ -35,6 +36,17 @@ export default function SignInScreen() {
       showToast.error('Sign in failed', 'Invalid email or password');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      showToast.error('Google sign in failed', 'Please try again');
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -208,17 +220,23 @@ export default function SignInScreen() {
               ]}
               onPress={handleSignIn}
               disabled={isLoading}>
-              <Text style={[
-                styles.buttonText,
-                {
-                  color: colors.buttonText,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
-                }
-              ]}>
-                Sign in
-              </Text>
-              <ChevronRight size={20} color={colors.buttonText} />
+              {isLoading ? (
+                <ActivityIndicator color={colors.buttonText} />
+              ) : (
+                <>
+                  <Text style={[
+                    styles.buttonText,
+                    {
+                      color: colors.buttonText,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
+                    Sign in
+                  </Text>
+                  <ChevronRight size={20} color={colors.buttonText} />
+                </>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -239,22 +257,31 @@ export default function SignInScreen() {
 
           <TouchableOpacity
             style={[styles.socialButton, { backgroundColor: colors.surface }]}
-            disabled={isLoading}>
-            <Image
-              source={{ uri: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={[
-              styles.socialButtonText,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-              }
-            ]}>
-              Sign in with Google
-            </Text>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            onPress={handleGoogleSignIn}
+            disabled={isLoading || isGoogleLoading}>
+            <View style={styles.socialButtonContent}>
+              {isGoogleLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <>
+                  <Image
+                    source={{ uri: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png' }}
+                    style={styles.socialIcon}
+                  />
+                  <Text style={[
+                    styles.socialButtonText,
+                    {
+                      color: colors.textPrimary,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.md,
+                    }
+                  ]}>
+                    Sign in with Google
+                  </Text>
+                  <ChevronRight size={20} color={colors.textSecondary} />
+                </>
+              )}
+            </View>
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -364,11 +391,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkboxInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 2,
-  },
   checkboxLabel: {
     fontSize: 14,
   },
@@ -402,9 +424,14 @@ const styles = StyleSheet.create({
   socialButton: {
     height: Platform.OS === 'web' ? 48 : 44,
     borderRadius: 12,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  socialButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    flex: 1,
   },
   socialIcon: {
     width: 24,

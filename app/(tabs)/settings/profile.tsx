@@ -1,12 +1,13 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ActivityIndicator, ScrollView, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
-import { Camera, ChevronLeft, MapPin } from 'lucide-react-native';
+import { Camera, ChevronLeft, Eye, EyeOff, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { CountryPicker } from '@/components/CountryPicker';
 import { showToast } from '@/components/Toast';
+import { emailRegex } from '@/lib/utils/validation';
 
 interface ProfileForm {
   name: string;
@@ -15,11 +16,334 @@ interface ProfileForm {
   state: string;
 }
 
+interface ChangeEmailModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSubmit: (newEmail: string) => void;
+}
+
+function VerifyPasswordModal({ visible, onClose, onVerify }: { 
+  visible: boolean; 
+  onClose: () => void;
+  onVerify: () => void;
+}) {
+  const { colors, fonts, fontSize } = useTheme();
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleVerify = async () => {
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+
+    setError(null);
+    setIsVerifying(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      onVerify();
+      setPassword('');
+    } catch (error) {
+      setError('Invalid password. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleClose = () => {
+    setPassword('');
+    setError(null);
+    onClose();
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.modalOverlay}
+      >
+        <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
+          <View style={styles.modalHeader}>
+            <Text style={[
+              styles.modalTitle,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.bold,
+                fontSize: fontSize.xl,
+              }
+            ]}>
+              Verify your password
+            </Text>
+            <TouchableOpacity onPress={handleClose}>
+              <X size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={[
+            styles.modalDescription,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+            }
+          ]}>
+            For security, please enter your password to continue
+          </Text>
+
+          <View style={styles.inputGroup}>
+            <View style={[
+              styles.passwordContainer,
+              { 
+                backgroundColor: colors.surface,
+                borderColor: error ? colors.error : colors.border,
+              }
+            ]}>
+              <TextInput
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setError(null);
+                }}
+                secureTextEntry={!showPassword}
+                placeholder="Enter your password"
+                placeholderTextColor={colors.textSecondary}
+                style={[
+                  styles.passwordInput,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.md,
+                  }
+                ]}
+                editable={!isVerifying}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+                disabled={isVerifying}>
+                {showPassword ? (
+                  <EyeOff size={20} color={colors.textSecondary} />
+                ) : (
+                  <Eye size={20} color={colors.textSecondary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            {error && (
+              <Text style={[
+                styles.errorText,
+                {
+                  color: colors.error,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
+                {error}
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              onPress={handleClose}
+              style={[styles.cancelButton, { backgroundColor: colors.surface }]}>
+              <Text style={[
+                styles.cancelButtonText,
+                {
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                }
+              ]}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.continueButton}>
+              {isVerifying ? (
+                <View style={[styles.loadingButton, { backgroundColor: colors.primary }]}>
+                  <ActivityIndicator color={colors.buttonText} />
+                </View>
+              ) : (
+                <Button
+                  label="Continue"
+                  onPress={handleVerify}
+                  variant="primary"
+                />
+              )}
+            </View>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+function ChangeEmailModal({ visible, onClose, onSubmit }: ChangeEmailModalProps) {
+  const { colors, fonts, fontSize } = useTheme();
+  const [newEmail, setNewEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!newEmail) {
+      setError('Please enter a new email address');
+      return;
+    }
+
+    if (!emailRegex.test(newEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      onSubmit(newEmail);
+      setNewEmail('');
+    } catch (error) {
+      setError('Failed to update email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    setNewEmail('');
+    setError(null);
+    onClose();
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.modalOverlay}
+      >
+        <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
+          <View style={styles.modalHeader}>
+            <Text style={[
+              styles.modalTitle,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.bold,
+                fontSize: fontSize.xl,
+              }
+            ]}>
+              Enter new email
+            </Text>
+            <TouchableOpacity onPress={handleClose}>
+              <X size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={[
+            styles.modalDescription,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+            }
+          ]}>
+            Enter your new email address. We'll send a verification code to confirm it's yours.
+          </Text>
+
+          <View style={styles.inputGroup}>
+            <TextInput
+              value={newEmail}
+              onChangeText={(text) => {
+                setNewEmail(text);
+                setError(null);
+              }}
+              placeholder="Enter new email"
+              placeholderTextColor={colors.textSecondary}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.surface,
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.md,
+                  borderColor: error ? colors.error : colors.border,
+                }
+              ]}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={!isSubmitting}
+            />
+            {error && (
+              <Text style={[
+                styles.errorText,
+                {
+                  color: colors.error,
+                  fontFamily: fonts.regular,
+                  fontSize: fontSize.sm,
+                }
+              ]}>
+                {error}
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              onPress={handleClose}
+              style={[styles.cancelButton, { backgroundColor: colors.surface }]}>
+              <Text style={[
+                styles.cancelButtonText,
+                {
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                }
+              ]}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.continueButton}>
+              {isSubmitting ? (
+                <View style={[styles.loadingButton, { backgroundColor: colors.primary }]}>
+                  <ActivityIndicator color={colors.buttonText} />
+                </View>
+              ) : (
+                <Button
+                  label="Send code"
+                  onPress={handleSubmit}
+                  variant="primary"
+                />
+              )}
+            </View>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
 export default function ProfileScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+  const [showChangeEmail, setShowChangeEmail] = useState(false);
   const [form, setForm] = useState<ProfileForm>({
     name: 'John Doe',
     email: 'john@example.com',
@@ -52,6 +376,26 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleEmailChange = async (newEmail: string) => {
+    try {
+      // Simulate API call to update email
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setForm(prev => ({ ...prev, email: newEmail }));
+      setShowChangeEmail(false);
+      
+      showToast.success(
+        'Email updated',
+        'Your email has been updated successfully'
+      );
+    } catch (error) {
+      showToast.error(
+        'Update failed',
+        'Failed to update email. Please try again.'
+      );
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SubHeader title="Profile" />
@@ -74,8 +418,8 @@ export default function ProfileScreen() {
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
               <Text style={[
-                styles.label, 
-                { 
+                styles.label,
+                {
                   color: colors.textSecondary,
                   fontFamily: fonts.medium,
                   fontSize: fontSize.sm,
@@ -86,22 +430,23 @@ export default function ProfileScreen() {
               <TextInput
                 value={form.name}
                 onChangeText={(text) => setForm({ ...form, name: text })}
+                placeholder="Enter your name"
+                placeholderTextColor={colors.textSecondary}
                 style={[
-                  styles.input, 
-                  { 
-                    backgroundColor: colors.surface, 
+                  styles.input,
+                  {
+                    backgroundColor: colors.surface,
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                   }
                 ]}
-                placeholderTextColor={colors.textSecondary}
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={[
-                styles.label, 
-                { 
+                styles.label,
+                {
                   color: colors.textSecondary,
                   fontFamily: fonts.medium,
                   fontSize: fontSize.sm,
@@ -109,44 +454,44 @@ export default function ProfileScreen() {
               ]}>
                 Email
               </Text>
-              <TextInput
-                value={form.email}
-                onChangeText={(text) => setForm({ ...form, email: text })}
-                style={[
-                  styles.input, 
-                  { 
-                    backgroundColor: colors.surface, 
-                    color: colors.textPrimary,
-                    fontFamily: fonts.regular,
-                  }
-                ]}
-                placeholderTextColor={colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              <View style={styles.emailContainer}>
+                <TextInput
+                  value={form.email}
+                  editable={false}
+                  style={[
+                    styles.input,
+                    styles.emailInput,
+                    {
+                      backgroundColor: colors.surface,
+                      color: colors.textPrimary,
+                      fontFamily: fonts.regular,
+                    }
+                  ]}
+                />
+                <TouchableOpacity
+                  style={[styles.changeButton, { backgroundColor: colors.primary }]}
+                  onPress={() => setShowVerifyPassword(true)}>
+                  <Text style={[
+                    styles.changeButtonText,
+                    {
+                      color: colors.buttonText,
+                      fontFamily: fonts.semibold,
+                      fontSize: fontSize.sm,
+                    }
+                  ]}>
+                    Change
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.locationSection}>
-              <View style={styles.locationHeader}>
-                <MapPin size={20} color={colors.textSecondary} />
-                <Text style={[
-                  styles.locationTitle, 
-                  { 
-                    color: colors.textPrimary,
-                    fontFamily: fonts.semibold,
-                    fontSize: fontSize.md,
-                  }
-                ]}>
-                  Location
-                </Text>
-              </View>
-
               <TouchableOpacity
                 onPress={() => setShowCountryPicker(true)}
                 style={[styles.input, styles.pickerButton, { backgroundColor: colors.surface }]}>
                 <Text style={[
-                  styles.pickerButtonText, 
-                  { 
+                  styles.pickerButtonText,
+                  {
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                   }
@@ -160,9 +505,9 @@ export default function ProfileScreen() {
                 value={form.state}
                 onChangeText={(text) => setForm({ ...form, state: text })}
                 style={[
-                  styles.input, 
-                  { 
-                    backgroundColor: colors.surface, 
+                  styles.input,
+                  {
+                    backgroundColor: colors.surface,
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                   }
@@ -190,6 +535,21 @@ export default function ProfileScreen() {
           setForm({ ...form, country });
           setShowCountryPicker(false);
         }}
+      />
+
+      <VerifyPasswordModal
+        visible={showVerifyPassword}
+        onClose={() => setShowVerifyPassword(false)}
+        onVerify={() => {
+          setShowVerifyPassword(false);
+          setShowChangeEmail(true);
+        }}
+      />
+
+      <ChangeEmailModal
+        visible={showChangeEmail}
+        onClose={() => setShowChangeEmail(false)}
+        onSubmit={handleEmailChange}
       />
     </View>
   );
@@ -244,17 +604,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 15,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  emailContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  emailInput: {
+    flex: 1,
+    opacity: 0.7,
+  },
+  changeButton: {
+    paddingHorizontal: 16,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  changeButtonText: {
+    fontSize: 14,
   },
   locationSection: {
     gap: 12,
-  },
-  locationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  locationTitle: {
-    fontWeight: '600',
   },
   pickerButton: {
     flexDirection: 'row',
@@ -269,5 +642,72 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContainer: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: Platform.OS === 'ios' ? 100 : 0,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 24,
+  },
+  modalDescription: {
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  passwordInput: {
+    flex: 1,
+    height: '100%',
+    paddingHorizontal: 16,
+  },
+  eyeButton: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    marginTop: 8,
+    marginLeft: 4,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 24,
+  },
+  cancelButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+  },
+  continueButton: {
+    flex: 2,
   },
 });

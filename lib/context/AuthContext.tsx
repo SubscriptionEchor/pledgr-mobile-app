@@ -2,6 +2,11 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserRole } from '@/lib/enums';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import Constants from 'expo-constants';
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface User {
   id: string;
@@ -15,6 +20,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateUserRole: (role: UserRole) => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -30,10 +36,20 @@ const REMEMBER_ME_KEY = '@remember_me';
 const USER_ROLE_KEY = '@user_role';
 const IS_CREATOR_CREATED_KEY = '@is_creator_created';
 
+// Get your Google client ID from your expo config
+const GOOGLE_CLIENT_ID = Constants.expoConfig?.extra?.googleClientId || '';
+const GOOGLE_EXPO_CLIENT_ID = Constants.expoConfig?.extra?.googleExpoClientId || '';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatorCreated, setIsCreatorCreated] = useState(false);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: GOOGLE_CLIENT_ID,
+    iosClientId: GOOGLE_CLIENT_ID,
+    expoClientId: GOOGLE_EXPO_CLIENT_ID,
+  });
 
   useEffect(() => {
     // Load isCreatorCreated flag from storage on mount
@@ -41,6 +57,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsCreatorCreated(value === 'true');
     });
   }, []);
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      handleGoogleResponse(authentication?.accessToken);
+    }
+  }, [response]);
+
+  const handleGoogleResponse = async (accessToken: string | undefined) => {
+    if (!accessToken) return;
+
+    try {
+      const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const userInfo = await response.json();
+      const mockUser = {
+        id: userInfo.id,
+        name: userInfo.name,
+        email: userInfo.email,
+        role: UserRole.MEMBER,
+        avatar: userInfo.picture,
+      };
+
+      await AsyncStorage.setItem(TOKEN_KEY, accessToken);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser));
+      await AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER);
+      await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false');
+
+      setUser(mockUser);
+      setIsCreatorCreated(false);
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Error fetching Google user info:', error);
+      showToast.error('Google sign in failed', 'Please try again');
+    }
+  };
 
   const checkAuth = async () => {
     try {
@@ -59,7 +113,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsCreatorCreated(creatorCreated === 'true');
         router.replace('/(tabs)');
       } else {
-        // Clear any stored data if token or role is missing
         await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
         router.replace('/(auth)/sign-in');
       }
@@ -85,7 +138,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
       };
 
-      // Store auth data
       await AsyncStorage.setItem(TOKEN_KEY, 'mock_token');
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser));
       await AsyncStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
@@ -97,6 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loginWithGoogle = async () => {
+    if (!request) return;
+    await promptAsync();
   };
 
   const logout = async () => {
@@ -129,7 +186,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{ 
       user, 
       isLoading, 
-      login, 
+      login,
+      loginWithGoogle,
       logout, 
       updateUserRole, 
       checkAuth,
