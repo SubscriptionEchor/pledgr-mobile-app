@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: '#1e88e5',
     letterSpacing: -0.5,
+    includeFontPadding: false,
   },
   loadingContainer: {
     flexDirection: 'row',

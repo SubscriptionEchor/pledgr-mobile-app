@@ -1,9 +1,25 @@
 import { Tabs } from 'expo-router';
-import { Home, Compass, Crown, MessageCircle, Menu } from 'lucide-react-native';
+import { Chrome as Home, Compass, Crown, MessageCircle, Menu } from 'lucide-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function MemberTabLayout() {
+    const { colors, fonts, fontSize } = useTheme();
+
     return (
-        <Tabs screenOptions={{ headerShown: false }}>
+        <Tabs screenOptions={{
+            headerShown: false,
+            tabBarStyle: {
+                backgroundColor: colors.background,
+                borderTopColor: colors.border,
+            },
+            tabBarActiveTintColor: colors.primary,
+            tabBarInactiveTintColor: colors.textSecondary,
+            tabBarLabelStyle: {
+                fontFamily: fonts.medium,
+                fontSize: fontSize.xs,
+                marginBottom: 4,
+            },
+        }}>
             <Tabs.Screen
                 name="home"
                 options={{

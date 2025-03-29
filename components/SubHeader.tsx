@@ -28,6 +28,7 @@ export function SubHeader({ title }: SubHeaderProps) {
           color: colors.textPrimary,
           fontFamily: fonts.semibold,
           fontSize: fontSize.xl,
+          includeFontPadding: false,
         }
       ]}>
         {title}

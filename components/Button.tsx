@@ -5,9 +5,10 @@ interface ButtonProps {
   label: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info';
+  disabled?: boolean;
 }
 
-export function Button({ label, onPress, variant = 'primary' }: ButtonProps) {
+export function Button({ label, onPress, variant = 'primary', disabled = false }: ButtonProps) {
   const { colors, fonts, fontSize } = useTheme();
 
   const getBackgroundColor = () => {
@@ -31,15 +32,20 @@ export function Button({ label, onPress, variant = 'primary' }: ButtonProps) {
     <TouchableOpacity
       style={[
         styles.button,
-        { backgroundColor: getBackgroundColor() },
+        { 
+          backgroundColor: getBackgroundColor(),
+          opacity: disabled ? 0.5 : 1,
+        },
       ]}
-      onPress={onPress}>
+      onPress={onPress}
+      disabled={disabled}>
       <Text style={[
         styles.label, 
         { 
           color: colors.buttonText,
           fontFamily: fonts.semibold,
           fontSize: fontSize.md,
+          includeFontPadding: false,
         }
       ]}>
         {label}
@@ -50,8 +56,8 @@ export function Button({ label, onPress, variant = 'primary' }: ButtonProps) {
 
 const styles = StyleSheet.create({
   button: {
+    height: 44,
     paddingHorizontal: 24,
-    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',

@@ -37,7 +37,6 @@ const REMEMBER_ME_KEY = '@remember_me';
 const USER_ROLE_KEY = '@user_role';
 const IS_CREATOR_CREATED_KEY = '@is_creator_created';
 
-// Get your Google client ID from your expo config
 const GOOGLE_CLIENT_ID = Constants.expoConfig?.extra?.googleClientId || '';
 const GOOGLE_EXPO_CLIENT_ID = Constants.expoConfig?.extra?.googleExpoClientId || '';
 
@@ -53,7 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    // Load isCreatorCreated flag from storage on mount
     AsyncStorage.getItem(IS_CREATOR_CREATED_KEY).then(value => {
       setIsCreatorCreated(value === 'true');
     });
@@ -83,10 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: userInfo.picture,
       };
 
-      await AsyncStorage.setItem(TOKEN_KEY, accessToken);
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser));
-      await AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER);
-      await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false');
+      await Promise.all([
+        AsyncStorage.setItem(TOKEN_KEY, accessToken),
+        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
+        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+      ]);
 
       setUser(mockUser);
       setIsCreatorCreated(false);
@@ -99,26 +99,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const token = await AsyncStorage.getItem(TOKEN_KEY);
-      const userRole = await AsyncStorage.getItem(USER_ROLE_KEY);
-      const userData = await AsyncStorage.getItem(USER_KEY);
-      const creatorCreated = await AsyncStorage.getItem(IS_CREATOR_CREATED_KEY);
+      const [token, userRole, userData, creatorCreated] = await Promise.all([
+        AsyncStorage.getItem(TOKEN_KEY),
+        AsyncStorage.getItem(USER_ROLE_KEY),
+        AsyncStorage.getItem(USER_KEY),
+        AsyncStorage.getItem(IS_CREATOR_CREATED_KEY)
+      ]);
 
-      if (token && userRole) {
-        const parsedUser = userData ? JSON.parse(userData) : null;
-        const user = {
-          ...parsedUser,
-          role: userRole as UserRole
-        };
-        setUser(user);
-        setIsCreatorCreated(creatorCreated === 'true');
-        router.replace('/creator/home');
-      } else {
+      if (!token || !userRole || !userData) {
         await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
         router.replace('/auth/sign-in');
+        return;
+      }
+
+      const parsedUser = JSON.parse(userData);
+      const user = {
+        ...parsedUser,
+        role: userRole as UserRole
+      };
+
+      setUser(user);
+      setIsCreatorCreated(creatorCreated === 'true');
+
+      // Route based on stored role
+      switch (userRole) {
+        case UserRole.CREATOR:
+          router.replace('/creator/home');
+          break;
+        case UserRole.CREATOR_ASSOCIATE:
+          router.replace('/creator-associate/home');
+          break;
+        case UserRole.MEMBER:
+          router.replace('/member/home');
+          break;
+        default:
+          router.replace('/auth/sign-in');
       }
     } catch (error) {
       console.error('Error checking auth:', error);
+      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
       router.replace('/auth/sign-in');
     } finally {
       setIsLoading(false);
@@ -139,14 +158,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
       };
 
-      await AsyncStorage.setItem(TOKEN_KEY, 'mock_token');
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser));
-      await AsyncStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
-      await AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER);
-      await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false');
+      await Promise.all([
+        AsyncStorage.setItem(TOKEN_KEY, 'mock_token'),
+        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString()),
+        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
+        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+      ]);
 
       setUser(mockUser);
       setIsCreatorCreated(false);
+      router.replace('/member/home');
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, REMEMBER_ME_KEY, USER_ROLE_KEY, IS_CREATOR_CREATED_KEY]);
+      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
       setUser(null);
       setIsCreatorCreated(false);
       router.replace('/auth/sign-in');
@@ -172,14 +194,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateUserRole = async (role: UserRole) => {
     if (!user) return;
 
-    const updatedUser = { ...user, role };
-    await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
-    await AsyncStorage.setItem(USER_ROLE_KEY, role);
-    setUser(updatedUser);
-    if (role === UserRole.MEMBER) {
-      router.replace('/member/home');
-    } else {
-      router.replace('/creator/home');
+    try {
+      const updatedUser = { ...user, role };
+      await Promise.all([
+        AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser)),
+        AsyncStorage.setItem(USER_ROLE_KEY, role)
+      ]);
+      
+      setUser(updatedUser);
+
+      switch (role) {
+        case UserRole.CREATOR:
+          router.replace('/creator/home');
+          break;
+        case UserRole.CREATOR_ASSOCIATE:
+          router.replace('/creator-associate/home');
+          break;
+        case UserRole.MEMBER:
+          router.replace('/member/home');
+          break;
+      }
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      showToast.error('Failed to update role', 'Please try again');
     }
   };
 

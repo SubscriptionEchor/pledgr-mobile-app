@@ -26,6 +26,7 @@ export function Header() {
               color: colors.textPrimary,
               fontFamily: fonts.bold,
               fontSize: fontSize['2xl'],
+              includeFontPadding: false,
             }
           ]}>
             Pledgr
