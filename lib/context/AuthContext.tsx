@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import Constants from 'expo-constants';
+import { showToast } from '@/components/Toast';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -89,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(mockUser);
       setIsCreatorCreated(false);
-      router.replace('/(tabs)');
+      router.replace('/member/home');
     } catch (error) {
       console.error('Error fetching Google user info:', error);
       showToast.error('Google sign in failed', 'Please try again');
@@ -111,14 +112,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         setUser(user);
         setIsCreatorCreated(creatorCreated === 'true');
-        router.replace('/(tabs)');
+        router.replace('/creator/home');
       } else {
         await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
-        router.replace('/(auth)/sign-in');
+        router.replace('/auth/sign-in');
       }
     } catch (error) {
       console.error('Error checking auth:', error);
-      router.replace('/(auth)/sign-in');
+      router.replace('/auth/sign-in');
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, REMEMBER_ME_KEY, USER_ROLE_KEY, IS_CREATOR_CREATED_KEY]);
       setUser(null);
       setIsCreatorCreated(false);
-      router.replace('/(auth)/sign-in');
+      router.replace('/auth/sign-in');
     } finally {
       setIsLoading(false);
     }
@@ -170,11 +171,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserRole = async (role: UserRole) => {
     if (!user) return;
-    
+
     const updatedUser = { ...user, role };
     await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
     await AsyncStorage.setItem(USER_ROLE_KEY, role);
     setUser(updatedUser);
+    if (role === UserRole.MEMBER) {
+      router.replace('/member/home');
+    } else {
+      router.replace('/creator/home');
+    }
   };
 
   const handleSetIsCreatorCreated = async (value: boolean) => {
@@ -183,13 +189,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isLoading, 
+    <AuthContext.Provider value={{
+      user,
+      isLoading,
       login,
       loginWithGoogle,
-      logout, 
-      updateUserRole, 
+      logout,
+      updateUserRole,
       checkAuth,
       isCreatorCreated,
       setIsCreatorCreated: handleSetIsCreatorCreated

@@ -31,7 +31,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
 
   useEffect(() => {
     setSheetVisible(visible);
-    
+
     if (visible) {
       Animated.spring(translateY, {
         toValue: 0,
@@ -52,11 +52,30 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
 
   const handleNavigation = (route: string) => {
     onClose();
-    // If user is a creator and trying to access settings, redirect to creator settings
-    if (route === '/settings' && isCreator) {
-      router.push('/settings/creator-settings');
-    } else {
-      router.push(route);
+
+    switch (route) {
+      case 'settings':
+        if (isCreator) {
+          router.push('/screens/creator/settings');
+        } else {
+          router.push('/screens/member/settings');
+        }
+        break;
+
+      case 'profile':
+        if (isCreator) {
+          router.push('/screens/creator/edit-page');
+        } else {
+          router.push('/screens/member/profile');
+        }
+        break;
+
+      case 'creatorOnboard':
+        router.push('/screens/common/creator-onboard');
+        break;
+
+      default:
+        break;
     }
   };
 
@@ -109,7 +128,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           <View style={styles.roleText}>
             <Text style={[
               styles.roleTitle,
-              { 
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
@@ -119,7 +138,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             </Text>
             <Text style={[
               styles.roleDescription,
-              { 
+              {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
@@ -133,7 +152,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           <View style={[styles.activeRole, { backgroundColor: colors.primary }]}>
             <Text style={[
               styles.activeRoleText,
-              { 
+              {
                 color: colors.buttonText,
                 fontFamily: fonts.medium,
                 fontSize: fontSize.xs,
@@ -158,7 +177,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           <View style={styles.roleText}>
             <Text style={[
               styles.roleTitle,
-              { 
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
@@ -168,7 +187,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             </Text>
             <Text style={[
               styles.roleDescription,
-              { 
+              {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
@@ -182,7 +201,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           <View style={[styles.activeRole, { backgroundColor: colors.primary }]}>
             <Text style={[
               styles.activeRoleText,
-              { 
+              {
                 color: colors.buttonText,
                 fontFamily: fonts.medium,
                 fontSize: fontSize.xs,
@@ -199,10 +218,10 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   return (
     <View style={styles.overlay}>
       <Pressable style={styles.backdrop} onPress={handleClose} />
-      <Animated.View 
+      <Animated.View
         style={[
           styles.sheet,
-          { 
+          {
             backgroundColor: colors.background,
             transform: [{ translateY }],
             maxHeight: MAX_SHEET_HEIGHT,
@@ -210,7 +229,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
         ]}>
         <View style={styles.handle} />
 
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -218,14 +237,14 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           <View style={styles.content}>
             <View style={[styles.profileSection, { backgroundColor: colors.surface }]}>
               <View style={styles.profileLeft}>
-                <Image 
-                  source={{ uri: user.avatar }} 
+                <Image
+                  source={{ uri: user.avatar }}
                   style={styles.avatar}
                 />
                 <View style={styles.profileInfo}>
                   <Text style={[
-                    styles.profileName, 
-                    { 
+                    styles.profileName,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.lg,
@@ -234,8 +253,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     {user.name}
                   </Text>
                   <Text style={[
-                    styles.profileEmail, 
-                    { 
+                    styles.profileEmail,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.sm,
@@ -245,9 +264,9 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
-                onPress={() => handleNavigation('/settings/profile')}>
+                onPress={() => handleNavigation('profile')}>
                 <Pencil size={20} color={colors.primary} />
               </TouchableOpacity>
             </View>
@@ -255,8 +274,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             {isCreatorCreated ? (
               <View style={styles.section}>
                 <Text style={[
-                  styles.sectionTitle, 
-                  { 
+                  styles.sectionTitle,
+                  {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.md,
@@ -277,7 +296,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     </View>
                     <Text style={[
                       styles.currentRole,
-                      { 
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
@@ -291,9 +310,9 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 {showRolePicker && renderRolePicker()}
               </View>
             ) : (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.creatorCardWrapper}
-                onPress={() => handleNavigation('/creator')}>
+                onPress={() => handleNavigation('creatorOnboard')}>
                 <LinearGradient
                   colors={[colors.primary, '#9333ea']}
                   start={{ x: 0, y: 0 }}
@@ -340,8 +359,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
 
             <View style={styles.section}>
               <Text style={[
-                styles.sectionTitle, 
-                { 
+                styles.sectionTitle,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.md,
@@ -357,8 +376,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   ]}
                   onPress={() => !isDark || toggleTheme()}>
                   <Text style={[
-                    styles.themeText, 
-                    { 
+                    styles.themeText,
+                    {
                       color: !isDark ? colors.primary : colors.textSecondary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
@@ -375,7 +394,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   onPress={() => isDark || toggleTheme()}>
                   <Text style={[
                     styles.themeText,
-                    { 
+                    {
                       color: isDark ? colors.primary : colors.textSecondary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
@@ -387,16 +406,16 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
               </View>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-              onPress={() => handleNavigation('/settings')}>
+              onPress={() => handleNavigation('settings')}>
               <View style={styles.settingsContent}>
                 <View style={[styles.settingsIcon, { backgroundColor: `${colors.primary}15` }]}>
                   <Settings size={20} color={colors.primary} />
                 </View>
                 <Text style={[
-                  styles.settingsText, 
-                  { 
+                  styles.settingsText,
+                  {
                     color: colors.textPrimary,
                     fontFamily: fonts.medium,
                     fontSize: fontSize.md,
@@ -415,8 +434,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
               onPress={() => setShowSignOutConfirmation(true)}>
               <LogOut size={20} color={colors.error} />
               <Text style={[
-                styles.signOutText, 
-                { 
+                styles.signOutText,
+                {
                   color: colors.error,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.md,

@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
-import { useRouter } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Crown } from 'lucide-react-native';
@@ -8,7 +7,6 @@ import { useTheme } from '@/hooks/useTheme';
 
 export default function SplashScreen() {
   const { checkAuth } = useAuth();
-  const router = useRouter();
   const { fonts } = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -79,7 +77,7 @@ export default function SplashScreen() {
     const initializeApp = async () => {
       // Wait for 3 seconds
       await new Promise(resolve => setTimeout(resolve, 3000));
-      
+
       // Check authentication status
       await checkAuth();
     };
@@ -102,7 +100,7 @@ export default function SplashScreen() {
         end={{ x: 0, y: 1 }}
         style={styles.gradient}
       >
-        <Animated.View 
+        <Animated.View
           style={[
             styles.content,
             {

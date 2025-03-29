@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
-import { Home, Library, Wallet, MessageSquare, Menu } from 'lucide-react-native';
+import { Home, Compass, Crown, MessageCircle, Menu } from 'lucide-react-native';
 
-export default function CreatorTabLayout() {
+export default function MemberTabLayout() {
     return (
         <Tabs screenOptions={{ headerShown: false }}>
             <Tabs.Screen
@@ -12,24 +12,24 @@ export default function CreatorTabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="library"
+                name="explore"
                 options={{
-                    title: 'Library',
-                    tabBarIcon: ({ color }) => <Library size={24} color={color} />
+                    title: 'Explore',
+                    tabBarIcon: ({ color }) => <Compass size={24} color={color} />
                 }}
             />
             <Tabs.Screen
-                name="payout"
+                name="membership"
                 options={{
-                    title: 'Payout',
-                    tabBarIcon: ({ color }) => <Wallet size={24} color={color} />
+                    title: 'Membership',
+                    tabBarIcon: ({ color }) => <Crown size={24} color={color} />
                 }}
             />
             <Tabs.Screen
                 name="chat"
                 options={{
                     title: 'Chat',
-                    tabBarIcon: ({ color }) => <MessageSquare size={24} color={color} />
+                    tabBarIcon: ({ color }) => <MessageCircle size={24} color={color} />
                 }}
             />
             <Tabs.Screen

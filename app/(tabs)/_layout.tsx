@@ -1,91 +1,50 @@
-import { Tabs } from 'expo-router';
-import { useTheme } from '@/hooks/useTheme';
-import { Footer } from '@/components/Footer';
-import { Platform, View } from 'react-native';
-import { usePathname } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
+import { Stack } from 'expo-router';
 
-export default function TabLayout() {
-  const { colors } = useTheme();
-  const pathname = usePathname();
+export default function RootLayout() {
   const { user } = useAuth();
 
-  const isCreator = user?.role === UserRole.CREATOR;
+  // If no user, show the (auth) layout group
+  if (!user || !user.role) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="auth" options={{ presentation: 'fullScreenModal' }} />
+      </Stack>
+    );
+  }
 
-  // Only show footer on main tab screens
-  const showFooter = pathname === '/' || 
-                    pathname === '/explore' || 
-                    pathname === '/membership' || 
-                    pathname === '/chat' || 
-                    pathname === '/menu' ||
-                    pathname === '/library' ||
-                    pathname === '/payouts';
+  // If the user is a member, show the (member) layout group
+  if (user.role === UserRole.MEMBER) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="member" options={{ presentation: 'fullScreenModal' }} />
+      </Stack>
+    );
+  }
 
+  // If the user is a creator, show the (creator) layout group
+  if (user.role === UserRole.CREATOR) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="creator" options={{ presentation: 'fullScreenModal' }} />
+      </Stack>
+    );
+  }
+
+  // If the user is a creator, show the (creator) layout group
+  if (user.role === UserRole.CREATOR_ASSOCIATE) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="creator-associate" options={{ presentation: 'fullScreenModal' }} />
+      </Stack>
+    );
+  }
+
+  // Default or fallback
   return (
-    <View style={{ flex: 1 }}>
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: { display: 'none' },
-        }}>
-        <Tabs.Screen 
-          name="index"
-          options={{
-            href: '/',
-          }}
-        />
-        {isCreator ? (
-          <>
-            <Tabs.Screen 
-              name="library"
-              options={{
-                href: '/library',
-              }}
-            />
-            <Tabs.Screen 
-              name="payouts"
-              options={{
-                href: '/payouts',
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Tabs.Screen 
-              name="explore"
-              options={{
-                href: '/explore',
-              }}
-            />
-            <Tabs.Screen 
-              name="membership"
-              options={{
-                href: '/membership',
-              }}
-            />
-          </>
-        )}
-        <Tabs.Screen 
-          name="chat"
-          options={{
-            href: '/chat',
-          }}
-        />
-        <Tabs.Screen 
-          name="menu"
-          options={{
-            href: '/menu',
-          }}
-        />
-        <Tabs.Screen 
-          name="creator"
-          options={{
-            href: null,
-          }}
-        />
-      </Tabs>
-      {showFooter && <Footer />}
-    </View>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="auth" options={{ presentation: 'fullScreenModal' }} />
+    </Stack>
   );
 }
