@@ -73,6 +73,7 @@ export default function SignInScreen() {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: Platform.OS === 'web' ? fontSize['4xl'] : fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               Welcome back
@@ -83,6 +84,7 @@ export default function SignInScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: Platform.OS === 'web' ? fontSize.xl : fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Sign in to continue building amazing things.
@@ -97,6 +99,7 @@ export default function SignInScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Email address
@@ -113,6 +116,7 @@ export default function SignInScreen() {
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}
                 autoCapitalize="none"
@@ -129,6 +133,7 @@ export default function SignInScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Password
@@ -149,6 +154,7 @@ export default function SignInScreen() {
                       color: colors.textPrimary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}
                   editable={!isLoading}
@@ -188,13 +194,14 @@ export default function SignInScreen() {
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Remember me
                 </Text>
               </TouchableOpacity>
 
-              <Link href="/forgot-password" asChild>
+              <Link href="/auth/forgot-password" asChild>
                 <TouchableOpacity disabled={isLoading}>
                   <Text style={[
                     styles.forgotPassword,
@@ -202,6 +209,7 @@ export default function SignInScreen() {
                       color: colors.primary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.sm,
+                      includeFontPadding: false
                     }
                   ]}>
                     Forgot password?
@@ -230,6 +238,7 @@ export default function SignInScreen() {
                       color: colors.buttonText,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Sign in
@@ -248,6 +257,7 @@ export default function SignInScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Or continue with
@@ -274,6 +284,7 @@ export default function SignInScreen() {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Sign in with Google
@@ -291,11 +302,12 @@ export default function SignInScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Don't have an account?{' '}
             </Text>
-            <Link href="/sign-up" asChild>
+            <Link href="/auth/sign-up" asChild>
               <TouchableOpacity disabled={isLoading}>
                 <Text style={[
                   styles.footerLink,
@@ -303,6 +315,7 @@ export default function SignInScreen() {
                     color: colors.primary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Sign up for free

@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     color: '#1e88e5',
+    includeFontPadding: false
   },
   dots: {
     flexDirection: 'row',

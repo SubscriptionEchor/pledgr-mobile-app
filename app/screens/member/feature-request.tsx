@@ -60,6 +60,7 @@ export default function FeatureRequestScreen() {
                             color: colors.textPrimary,
                             fontFamily: fonts.bold,
                             fontSize: fontSize['2xl'],
+                            includeFontPadding: false
                         }
                     ]}>
                         Share Your Ideas
@@ -70,6 +71,7 @@ export default function FeatureRequestScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Help us improve by suggesting new features or improvements
@@ -87,6 +89,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Innovation Welcome
@@ -97,6 +100,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             We value fresh ideas that can make the platform better for everyone
@@ -113,6 +117,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Quick Implementation
@@ -123,6 +128,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             Popular requests may be implemented in upcoming updates
@@ -138,6 +144,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.medium,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             Feature Title
@@ -154,6 +161,7 @@ export default function FeatureRequestScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}
                             editable={!isSubmitting}
@@ -167,6 +175,7 @@ export default function FeatureRequestScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.medium,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             Description
@@ -187,6 +196,7 @@ export default function FeatureRequestScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}
                             editable={!isSubmitting}

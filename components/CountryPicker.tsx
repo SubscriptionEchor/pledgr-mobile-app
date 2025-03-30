@@ -45,20 +45,21 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={handleClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Select Country
@@ -76,11 +77,12 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
             placeholder="Search countries"
             placeholderTextColor={colors.textSecondary}
             style={[
-              styles.searchInput, 
-              { 
+              styles.searchInput,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}
           />
@@ -94,11 +96,12 @@ export function CountryPicker({ visible, onClose, onSelect }: CountryPickerProps
               style={[styles.countryItem, { borderBottomColor: colors.border }]}
               onPress={() => handleSelect(item)}>
               <Text style={[
-                styles.countryName, 
-                { 
+                styles.countryName,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}>
                 {item}

@@ -45,8 +45,8 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
 
   const filteredSuggestions = useMemo(() => {
     if (!search.trim()) return [];
-    
-    return MOCK_SUGGESTIONS.filter(member => 
+
+    return MOCK_SUGGESTIONS.filter(member =>
       member.name.toLowerCase().includes(search.toLowerCase()) ||
       member.email.toLowerCase().includes(search.toLowerCase())
     );
@@ -63,7 +63,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
       'Invitation sent',
       `Team invitation has been sent to ${selectedMember.email}`
     );
-    
+
     // Reset state
     setSearch('');
     setSelectedMember(null);
@@ -77,20 +77,21 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={handleClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Add Team Member
@@ -100,7 +101,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -112,6 +113,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.md,
+              includeFontPadding: false
             }
           ]}>
             Search and select team members to invite
@@ -130,6 +132,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}
               autoFocus
@@ -143,7 +146,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                 style={[
                   styles.resultItem,
                   {
-                    backgroundColor: selectedMember?.id === member.id 
+                    backgroundColor: selectedMember?.id === member.id
                       ? `${colors.primary}15`
                       : colors.surface,
                   }
@@ -151,7 +154,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                 onPress={() => handleSelectMember(member)}
               >
                 <View style={styles.resultContent}>
-                  <Image 
+                  <Image
                     source={{ uri: member.avatar }}
                     style={styles.avatar}
                   />
@@ -162,6 +165,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {member.name}
@@ -172,6 +176,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       {member.email}
@@ -194,6 +199,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   No results found for "{search}"
@@ -213,6 +219,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Cancel

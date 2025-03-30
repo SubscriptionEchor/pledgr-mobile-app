@@ -36,6 +36,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               Choose your plan
@@ -49,7 +50,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
             <View style={[
               styles.planCard,
               styles.currentPlan,
-              { 
+              {
                 backgroundColor: colors.surface,
                 borderColor: colors.primary,
               }
@@ -61,6 +62,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.xl,
+                    includeFontPadding: false
                   }
                 ]}>
                   Basic Plan
@@ -71,6 +73,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.primary,
                     fontFamily: fonts.medium,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Current plan
@@ -84,6 +87,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.bold,
                     fontSize: fontSize['3xl'],
+                    includeFontPadding: false
                   }
                 ]}>
                   15%
@@ -94,6 +98,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.lg,
+                    includeFontPadding: false
                   }
                 ]}>
                   platform fee
@@ -106,6 +111,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Current plan
@@ -120,6 +126,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.xl,
+                    includeFontPadding: false
                   }
                 ]}>
                   Pro Plan
@@ -133,6 +140,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.bold,
                     fontSize: fontSize['3xl'],
+                    includeFontPadding: false
                   }
                 ]}>
                   8%
@@ -143,6 +151,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.lg,
+                    includeFontPadding: false
                   }
                 ]}>
                   platform fee

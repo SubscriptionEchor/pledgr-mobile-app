@@ -103,6 +103,7 @@ export default function MenuScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}
                         numberOfLines={1}>
@@ -115,6 +116,7 @@ export default function MenuScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.xs,
+                                includeFontPadding: false
                             }
                         ]}
                         numberOfLines={2}>

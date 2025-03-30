@@ -29,7 +29,7 @@ export function PageSettings() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
             Legal first name
           </Text>
           <TextInput
@@ -43,13 +43,14 @@ export function PageSettings() {
                 backgroundColor: colors.surface,
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
+                includeFontPadding: false
               }
             ]}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
             Legal surname
           </Text>
           <TextInput
@@ -63,13 +64,14 @@ export function PageSettings() {
                 backgroundColor: colors.surface,
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
+                includeFontPadding: false
               }
             ]}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
             Country of residence
           </Text>
           <TouchableOpacity
@@ -84,6 +86,7 @@ export function PageSettings() {
               {
                 color: form.country ? colors.textPrimary : colors.textSecondary,
                 fontFamily: fonts.regular,
+                includeFontPadding: false
               }
             ]}>
               {form.country || 'Select a country'}
@@ -96,6 +99,7 @@ export function PageSettings() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This information is used for tax purposes
@@ -109,6 +113,7 @@ export function PageSettings() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Visibility Settings
@@ -121,6 +126,7 @@ export function PageSettings() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
+                  includeFontPadding: false
                 }
               ]}>
                 Earnings visibility
@@ -131,6 +137,7 @@ export function PageSettings() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Choose whether to display your earnings publicly
@@ -156,6 +163,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Keep private
@@ -166,6 +174,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Only you can see your earnings
@@ -192,6 +201,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Make public
@@ -202,6 +212,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Everyone can see your earnings
@@ -219,6 +230,7 @@ export function PageSettings() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
+                  includeFontPadding: false
                 }
               ]}>
                 Membership Details
@@ -229,6 +241,7 @@ export function PageSettings() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Control who can see your membership details
@@ -254,6 +267,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Keep private
@@ -264,6 +278,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Only you can see membership details
@@ -290,6 +305,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Make public
@@ -300,6 +316,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Everyone can see membership details
@@ -317,6 +334,7 @@ export function PageSettings() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
+                  includeFontPadding: false
                 }
               ]}>
                 Membership Options
@@ -327,6 +345,7 @@ export function PageSettings() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Choose which membership options to display
@@ -352,6 +371,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Show free and paid options
@@ -362,6 +382,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Display all membership tiers
@@ -388,6 +409,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Show paid options only
@@ -398,6 +420,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Hide free membership tier
@@ -415,6 +438,7 @@ export function PageSettings() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
+                  includeFontPadding: false
                 }
               ]}>
                 Comment access
@@ -425,6 +449,7 @@ export function PageSettings() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Manage comment settings for your page
@@ -450,6 +475,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Allow comments
@@ -460,6 +486,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Members can comment on your posts
@@ -486,6 +513,7 @@ export function PageSettings() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.medium,
+                        includeFontPadding: false
                       }
                     ]}>
                       Turn off comments
@@ -496,6 +524,7 @@ export function PageSettings() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Disable comments on all posts
@@ -516,6 +545,7 @@ export function PageSettings() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.lg,
+                  includeFontPadding: false
                 }
               ]}>
                 Adult content
@@ -526,6 +556,7 @@ export function PageSettings() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 My work isn't suitable for people under 18

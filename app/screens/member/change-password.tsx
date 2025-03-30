@@ -108,6 +108,7 @@ export default function ChangePasswordScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Choose a strong password that you haven't used before.
@@ -122,6 +123,7 @@ export default function ChangePasswordScreen() {
                                     color: colors.error,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {error}
@@ -137,6 +139,7 @@ export default function ChangePasswordScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Current Password
@@ -160,6 +163,7 @@ export default function ChangePasswordScreen() {
                                             color: colors.textPrimary,
                                             fontFamily: fonts.regular,
                                             fontSize: fontSize.md,
+                                            includeFontPadding: false
                                         }
                                     ]}
                                     secureTextEntry={!showPasswords.current}
@@ -186,6 +190,7 @@ export default function ChangePasswordScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 New Password
@@ -209,6 +214,7 @@ export default function ChangePasswordScreen() {
                                             color: colors.textPrimary,
                                             fontFamily: fonts.regular,
                                             fontSize: fontSize.md,
+                                            includeFontPadding: false
                                         }
                                     ]}
                                     secureTextEntry={!showPasswords.new}
@@ -235,6 +241,7 @@ export default function ChangePasswordScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Password Requirements
@@ -259,6 +266,7 @@ export default function ChangePasswordScreen() {
                                                 color: requirement.met ? colors.textPrimary : colors.textSecondary,
                                                 fontFamily: fonts.regular,
                                                 fontSize: fontSize.sm,
+                                                includeFontPadding: false
                                             }
                                         ]}>
                                             {requirement.label}
@@ -275,6 +283,7 @@ export default function ChangePasswordScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Confirm New Password
@@ -298,6 +307,7 @@ export default function ChangePasswordScreen() {
                                             color: colors.textPrimary,
                                             fontFamily: fonts.regular,
                                             fontSize: fontSize.md,
+                                            includeFontPadding: false
                                         }
                                     ]}
                                     secureTextEntry={!showPasswords.confirm}

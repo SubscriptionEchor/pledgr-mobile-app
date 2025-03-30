@@ -143,6 +143,7 @@ export default function NotificationsScreen() {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                 }
             ]}>
                 {title}
@@ -164,6 +165,7 @@ export default function NotificationsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             {item.title}
@@ -196,6 +198,7 @@ export default function NotificationsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.bold,
                                 fontSize: fontSize.xl,
+                                includeFontPadding: false
                             }
                         ]}>
                             Notification Feed
@@ -225,6 +228,7 @@ export default function NotificationsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.bold,
                                 fontSize: fontSize.xl,
+                                includeFontPadding: false
                             }
                         ]}>
                             Email
@@ -266,10 +270,11 @@ export default function NotificationsScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             Edit your preferences on{' '}
-                            <Text style={{ color: colors.primary }}>
+                            <Text style={{ color: colors.primary, includeFontPadding: false }}>
                                 marketing email settings
                             </Text>
                             .
@@ -294,6 +299,7 @@ export default function NotificationsScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.xl,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Notification Preferences
@@ -304,6 +310,7 @@ export default function NotificationsScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Choose what notifications you want to receive
@@ -330,6 +337,7 @@ export default function NotificationsScreen() {
                                                 color: colors.textPrimary,
                                                 fontFamily: fonts.semibold,
                                                 fontSize: fontSize.md,
+                                                includeFontPadding: false
                                             }
                                         ]}>
                                             {setting.title}
@@ -340,6 +348,7 @@ export default function NotificationsScreen() {
                                                 color: colors.textSecondary,
                                                 fontFamily: fonts.regular,
                                                 fontSize: fontSize.sm,
+                                                includeFontPadding: false
                                             }
                                         ]}>
                                             {setting.description}
@@ -362,6 +371,7 @@ export default function NotificationsScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                         }
                     ]}>
                         You can change these preferences at any time. Email notifications will be sent to your registered email address.

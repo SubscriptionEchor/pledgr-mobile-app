@@ -46,20 +46,21 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={handleClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Select Language
@@ -69,19 +70,20 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          style={styles.scrollView} 
+        <ScrollView
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           <View style={[styles.warningBox, { backgroundColor: `${colors.primary}15` }]}>
             <Globe2 size={24} color={colors.primary} />
             <Text style={[
-              styles.warningText, 
-              { 
+              styles.warningText,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Choose your preferred language. This will change the language of the app interface.
@@ -96,11 +98,12 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
               placeholder="Search languages"
               placeholderTextColor={colors.textSecondary}
               style={[
-                styles.searchInput, 
-                { 
+                styles.searchInput,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}
             />
@@ -112,18 +115,19 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
                 key={language.code}
                 style={[
                   styles.languageItem,
-                  { 
+                  {
                     backgroundColor: language.code === selectedCode ? `${colors.primary}15` : 'transparent',
-                    borderBottomColor: colors.border 
+                    borderBottomColor: colors.border
                   }
                 ]}
                 onPress={() => handleSelect(language)}>
                 <Text style={[
-                  styles.languageName, 
-                  { 
+                  styles.languageName,
+                  {
                     color: colors.textPrimary,
                     fontFamily: language.code === selectedCode ? fonts.semibold : fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   {language.name}

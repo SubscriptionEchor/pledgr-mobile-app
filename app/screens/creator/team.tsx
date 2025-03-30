@@ -111,6 +111,7 @@ export default function TeamScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                             {member.name}
@@ -129,6 +130,7 @@ export default function TeamScreen() {
                                     color: member.status === 'active' ? colors.success : colors.warning,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.xs,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {member.status === 'active' ? 'Active' : 'Pending'}
@@ -144,6 +146,7 @@ export default function TeamScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                         {member.email}
@@ -165,6 +168,7 @@ export default function TeamScreen() {
                                     color: colors.primary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.xs,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Resend
@@ -181,6 +185,7 @@ export default function TeamScreen() {
                                 color: colors.error,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.xs,
+                                includeFontPadding: false
                             }
                         ]}>
                             Remove
@@ -197,6 +202,7 @@ export default function TeamScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.xs,
+                                includeFontPadding: false
                             }
                         ]}>
                             Joined {member.joinedDate}
@@ -223,6 +229,7 @@ export default function TeamScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.bold,
                                 fontSize: fontSize['2xl'],
+                                includeFontPadding: false
                             }
                         ]}>
                             Upgrade to Pro
@@ -234,6 +241,7 @@ export default function TeamScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Unlock team collaboration features and invite team members to help manage your creator page
@@ -248,6 +256,7 @@ export default function TeamScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Add unlimited team members
@@ -262,6 +271,7 @@ export default function TeamScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Assign custom roles and permissions
@@ -276,6 +286,7 @@ export default function TeamScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Track team activity and manage access
@@ -297,6 +308,7 @@ export default function TeamScreen() {
                                         color: colors.buttonText,
                                         fontFamily: fonts.semibold,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Upgrade to Pro
@@ -320,6 +332,7 @@ export default function TeamScreen() {
                         color: colors.textPrimary,
                         fontFamily: fonts.bold,
                         fontSize: fontSize.xl,
+                        includeFontPadding: false
                     }
                 ]}>
                     Team Members
@@ -335,6 +348,7 @@ export default function TeamScreen() {
                             color: colors.buttonText,
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                         }
                     ]}>
                         Add Member

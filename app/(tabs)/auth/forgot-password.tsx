@@ -30,12 +30,12 @@ export default function ForgotPasswordScreen() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       showToast.success(
         'Reset link sent',
         'Check your email for instructions to reset your password'
       );
-      
+
       router.back();
     } catch (error) {
       showToast.error(
@@ -48,11 +48,11 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
           { minHeight: SCREEN_HEIGHT }
@@ -80,6 +80,7 @@ export default function ForgotPasswordScreen() {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: Platform.OS === 'web' ? fontSize['4xl'] : fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               Reset password
@@ -90,6 +91,7 @@ export default function ForgotPasswordScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: Platform.OS === 'web' ? fontSize.xl : fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Enter your email address and we'll send you instructions to reset your password.
@@ -104,6 +106,7 @@ export default function ForgotPasswordScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Email address
@@ -120,6 +123,7 @@ export default function ForgotPasswordScreen() {
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}
                 autoCapitalize="none"
@@ -150,6 +154,7 @@ export default function ForgotPasswordScreen() {
                       color: colors.buttonText,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Send reset link

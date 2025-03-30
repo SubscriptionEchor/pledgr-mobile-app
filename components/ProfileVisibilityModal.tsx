@@ -13,11 +13,11 @@ interface ProfileVisibilityModalProps {
   onSelect: (visibility: string) => void;
 }
 
-export function ProfileVisibilityModal({ 
-  visible, 
-  onClose, 
+export function ProfileVisibilityModal({
+  visible,
+  onClose,
   selectedVisibility,
-  onSelect 
+  onSelect
 }: ProfileVisibilityModalProps) {
   const { colors, fonts, fontSize } = useTheme();
   const [isPublic, setIsPublic] = useState(selectedVisibility === ProfileVisibility.PUBLIC);
@@ -31,20 +31,21 @@ export function ProfileVisibilityModal({
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Profile Visibility
@@ -54,7 +55,7 @@ export function ProfileVisibilityModal({
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -62,11 +63,12 @@ export function ProfileVisibilityModal({
           <View style={[styles.warningBox, { backgroundColor: '#FFF9F0' }]}>
             <AlertTriangle size={24} color="#F59E0B" />
             <Text style={[
-              styles.warningText, 
-              { 
+              styles.warningText,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Choose who can see your {isCreator ? 'shop and ' : ''}profile content. You can change this at any time.
@@ -78,21 +80,23 @@ export function ProfileVisibilityModal({
               <View style={[styles.toggleContainer, { backgroundColor: colors.surface }]}>
                 <View style={styles.toggleContent}>
                   <Text style={[
-                    styles.toggleTitle, 
-                    { 
+                    styles.toggleTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.lg,
+                      includeFontPadding: false
                     }
                   ]}>
                     Shop Visibility
                   </Text>
                   <Text style={[
-                    styles.toggleDescription, 
-                    { 
+                    styles.toggleDescription,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Make your shop and products visible to the public
@@ -120,6 +124,7 @@ export function ProfileVisibilityModal({
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   {isPublic ? (
@@ -138,6 +143,7 @@ export function ProfileVisibilityModal({
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     When visibility is off:
@@ -149,6 +155,7 @@ export function ProfileVisibilityModal({
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       • Products will no longer be visible to the public but customers who have already purchased products will still have access to them
@@ -159,6 +166,7 @@ export function ProfileVisibilityModal({
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       • Posts and collections will remain visible on your page but no longer appear in the shop tab
@@ -172,21 +180,23 @@ export function ProfileVisibilityModal({
               <View style={[styles.toggleContainer, { backgroundColor: colors.surface }]}>
                 <View style={styles.toggleContent}>
                   <Text style={[
-                    styles.toggleTitle, 
-                    { 
+                    styles.toggleTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.lg,
+                      includeFontPadding: false
                     }
                   ]}>
                     Public Profile
                   </Text>
                   <Text style={[
-                    styles.toggleDescription, 
-                    { 
+                    styles.toggleDescription,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Allow anyone to view your profile and content
@@ -201,12 +211,13 @@ export function ProfileVisibilityModal({
               </View>
 
               <Text style={[
-                styles.sectionTitle, 
-                { 
+                styles.sectionTitle,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.lg,
                   marginTop: 24,
+                  includeFontPadding: false
                 }
               ]}>
                 What this means:
@@ -219,21 +230,23 @@ export function ProfileVisibilityModal({
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
-                      styles.infoTitle, 
-                      { 
+                      styles.infoTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       Public Profile
                     </Text>
                     <Text style={[
-                      styles.infoDescription, 
-                      { 
+                      styles.infoDescription,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       Your profile, posts, and activity are visible to everyone
@@ -247,21 +260,23 @@ export function ProfileVisibilityModal({
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
-                      styles.infoTitle, 
-                      { 
+                      styles.infoTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       Engagement
                     </Text>
                     <Text style={[
-                      styles.infoDescription, 
-                      { 
+                      styles.infoDescription,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       Anyone can follow you and interact with your content
@@ -275,21 +290,23 @@ export function ProfileVisibilityModal({
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
-                      styles.infoTitle, 
-                      { 
+                      styles.infoTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       Privacy Control
                     </Text>
                     <Text style={[
-                      styles.infoDescription, 
-                      { 
+                      styles.infoDescription,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       You can still block specific users and control who can message you

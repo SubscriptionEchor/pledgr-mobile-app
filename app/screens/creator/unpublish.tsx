@@ -39,6 +39,7 @@ export default function UnpublishScreen() {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                     }
                 ]}>
                     When you unpublish your page:
@@ -51,6 +52,7 @@ export default function UnpublishScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         • Members will not be able to access your creator page and member billing will be suspended
@@ -62,6 +64,7 @@ export default function UnpublishScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         • Customers who have bought items from your shop will keep access to their purchases, but your shop and products will otherwise no longer be visible
@@ -73,6 +76,7 @@ export default function UnpublishScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         • We'll keep your creator page content and member information, including pledges, for when you decide to launch your page at a later date
@@ -90,6 +94,7 @@ export default function UnpublishScreen() {
                             color: colors.error,
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Unpublish your page

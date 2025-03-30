@@ -23,8 +23,8 @@ interface AuthenticatorModalProps {
   onToggle: (value: boolean) => void;
 }
 
-export function AuthenticatorModal({ 
-  visible, 
+export function AuthenticatorModal({
+  visible,
   onClose,
   isEnabled,
   onToggle
@@ -118,20 +118,21 @@ export function AuthenticatorModal({
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Two-Factor Authentication
@@ -141,8 +142,8 @@ export function AuthenticatorModal({
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          style={styles.scrollView} 
+        <ScrollView
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
@@ -151,35 +152,38 @@ export function AuthenticatorModal({
               <View style={[styles.successIcon, { backgroundColor: `${colors.success}15` }]}>
                 <Check size={32} color={colors.success} />
               </View>
-              
+
               <View style={styles.successContent}>
                 <Text style={[
-                  styles.successTitle, 
-                  { 
+                  styles.successTitle,
+                  {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.xl,
+                    includeFontPadding: false
                   }
                 ]}>
                   Two-Factor Authentication is Enabled
                 </Text>
                 <Text style={[
-                  styles.successDescription, 
-                  { 
+                  styles.successDescription,
+                  {
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Your account is protected with an additional layer of security.
                 </Text>
                 {lastVerifiedTime && (
                   <Text style={[
-                    styles.lastVerified, 
-                    { 
+                    styles.lastVerified,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.sm,
+                      includeFontPadding: false
                     }
                   ]}>
                     Last verified: {lastVerifiedTime}
@@ -190,21 +194,23 @@ export function AuthenticatorModal({
               <View style={[styles.mainSetting, { backgroundColor: colors.surface }]}>
                 <View style={styles.settingContent}>
                   <Text style={[
-                    styles.settingTitle, 
-                    { 
+                    styles.settingTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Two-Factor Authentication
                   </Text>
                   <Text style={[
-                    styles.settingDescription, 
-                    { 
+                    styles.settingDescription,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.sm,
+                      includeFontPadding: false
                     }
                   ]}>
                     Use an authenticator app to generate verification codes
@@ -223,11 +229,12 @@ export function AuthenticatorModal({
               <View style={[styles.warningBox, { backgroundColor: `${colors.primary}15` }]}>
                 <Shield size={24} color={colors.primary} />
                 <Text style={[
-                  styles.warningText, 
-                  { 
+                  styles.warningText,
+                  {
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Add an extra layer of security to your account by requiring both your password and a verification code from your phone.
@@ -237,21 +244,23 @@ export function AuthenticatorModal({
               <View style={[styles.mainSetting, { backgroundColor: colors.surface }]}>
                 <View style={styles.settingContent}>
                   <Text style={[
-                    styles.settingTitle, 
-                    { 
+                    styles.settingTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Enable Two-Factor Authentication
                   </Text>
                   <Text style={[
-                    styles.settingDescription, 
-                    { 
+                    styles.settingDescription,
+                    {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.sm,
+                      includeFontPadding: false
                     }
                   ]}>
                     Use an authenticator app to generate verification codes
@@ -268,16 +277,17 @@ export function AuthenticatorModal({
               {!isEnabled ? (
                 <View style={styles.infoSection}>
                   <Text style={[
-                    styles.infoTitle, 
-                    { 
+                    styles.infoTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     How it works:
                   </Text>
-                  
+
                   <View style={styles.infoCards}>
                     <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
                       <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
@@ -285,21 +295,23 @@ export function AuthenticatorModal({
                       </View>
                       <View style={styles.infoCardContent}>
                         <Text style={[
-                          styles.infoCardTitle, 
-                          { 
+                          styles.infoCardTitle,
+                          {
                             color: colors.textPrimary,
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                           }
                         ]}>
                           Setup Process
                         </Text>
                         <Text style={[
-                          styles.infoCardDescription, 
-                          { 
+                          styles.infoCardDescription,
+                          {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                           }
                         ]}>
                           Scan a QR code with your authenticator app to link it to your account
@@ -313,21 +325,23 @@ export function AuthenticatorModal({
                       </View>
                       <View style={styles.infoCardContent}>
                         <Text style={[
-                          styles.infoCardTitle, 
-                          { 
+                          styles.infoCardTitle,
+                          {
                             color: colors.textPrimary,
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                           }
                         ]}>
                           Enhanced Security
                         </Text>
                         <Text style={[
-                          styles.infoCardDescription, 
-                          { 
+                          styles.infoCardDescription,
+                          {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                           }
                         ]}>
                           Protect your account even if your password is compromised
@@ -339,11 +353,12 @@ export function AuthenticatorModal({
               ) : showVerification ? (
                 <View style={styles.verificationSection}>
                   <Text style={[
-                    styles.stepTitle, 
-                    { 
+                    styles.stepTitle,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.lg,
+                      includeFontPadding: false
                     }
                   ]}>
                     3. Verify authentication code
@@ -358,12 +373,13 @@ export function AuthenticatorModal({
                         }}
                         style={[
                           styles.input,
-                          { 
+                          {
                             backgroundColor: colors.surface,
                             color: colors.textPrimary,
                             borderColor: error ? colors.error : colors.border,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.lg,
+                            includeFontPadding: false
                           }
                         ]}
                         placeholder="Enter 6-digit code"
@@ -374,11 +390,12 @@ export function AuthenticatorModal({
                       />
                       {error && (
                         <Text style={[
-                          styles.errorText, 
-                          { 
+                          styles.errorText,
+                          {
                             color: colors.error,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                           }
                         ]}>
                           {error}
@@ -389,11 +406,12 @@ export function AuthenticatorModal({
                     {isVerified ? (
                       <View style={[styles.successMessage, { backgroundColor: `${colors.success}15` }]}>
                         <Text style={[
-                          styles.successText, 
-                          { 
+                          styles.successText,
+                          {
                             color: colors.success,
                             fontFamily: fonts.medium,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                           }
                         ]}>
                           Two-factor authentication has been enabled successfully!
@@ -402,42 +420,46 @@ export function AuthenticatorModal({
                     ) : (
                       <View style={[styles.instructions, { backgroundColor: colors.surface }]}>
                         <Text style={[
-                          styles.instructionsTitle, 
-                          { 
+                          styles.instructionsTitle,
+                          {
                             color: colors.textPrimary,
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                           }
                         ]}>
                           Verification Instructions
                         </Text>
                         <View style={styles.instructionsList}>
                           <Text style={[
-                            styles.instruction, 
-                            { 
+                            styles.instruction,
+                            {
                               color: colors.textSecondary,
                               fontFamily: fonts.regular,
                               fontSize: fontSize.sm,
+                              includeFontPadding: false
                             }
                           ]}>
                             1. Open your authenticator app
                           </Text>
                           <Text style={[
-                            styles.instruction, 
-                            { 
+                            styles.instruction,
+                            {
                               color: colors.textSecondary,
                               fontFamily: fonts.regular,
                               fontSize: fontSize.sm,
+                              includeFontPadding: false
                             }
                           ]}>
                             2. Find the Pledgr entry
                           </Text>
                           <Text style={[
-                            styles.instruction, 
-                            { 
+                            styles.instruction,
+                            {
                               color: colors.textSecondary,
                               fontFamily: fonts.regular,
                               fontSize: fontSize.sm,
+                              includeFontPadding: false
                             }
                           ]}>
                             3. Enter the 6-digit code shown in the app
@@ -453,12 +475,13 @@ export function AuthenticatorModal({
                       style={[styles.cancelButton, { backgroundColor: colors.surface }]}
                       disabled={isVerifying || isVerified}>
                       <Text style={[
-                        styles.cancelButtonText, 
-                        { 
+                        styles.cancelButtonText,
+                        {
                           color: colors.textPrimary,
                           fontFamily: fonts.semibold,
                           fontSize: fontSize.md,
                           opacity: (isVerifying || isVerified) ? 0.5 : 1,
+                          includeFontPadding: false
                         }
                       ]}>
                         Back
@@ -484,11 +507,12 @@ export function AuthenticatorModal({
                 <View style={styles.setupSection}>
                   <View style={styles.step}>
                     <Text style={[
-                      styles.stepTitle, 
-                      { 
+                      styles.stepTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.lg,
+                        includeFontPadding: false
                       }
                     ]}>
                       1. Scan QR code
@@ -499,11 +523,12 @@ export function AuthenticatorModal({
                         style={styles.qrCode}
                       />
                       <Text style={[
-                        styles.qrText, 
-                        { 
+                        styles.qrText,
+                        {
                           color: colors.textSecondary,
                           fontFamily: fonts.regular,
                           fontSize: fontSize.sm,
+                          includeFontPadding: false
                         }
                       ]}>
                         Scan this QR code with your Google Authenticator app
@@ -511,21 +536,23 @@ export function AuthenticatorModal({
                     </View>
                     <View style={[styles.manualContainer, { backgroundColor: colors.surface }]}>
                       <Text style={[
-                        styles.manualTitle, 
-                        { 
+                        styles.manualTitle,
+                        {
                           color: colors.textSecondary,
                           fontFamily: fonts.regular,
                           fontSize: fontSize.sm,
+                          includeFontPadding: false
                         }
                       ]}>
                         Or enter this code manually:
                       </Text>
                       <Text style={[
-                        styles.manualCode, 
-                        { 
+                        styles.manualCode,
+                        {
                           color: colors.textPrimary,
                           fontFamily: fonts.medium,
                           fontSize: fontSize.md,
+                          includeFontPadding: false
                         }
                       ]}>
                         2H7D65Y7LBUWQNJ275BTFULRPFWQGMGF
@@ -535,21 +562,23 @@ export function AuthenticatorModal({
 
                   <View style={styles.step}>
                     <Text style={[
-                      styles.stepTitle, 
-                      { 
+                      styles.stepTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.lg,
+                        includeFontPadding: false
                       }
                     ]}>
                       2. Save backup codes
                     </Text>
                     <Text style={[
-                      styles.stepDescription, 
-                      { 
+                      styles.stepDescription,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       Keep these backup codes safe — you'll need them if you lose access to your authenticator app
@@ -557,18 +586,19 @@ export function AuthenticatorModal({
                     <View style={[styles.codesContainer, { backgroundColor: colors.surface }]}>
                       <View style={styles.codesGrid}>
                         {BACKUP_CODES.map((code, index) => (
-                          <View 
+                          <View
                             key={code}
                             style={[
                               styles.codeItem,
                               { backgroundColor: `${colors.primary}15` }
                             ]}>
                             <Text style={[
-                              styles.codeText, 
-                              { 
+                              styles.codeText,
+                              {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.medium,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                               }
                             ]}>
                               {code}
@@ -582,11 +612,12 @@ export function AuthenticatorModal({
                           style={[styles.actionButton, { backgroundColor: colors.surface }]}>
                           <Copy size={20} color={colors.textPrimary} />
                           <Text style={[
-                            styles.actionButtonText, 
-                            { 
+                            styles.actionButtonText,
+                            {
                               color: colors.textPrimary,
                               fontFamily: fonts.medium,
                               fontSize: fontSize.sm,
+                              includeFontPadding: false
                             }
                           ]}>
                             Copy codes
@@ -597,11 +628,12 @@ export function AuthenticatorModal({
                           style={[styles.actionButton, { backgroundColor: colors.surface }]}>
                           <Download size={20} color={colors.primary} />
                           <Text style={[
-                            styles.actionButtonText, 
-                            { 
+                            styles.actionButtonText,
+                            {
                               color: colors.primary,
                               fontFamily: fonts.medium,
                               fontSize: fontSize.sm,
+                              includeFontPadding: false
                             }
                           ]}>
                             Download codes
@@ -616,11 +648,12 @@ export function AuthenticatorModal({
                       onPress={handleClose}
                       style={[styles.cancelButton, { backgroundColor: colors.surface }]}>
                       <Text style={[
-                        styles.cancelButtonText, 
-                        { 
+                        styles.cancelButtonText,
+                        {
                           color: colors.textPrimary,
                           fontFamily: fonts.semibold,
                           fontSize: fontSize.md,
+                          includeFontPadding: false
                         }
                       ]}>
                         Cancel

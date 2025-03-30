@@ -23,8 +23,8 @@ interface DeviceManagementModalProps {
   onLogoutAllDevices: () => void;
 }
 
-export function DeviceManagementModal({ 
-  visible, 
+export function DeviceManagementModal({
+  visible,
   onClose,
   devices,
   onLogoutDevice,
@@ -73,20 +73,21 @@ export function DeviceManagementModal({
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.title, 
-            { 
+            styles.title,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Device Management
@@ -96,19 +97,20 @@ export function DeviceManagementModal({
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          style={styles.scrollView} 
+        <ScrollView
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           <View style={[styles.warningBox, { backgroundColor: `${colors.primary}15` }]}>
             <Smartphone size={24} color={colors.primary} />
             <Text style={[
-              styles.warningText, 
-              { 
+              styles.warningText,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Review and manage all devices that are currently signed in to your account. You can log out of any device remotely.
@@ -117,18 +119,19 @@ export function DeviceManagementModal({
 
           <View style={styles.deviceList}>
             {devices.map((device) => (
-              <View 
+              <View
                 key={device.id}
                 style={[styles.deviceItem, { backgroundColor: colors.surface }]}
               >
                 <View style={styles.deviceInfo}>
                   <View style={styles.deviceHeader}>
                     <Text style={[
-                      styles.deviceName, 
-                      { 
+                      styles.deviceName,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {device.name}
@@ -136,11 +139,12 @@ export function DeviceManagementModal({
                     {device.isCurrentDevice && (
                       <View style={[styles.currentDevice, { backgroundColor: colors.success }]}>
                         <Text style={[
-                          styles.currentDeviceText, 
-                          { 
+                          styles.currentDeviceText,
+                          {
                             color: colors.buttonText,
                             fontFamily: fonts.medium,
                             fontSize: fontSize.xs,
+                            includeFontPadding: false
                           }
                         ]}>
                           Current Device
@@ -153,11 +157,12 @@ export function DeviceManagementModal({
                     <View style={styles.detailItem}>
                       <Globe size={16} color={colors.textSecondary} />
                       <Text style={[
-                        styles.detailText, 
-                        { 
+                        styles.detailText,
+                        {
                           color: colors.textSecondary,
                           fontFamily: fonts.regular,
                           fontSize: fontSize.sm,
+                          includeFontPadding: false
                         }
                       ]}>
                         {device.location}
@@ -166,11 +171,12 @@ export function DeviceManagementModal({
                     <View style={styles.detailItem}>
                       <Clock size={16} color={colors.textSecondary} />
                       <Text style={[
-                        styles.detailText, 
-                        { 
+                        styles.detailText,
+                        {
                           color: colors.textSecondary,
                           fontFamily: fonts.regular,
                           fontSize: fontSize.sm,
+                          includeFontPadding: false
                         }
                       ]}>
                         {device.lastActive}
@@ -180,7 +186,7 @@ export function DeviceManagementModal({
                 </View>
 
                 {!device.isCurrentDevice && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => handleLogoutClick(device)}
                     style={[styles.logoutButton, { backgroundColor: `${colors.error}15` }]}
                   >
@@ -191,8 +197,8 @@ export function DeviceManagementModal({
             ))}
           </View>
 
-          <Button 
-            label="Log Out All Other Devices" 
+          <Button
+            label="Log Out All Other Devices"
             onPress={handleLogoutAllClick}
             variant="error"
           />

@@ -15,6 +15,7 @@ export default function ExploreScreen() {
                         color: colors.textPrimary,
                         fontFamily: fonts.bold,
                         fontSize: fontSize['2xl'],
+                        includeFontPadding: false
                     }
                 ]}>
                     Explore

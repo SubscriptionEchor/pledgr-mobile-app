@@ -73,6 +73,7 @@ function TagModal({ visible, onClose, onSelect, selectedTags }: TagModalProps) {
                             color: colors.textPrimary,
                             fontFamily: fonts.bold,
                             fontSize: fontSize.xl,
+                            includeFontPadding: false
                         }
                     ]}>
                         Add Featured Tags
@@ -105,6 +106,7 @@ function TagModal({ visible, onClose, onSelect, selectedTags }: TagModalProps) {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {tag}
@@ -123,6 +125,7 @@ function TagModal({ visible, onClose, onSelect, selectedTags }: TagModalProps) {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Cancel
@@ -137,6 +140,7 @@ function TagModal({ visible, onClose, onSelect, selectedTags }: TagModalProps) {
                                 color: colors.buttonText,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Add selected tags
@@ -216,6 +220,7 @@ export default function EditPageScreen() {
                                         color: isActive ? colors.buttonText : colors.textSecondary,
                                         fontFamily: fonts.medium,
                                         fontSize: fontSize.sm,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     {tab.label}

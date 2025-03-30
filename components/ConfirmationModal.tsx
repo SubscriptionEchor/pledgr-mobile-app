@@ -24,9 +24,9 @@ export function ConfirmationModal({
   const { colors, fonts, fontSize } = useTheme();
 
   return (
-    <Modal 
-      visible={visible} 
-      transparent 
+    <Modal
+      visible={visible}
+      transparent
       animationType="fade"
       onRequestClose={onClose}
     >
@@ -34,21 +34,23 @@ export function ConfirmationModal({
         <View style={[styles.container, { backgroundColor: colors.background }]}>
           <View style={styles.content}>
             <Text style={[
-              styles.title, 
-              { 
+              styles.title,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.xl,
+                includeFontPadding: false
               }
             ]}>
               {title}
             </Text>
             <Text style={[
-              styles.description, 
-              { 
+              styles.description,
+              {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               {description}
@@ -60,11 +62,12 @@ export function ConfirmationModal({
               onPress={onClose}
               style={[styles.cancelButton, { backgroundColor: colors.surface }]}>
               <Text style={[
-                styles.cancelButtonText, 
-                { 
+                styles.cancelButtonText,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}>
                 Cancel

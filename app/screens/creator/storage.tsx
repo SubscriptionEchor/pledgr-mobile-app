@@ -23,6 +23,7 @@ export default function StorageScreen() {
                             color: colors.textPrimary,
                             fontFamily: fonts.bold,
                             fontSize: fontSize['2xl'],
+                            includeFontPadding: false
                         }
                     ]}>
                         4.3GB available
@@ -33,6 +34,7 @@ export default function StorageScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         You've used 15.7GB of storage space, out of 20GB total storage available.

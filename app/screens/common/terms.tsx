@@ -22,6 +22,7 @@ export default function TermsScreen() {
                             color: colors.textPrimary,
                             fontFamily: fonts.bold,
                             fontSize: fontSize['2xl'],
+                            includeFontPadding: false
                         }
                     ]}>
                         Terms of Service
@@ -32,6 +33,7 @@ export default function TermsScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Last updated: March 15, 2024
@@ -49,6 +51,7 @@ export default function TermsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Data Protection
@@ -65,6 +68,7 @@ export default function TermsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Fair Usage
@@ -81,6 +85,7 @@ export default function TermsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             Community Rules
@@ -97,6 +102,7 @@ export default function TermsScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.lg,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {section.title}
@@ -107,6 +113,7 @@ export default function TermsScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {section.content}

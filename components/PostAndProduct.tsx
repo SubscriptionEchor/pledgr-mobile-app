@@ -38,7 +38,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -51,6 +51,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               Featured Tags
@@ -65,6 +66,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                   color: colors.buttonText,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Add Tags
@@ -79,6 +81,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
             color: colors.textSecondary,
             fontFamily: fonts.regular,
             fontSize: fontSize.md,
+            includeFontPadding: false
           }
         ]}>
           Highlight important tags to help visitors discover your content
@@ -93,6 +96,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.lg,
+                includeFontPadding: false
               }
             ]}>
               No tags available
@@ -103,6 +107,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Add tags to help organize and categorize your content
@@ -126,6 +131,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {tag.name}
@@ -136,6 +142,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       {tag.posts} {tag.posts === 1 ? 'post' : 'posts'}

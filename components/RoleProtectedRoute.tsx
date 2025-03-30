@@ -28,6 +28,7 @@ export function RoleProtectedRoute({ children, allowedRoles }: RoleProtectedRout
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             Access Denied
@@ -38,6 +39,7 @@ export function RoleProtectedRoute({ children, allowedRoles }: RoleProtectedRout
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.md,
+              includeFontPadding: false
             }
           ]}>
             You don't have permission to access this page.

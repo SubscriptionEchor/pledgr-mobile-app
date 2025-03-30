@@ -15,6 +15,7 @@ export default function LibraryScreen() {
                         color: colors.textPrimary,
                         fontFamily: fonts.bold,
                         fontSize: fontSize['2xl'],
+                        includeFontPadding: false
                     }
                 ]}>
                     Library

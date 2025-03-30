@@ -47,20 +47,21 @@ export function SubscriptionDetailsModal({
   };
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
+    <Modal
+      visible={visible}
+      animationType="slide"
       transparent
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <Text style={[
-            styles.headerTitle, 
-            { 
+            styles.headerTitle,
+            {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.xl,
+              includeFontPadding: false
             }
           ]}>
             {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Subscription Details' : 'Following Details'}
@@ -70,7 +71,7 @@ export function SubscriptionDetailsModal({
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -79,21 +80,23 @@ export function SubscriptionDetailsModal({
             <Image source={{ uri: subscriber.avatar }} style={styles.avatar} />
             <View style={styles.creatorText}>
               <Text style={[
-                styles.creatorName, 
-                { 
+                styles.creatorName,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.lg,
+                  includeFontPadding: false
                 }
               ]}>
                 {subscriber.name}
               </Text>
               <Text style={[
-                styles.creatorTitle, 
-                { 
+                styles.creatorTitle,
+                {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 {subscriber.title}
@@ -103,11 +106,12 @@ export function SubscriptionDetailsModal({
 
           <View style={[styles.membershipCard, { backgroundColor: colors.surface }]}>
             <Text style={[
-              styles.membershipTitle, 
-              { 
+              styles.membershipTitle,
+              {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.xl,
+                includeFontPadding: false
               }
             ]}>
               {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Premium' : 'Free Membership'}
@@ -116,32 +120,35 @@ export function SubscriptionDetailsModal({
               {subscriber.status === SubscriptionStatus.SUBSCRIBED && (
                 <View style={styles.priceRow}>
                   <Text style={[
-                    styles.price, 
-                    { 
+                    styles.price,
+                    {
                       color: colors.textPrimary,
                       fontFamily: fonts.bold,
                       fontSize: fontSize['2xl'],
+                      includeFontPadding: false
                     }
                   ]}>
                     $9.99/month
                   </Text>
                   <View style={styles.nextPaymentWrapper}>
                     <Text style={[
-                      styles.nextPaymentLabel, 
-                      { 
+                      styles.nextPaymentLabel,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.xs,
+                        includeFontPadding: false
                       }
                     ]}>
                       Next payment
                     </Text>
                     <Text style={[
-                      styles.nextPaymentDate, 
-                      { 
+                      styles.nextPaymentDate,
+                      {
                         color: colors.primary,
                         fontFamily: fonts.medium,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       {subscriber.nextPayment}
@@ -152,14 +159,15 @@ export function SubscriptionDetailsModal({
               <View style={[styles.statusBadge, { backgroundColor: `${colors.success}15` }]}>
                 <Check size={16} color={colors.success} />
                 <Text style={[
-                  styles.statusText, 
-                  { 
+                  styles.statusText,
+                  {
                     color: colors.success,
                     fontFamily: fonts.medium,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
-                  {subscriber.status === SubscriptionStatus.SUBSCRIBED 
+                  {subscriber.status === SubscriptionStatus.SUBSCRIBED
                     ? 'Your subscription is active'
                     : "You're following this creator"}
                 </Text>
@@ -171,11 +179,12 @@ export function SubscriptionDetailsModal({
             <View style={styles.notificationHeader}>
               <Bell size={20} color={colors.textPrimary} />
               <Text style={[
-                styles.notificationTitle, 
-                { 
+                styles.notificationTitle,
+                {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.lg,
+                  includeFontPadding: false
                 }
               ]}>
                 Notification Preferences
@@ -184,7 +193,7 @@ export function SubscriptionDetailsModal({
 
             <View style={[styles.notificationList, { backgroundColor: colors.surface }]}>
               {Object.entries(notificationSettings).map(([key, value], index, array) => (
-                <View 
+                <View
                   key={key}
                   style={[
                     styles.notificationItem,
@@ -192,21 +201,23 @@ export function SubscriptionDetailsModal({
                   ]}>
                   <View style={styles.notificationItemContent}>
                     <Text style={[
-                      styles.notificationItemTitle, 
-                      { 
+                      styles.notificationItemTitle,
+                      {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </Text>
                     <Text style={[
-                      styles.notificationItemDescription, 
-                      { 
+                      styles.notificationItemDescription,
+                      {
                         color: colors.textSecondary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.sm,
+                        includeFontPadding: false
                       }
                     ]}>
                       {getNotificationDescription(key as NotificationTypes)}
@@ -229,11 +240,12 @@ export function SubscriptionDetailsModal({
             style={[styles.cancelButton, { backgroundColor: `${colors.error}15` }]}
             onPress={subscriber.status === SubscriptionStatus.SUBSCRIBED ? onCancelSubscription : onUnfollow}>
             <Text style={[
-              styles.cancelButtonText, 
-              { 
+              styles.cancelButtonText,
+              {
                 color: colors.error,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Cancel Subscription' : 'Unfollow'}

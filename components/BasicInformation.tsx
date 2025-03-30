@@ -86,7 +86,7 @@ export function BasicInformation() {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       ref={scrollViewRef}
       onScroll={handleScroll}
       scrollEventThrottle={16}
@@ -100,6 +100,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Name of Page
@@ -110,6 +111,7 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This is how your page will appear to visitors
@@ -124,6 +126,7 @@ export function BasicInformation() {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}
             placeholder="Enter page name"
@@ -140,6 +143,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             What are you creating?
@@ -156,15 +160,16 @@ export function BasicInformation() {
                 color: selectedCategories.length > 0 ? colors.textPrimary : colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
-              {selectedCategories.length > 0 
+              {selectedCategories.length > 0
                 ? selectedCategories.join(', ')
                 : 'Select categories...'}
             </Text>
-            <ChevronDown 
-              size={20} 
-              color={colors.textSecondary} 
+            <ChevronDown
+              size={20}
+              color={colors.textSecondary}
               style={{ transform: [{ rotate: isDropdownOpen ? '180deg' : '0deg' }] }}
             />
           </TouchableOpacity>
@@ -173,7 +178,7 @@ export function BasicInformation() {
               styles.dropdownContainer,
               { backgroundColor: colors.surface }
             ]}>
-              <ScrollView 
+              <ScrollView
                 style={styles.categoriesList}
                 nestedScrollEnabled
                 showsVerticalScrollIndicator={false}
@@ -194,6 +199,7 @@ export function BasicInformation() {
                         color: selectedCategories.includes(category) ? colors.primary : colors.textPrimary,
                         fontFamily: fonts.regular,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {category}
@@ -217,6 +223,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Profile Photo
@@ -227,6 +234,7 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This will appear on your page as your main avatar.
@@ -249,6 +257,7 @@ export function BasicInformation() {
                   color: colors.buttonText,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Upload new photo
@@ -260,6 +269,7 @@ export function BasicInformation() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.xs,
+                includeFontPadding: false
               }
             ]}>
               Recommended: Square image, 1024px by 1024px
@@ -276,6 +286,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Cover Photo
@@ -286,6 +297,7 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This will be displayed at the top of your page.
@@ -308,6 +320,7 @@ export function BasicInformation() {
                   color: colors.buttonText,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Upload new photo
@@ -319,6 +332,7 @@ export function BasicInformation() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.xs,
+                includeFontPadding: false
               }
             ]}>
               Recommended: 1600px wide and 400px tall
@@ -335,13 +349,14 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Page URL
           </Text>
           <View style={[
             styles.urlContainer,
-            { 
+            {
               backgroundColor: colors.surface,
               opacity: 0.8
             }
@@ -352,6 +367,7 @@ export function BasicInformation() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               pledgr.com/
@@ -362,6 +378,7 @@ export function BasicInformation() {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               {pageUrl}
@@ -373,6 +390,7 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.xs,
+              includeFontPadding: false
             }
           ]}>
             Your page URL is automatically generated from your page name
@@ -388,6 +406,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Custom Brand Color
@@ -398,14 +417,15 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This color will be used for buttons, links, and accents throughout your page. Choose a color that reflects your brand and ensures good contrast.
           </Text>
-           <View style={[
-              styles.colorPreview,
-              { backgroundColor: brandColor }
-            ]} />
+          <View style={[
+            styles.colorPreview,
+            { backgroundColor: brandColor }
+          ]} />
           <View style={styles.colorSection}>
             <Text style={[
               styles.colorCode,
@@ -413,6 +433,7 @@ export function BasicInformation() {
                 color: colors.textPrimary,
                 fontFamily: fonts.medium,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               {brandColor.toUpperCase()}
@@ -426,6 +447,7 @@ export function BasicInformation() {
                   color: colors.primary,
                   fontFamily: fonts.medium,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Reset to default
@@ -444,6 +466,7 @@ export function BasicInformation() {
                   color: colors.buttonText,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Button Preview
@@ -455,6 +478,7 @@ export function BasicInformation() {
                 color: brandColor,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Link Preview
@@ -467,6 +491,7 @@ export function BasicInformation() {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Suggested Colors
@@ -498,6 +523,7 @@ export function BasicInformation() {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             About Your Page
@@ -508,6 +534,7 @@ export function BasicInformation() {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             Let visitors know what your page is about. You can style your text below.
@@ -523,6 +550,7 @@ export function BasicInformation() {
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Normal
@@ -536,6 +564,7 @@ export function BasicInformation() {
                   color: colors.textPrimary,
                   fontFamily: fonts.bold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 B
@@ -549,6 +578,7 @@ export function BasicInformation() {
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
                   fontStyle: 'italic',
+                  includeFontPadding: false
                 }
               ]}>
                 I
@@ -562,6 +592,7 @@ export function BasicInformation() {
                   fontFamily: fonts.regular,
                   fontSize: fontSize.sm,
                   textDecorationLine: 'underline',
+                  includeFontPadding: false
                 }
               ]}>
                 U
@@ -582,6 +613,7 @@ export function BasicInformation() {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}
             placeholder="Write about your page..."

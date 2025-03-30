@@ -80,6 +80,7 @@ function VerifyPasswordModal({ visible, onClose, onVerify }: {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.bold,
                                 fontSize: fontSize.xl,
+                                includeFontPadding: false
                             }
                         ]}>
                             Verify your password
@@ -95,6 +96,7 @@ function VerifyPasswordModal({ visible, onClose, onVerify }: {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         For security, please enter your password to continue
@@ -123,6 +125,7 @@ function VerifyPasswordModal({ visible, onClose, onVerify }: {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}
                                 editable={!isVerifying}
@@ -145,6 +148,7 @@ function VerifyPasswordModal({ visible, onClose, onVerify }: {
                                     color: colors.error,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {error}
@@ -162,6 +166,7 @@ function VerifyPasswordModal({ visible, onClose, onVerify }: {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Cancel

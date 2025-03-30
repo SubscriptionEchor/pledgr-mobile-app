@@ -132,6 +132,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Creator
@@ -142,6 +143,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Manage your creator profile
@@ -156,6 +158,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.buttonText,
                 fontFamily: fonts.medium,
                 fontSize: fontSize.xs,
+                includeFontPadding: false
               }
             ]}>
               Active
@@ -181,6 +184,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.textPrimary,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Member
@@ -191,6 +195,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Browse and interact with content
@@ -205,6 +210,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 color: colors.buttonText,
                 fontFamily: fonts.medium,
                 fontSize: fontSize.xs,
+                includeFontPadding: false
               }
             ]}>
               Active
@@ -248,6 +254,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.lg,
+                      includeFontPadding: false
                     }
                   ]}>
                     {user.name}
@@ -258,6 +265,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       color: colors.textSecondary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.sm,
+                      includeFontPadding: false
                     }
                   ]}>
                     {user.email}
@@ -279,6 +287,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Current Role
@@ -300,6 +309,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                         color: colors.textPrimary,
                         fontFamily: fonts.semibold,
                         fontSize: fontSize.md,
+                        includeFontPadding: false
                       }
                     ]}>
                       {user.role === UserRole.CREATOR ? 'Creator' : 'Member'}
@@ -335,6 +345,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                             fontFamily: fonts.semibold,
                             fontSize: fontSize.lg,
                             color: '#fff',
+                            includeFontPadding: false
                           }
                         ]}>
                           Become a Creator
@@ -345,6 +356,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
                             color: 'rgba(255, 255, 255, 0.9)',
+                            includeFontPadding: false
                           }
                         ]}>
                           Share your content with the world
@@ -364,6 +376,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}>
                 Appearance
@@ -381,6 +394,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       color: !isDark ? colors.primary : colors.textSecondary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Light
@@ -398,6 +412,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       color: isDark ? colors.primary : colors.textSecondary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Dark
@@ -419,6 +434,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     color: colors.textPrimary,
                     fontFamily: fonts.medium,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Settings
@@ -439,6 +455,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   color: colors.error,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.md,
+                  includeFontPadding: false
                 }
               ]}>
                 Sign out

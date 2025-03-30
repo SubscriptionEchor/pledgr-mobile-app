@@ -101,6 +101,7 @@ export default function SignUpScreen() {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: Platform.OS === 'web' ? fontSize['4xl'] : fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               Create your account
@@ -111,6 +112,7 @@ export default function SignUpScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: Platform.OS === 'web' ? fontSize.xl : fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Join our community of creators and innovators.
@@ -125,6 +127,7 @@ export default function SignUpScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Email address
@@ -141,6 +144,7 @@ export default function SignUpScreen() {
                     color: colors.textPrimary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}
                 autoCapitalize="none"
@@ -157,6 +161,7 @@ export default function SignUpScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Password
@@ -177,6 +182,7 @@ export default function SignUpScreen() {
                       color: colors.textPrimary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}
                   editable={!isLoading}
@@ -198,6 +204,7 @@ export default function SignUpScreen() {
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.xs,
+                  includeFontPadding: false
                 }
               ]}>
                 Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character
@@ -211,6 +218,7 @@ export default function SignUpScreen() {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Confirm password
@@ -231,6 +239,7 @@ export default function SignUpScreen() {
                       color: colors.textPrimary,
                       fontFamily: fonts.regular,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}
                   editable={!isLoading}
@@ -268,6 +277,7 @@ export default function SignUpScreen() {
                       color: colors.buttonText,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Create account
@@ -286,6 +296,7 @@ export default function SignUpScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Or continue with
@@ -312,6 +323,7 @@ export default function SignUpScreen() {
                       color: colors.textPrimary,
                       fontFamily: fonts.semibold,
                       fontSize: fontSize.md,
+                      includeFontPadding: false
                     }
                   ]}>
                     Sign up with Google
@@ -329,11 +341,12 @@ export default function SignUpScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.sm,
+                includeFontPadding: false
               }
             ]}>
               Already have an account?{' '}
             </Text>
-            <Link href="/sign-in" asChild>
+            <Link href="/auth/sign-in" asChild>
               <TouchableOpacity disabled={isLoading}>
                 <Text style={[
                   styles.footerLink,
@@ -341,6 +354,7 @@ export default function SignUpScreen() {
                     color: colors.primary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Sign in

@@ -34,6 +34,7 @@ export default function PlanScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Manage your platform fees and features
@@ -49,6 +50,7 @@ export default function PlanScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.xl,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Basic Plan
@@ -60,6 +62,7 @@ export default function PlanScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.bold,
                                         fontSize: fontSize['3xl'],
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     15%
@@ -70,6 +73,7 @@ export default function PlanScreen() {
                                         color: colors.textSecondary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.lg,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     platform fee
@@ -84,6 +88,7 @@ export default function PlanScreen() {
                                     color: colors.success,
                                     fontFamily: fonts.medium,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Active
@@ -97,6 +102,7 @@ export default function PlanScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.md,
+                            includeFontPadding: false
                         }
                     ]}>
                         Platform fee + applicable fees and taxes will be charged on all transactions. Upgrade to Pro plan for reduced fees.
@@ -119,6 +125,7 @@ export default function PlanScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.semibold,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Upgrade to Pro
@@ -129,6 +136,7 @@ export default function PlanScreen() {
                                         color: colors.textSecondary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.sm,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     Get more features and lower fees

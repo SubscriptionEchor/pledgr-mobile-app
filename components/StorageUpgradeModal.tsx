@@ -39,6 +39,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                     color: colors.textPrimary,
                     fontFamily: fonts.bold,
                     fontSize: fontSize.xl,
+                    includeFontPadding: false
                   }
                 ]}>
                   Upgrade Storage
@@ -49,6 +50,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Get more space for your content
@@ -68,6 +70,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                   color: colors.textPrimary,
                   fontFamily: fonts.bold,
                   fontSize: fontSize['2xl'],
+                  includeFontPadding: false
                 }
               ]}>
                 100GB Extra Storage
@@ -78,6 +81,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.lg,
+                  includeFontPadding: false
                 }
               ]}>
                 Monthly subscription
@@ -91,6 +95,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                   color: colors.textPrimary,
                   fontFamily: fonts.bold,
                   fontSize: fontSize['3xl'],
+                  includeFontPadding: false
                 }
               ]}>
                 $15
@@ -101,6 +106,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                   color: colors.textSecondary,
                   fontFamily: fonts.regular,
                   fontSize: fontSize.lg,
+                  includeFontPadding: false
                 }
               ]}>
                 per month
@@ -117,6 +123,7 @@ export function StorageUpgradeModal({ visible, onClose }: StorageUpgradeModalPro
                   color: colors.success,
                   fontFamily: fonts.medium,
                   fontSize: fontSize.sm,
+                  includeFontPadding: false
                 }
               ]}>
                 Upgrade instantly

@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState } from 'react';
-import { 
-  Bold, 
-  Italic, 
+import {
+  Bold,
+  Italic,
   Underline,
   AlignLeft,
   AlignCenter,
@@ -66,6 +66,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
             color: colors.textPrimary,
             fontFamily: fonts.bold,
             fontSize: fontSize['2xl'],
+            includeFontPadding: false
           }
         ]}>
           How do you want to welcome your members?
@@ -77,6 +78,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
             color: colors.textSecondary,
             fontFamily: fonts.regular,
             fontSize: fontSize.md,
+            includeFontPadding: false
           }
         ]}>
           Customize the welcome message your members will receive when they join your page.
@@ -109,6 +111,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Use the same welcome note for each tier
@@ -119,6 +122,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   All members will receive the same welcome message when they join
@@ -153,6 +157,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                     color: colors.textPrimary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.md,
+                    includeFontPadding: false
                   }
                 ]}>
                   Customize welcome notes for each tier
@@ -163,6 +168,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                     color: colors.textSecondary,
                     fontFamily: fonts.regular,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   Create unique welcome messages for different membership tiers
@@ -179,22 +185,23 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
               fontSize: fontSize.lg,
+              includeFontPadding: false
             }
           ]}>
             Welcome Note
           </Text>
 
           <View style={[styles.toolbar, { backgroundColor: colors.background }]}>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.toolbarContent}
             >
-              {toolbarButtons.map((button, index) => 
+              {toolbarButtons.map((button, index) =>
                 button.type === 'divider' ? (
-                  <View 
+                  <View
                     key={`divider-${index}`}
-                    style={[styles.divider, { backgroundColor: colors.border }]} 
+                    style={[styles.divider, { backgroundColor: colors.border }]}
                   />
                 ) : (
                   <TouchableOpacity
@@ -218,6 +225,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}
             placeholder="Write your welcome message..."
@@ -230,6 +238,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
               fontSize: fontSize.sm,
+              includeFontPadding: false
             }
           ]}>
             This message will be sent to all members when they join your page

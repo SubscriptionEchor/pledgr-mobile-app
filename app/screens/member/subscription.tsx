@@ -109,6 +109,7 @@ export default function SubscriptionScreen() {
                     color: colors.primary,
                     fontFamily: fonts.semibold,
                     fontSize: fontSize.xs,
+                    includeFontPadding: false
                 }
             ]}>
                 PRO
@@ -137,6 +138,7 @@ export default function SubscriptionScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.semibold,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     {subscriber.name}
@@ -150,6 +152,7 @@ export default function SubscriptionScreen() {
                                 color: colors.textSecondary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.sm,
+                                includeFontPadding: false
                             }
                         ]}>
                             {subscriber.title}
@@ -176,6 +179,7 @@ export default function SubscriptionScreen() {
                                 : colors.primary,
                             fontFamily: fonts.medium,
                             fontSize: fontSize.xs,
+                            includeFontPadding: false
                         }
                     ]}>
                         {subscriber.status === SubscriptionStatus.SUBSCRIBED ? 'Subscribed' : 'Following'}
@@ -192,6 +196,7 @@ export default function SubscriptionScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.xs,
+                            includeFontPadding: false
                         }
                     ]}>
                         Since {subscriber.followingSince}
@@ -206,6 +211,7 @@ export default function SubscriptionScreen() {
                                 color: colors.primary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.xs,
+                                includeFontPadding: false
                             }
                         ]}>
                             Next: {subscriber.nextPayment}
@@ -231,6 +237,7 @@ export default function SubscriptionScreen() {
                             color: colors.textPrimary,
                             fontFamily: fonts.bold,
                             fontSize: fontSize['2xl'],
+                            includeFontPadding: false
                         }
                     ]}>
                         Your Subscriptions
@@ -241,6 +248,7 @@ export default function SubscriptionScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.sm,
+                            includeFontPadding: false
                         }
                     ]}>
                         Manage your subscriptions and following list
@@ -276,6 +284,7 @@ export default function SubscriptionScreen() {
                                         : colors.textSecondary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 {option.label}

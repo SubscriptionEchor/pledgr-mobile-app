@@ -56,6 +56,7 @@ export default function CreatorOnboardingScreen() {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
                 fontSize: fontSize['2xl'],
+                includeFontPadding: false
               }
             ]}>
               What type of content will you create?
@@ -66,6 +67,7 @@ export default function CreatorOnboardingScreen() {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Choose a category that best describes your content.
@@ -97,6 +99,7 @@ export default function CreatorOnboardingScreen() {
                     color: colors.textPrimary,
                     fontFamily: fonts.medium,
                     fontSize: fontSize.sm,
+                    includeFontPadding: false
                   }
                 ]}>
                   {category.label}
@@ -124,6 +127,7 @@ export default function CreatorOnboardingScreen() {
                 color: colors.buttonText,
                 fontFamily: fonts.semibold,
                 fontSize: fontSize.md,
+                includeFontPadding: false
               }
             ]}>
               Next

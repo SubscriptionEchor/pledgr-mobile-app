@@ -95,6 +95,7 @@ export default function CreatePageScreen() {
                             color: colors.textSecondary,
                             fontFamily: fonts.regular,
                             fontSize: fontSize.lg,
+                            includeFontPadding: false
                         }
                     ]}>
                         Fill in some details for your fans
@@ -108,6 +109,7 @@ export default function CreatePageScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Add page logo
@@ -134,6 +136,7 @@ export default function CreatePageScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Page name
@@ -150,6 +153,7 @@ export default function CreatePageScreen() {
                                         color: colors.textPrimary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}
                                 editable={!isCreating}
@@ -163,6 +167,7 @@ export default function CreatePageScreen() {
                                     color: colors.textPrimary,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Page URL
@@ -177,6 +182,7 @@ export default function CreatePageScreen() {
                                         color: colors.textSecondary,
                                         fontFamily: fonts.regular,
                                         fontSize: fontSize.md,
+                                        includeFontPadding: false
                                     }
                                 ]}>
                                     pledgr.com/
@@ -192,6 +198,7 @@ export default function CreatePageScreen() {
                                             color: colors.textPrimary,
                                             fontFamily: fonts.regular,
                                             fontSize: fontSize.md,
+                                            includeFontPadding: false
                                         }
                                     ]}
                                     autoCapitalize="none"
@@ -205,6 +212,7 @@ export default function CreatePageScreen() {
                                     color: colors.textSecondary,
                                     fontFamily: fonts.regular,
                                     fontSize: fontSize.sm,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 This URL will be used to access your creator page
@@ -234,6 +242,7 @@ export default function CreatePageScreen() {
                                     color: colors.buttonText,
                                     fontFamily: fonts.semibold,
                                     fontSize: fontSize.md,
+                                    includeFontPadding: false
                                 }
                             ]}>
                                 Create page

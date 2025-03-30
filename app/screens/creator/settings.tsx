@@ -100,6 +100,7 @@ export default function SettingsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
+                                includeFontPadding: false
                             }
                         ]}>
                             {section.title}
@@ -130,6 +131,7 @@ export default function SettingsScreen() {
                                                 color: colors.textPrimary,
                                                 fontFamily: fonts.regular,
                                                 fontSize: fontSize.md,
+                                                includeFontPadding: false
                                             }
                                         ]}>
                                             {item.label}
