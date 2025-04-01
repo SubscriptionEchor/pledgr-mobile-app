@@ -10,7 +10,10 @@ import {
     Bell,
     Users,
     Ban,
-    ChevronRight
+    ChevronRight,
+    Lightbulb,
+    FileText,
+    Lock
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { ProfileVisibilityModal } from '@/components/ProfileVisibilityModal';
@@ -65,6 +68,29 @@ const SETTINGS_SECTIONS = [
                 label: 'Unpublish Page',
                 icon: Ban,
                 route: '/screens/creator/unpublish',
+            },
+        ],
+    },
+    {
+        title: 'Others',
+        items: [
+            {
+                id: 'feature-request',
+                label: 'Feature Request',
+                icon: Lightbulb,
+                route: '/screens/member/feature-request',
+            },
+            {
+                id: 'terms',
+                label: 'Terms of Service',
+                icon: FileText,
+                route: '/screens/common/terms',
+            },
+            {
+                id: 'privacy',
+                label: 'Privacy Policy',
+                icon: Lock,
+                route: '/screens/common/privacy',
             },
         ],
     },

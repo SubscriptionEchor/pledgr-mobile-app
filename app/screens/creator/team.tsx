@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { Crown, Sparkles, UserPlus, Send, Clock } from 'lucide-react-native';
+import { Send, Check, UserPlus, Clock } from 'lucide-react-native';
 import { useState } from 'react';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { AddTeamMemberModal } from '@/components/AddTeamMemberModal';
@@ -36,8 +36,7 @@ const MOCK_MEMBERS: TeamMember[] = [
 
 export default function TeamScreen() {
     const { colors, fonts, fontSize } = useTheme();
-    const [isUpgrading, setIsUpgrading] = useState(false);
-    const [isUpgraded, setIsUpgraded] = useState(false);
+    const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [confirmationModal, setConfirmationModal] = useState<{
         visible: boolean;
@@ -47,13 +46,6 @@ export default function TeamScreen() {
         visible: false,
         type: 'remove',
     });
-
-    const handleUpgrade = async () => {
-        setIsUpgrading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsUpgraded(true);
-        setIsUpgrading(false);
-    };
 
     const handleResend = (member: TeamMember) => {
         setConfirmationModal({
@@ -213,114 +205,6 @@ export default function TeamScreen() {
         </View>
     );
 
-    if (!isUpgraded) {
-        return (
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <SubHeader title="Team" />
-                <View style={styles.centeredContainer}>
-                    <View style={[styles.upgradeCard, { backgroundColor: colors.surface }]}>
-                        <View style={styles.iconWrapper}>
-                            <Crown size={32} color={colors.primary} />
-                        </View>
-
-                        <Text style={[
-                            styles.title,
-                            {
-                                color: colors.textPrimary,
-                                fontFamily: fonts.bold,
-                                fontSize: fontSize['2xl'],
-                                includeFontPadding: false
-                            }
-                        ]}>
-                            Upgrade to Pro
-                        </Text>
-
-                        <Text style={[
-                            styles.subtitle,
-                            {
-                                color: colors.textSecondary,
-                                fontFamily: fonts.regular,
-                                fontSize: fontSize.md,
-                                includeFontPadding: false
-                            }
-                        ]}>
-                            Unlock team collaboration features and invite team members to help manage your creator page
-                        </Text>
-
-                        <View style={styles.features}>
-                            <View style={styles.featureItem}>
-                                <Sparkles size={20} color={colors.primary} />
-                                <Text style={[
-                                    styles.featureText,
-                                    {
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.regular,
-                                        fontSize: fontSize.md,
-                                        includeFontPadding: false
-                                    }
-                                ]}>
-                                    Add unlimited team members
-                                </Text>
-                            </View>
-
-                            <View style={styles.featureItem}>
-                                <Sparkles size={20} color={colors.primary} />
-                                <Text style={[
-                                    styles.featureText,
-                                    {
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.regular,
-                                        fontSize: fontSize.md,
-                                        includeFontPadding: false
-                                    }
-                                ]}>
-                                    Assign custom roles and permissions
-                                </Text>
-                            </View>
-
-                            <View style={styles.featureItem}>
-                                <Sparkles size={20} color={colors.primary} />
-                                <Text style={[
-                                    styles.featureText,
-                                    {
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.regular,
-                                        fontSize: fontSize.md,
-                                        includeFontPadding: false
-                                    }
-                                ]}>
-                                    Track team activity and manage access
-                                </Text>
-                            </View>
-                        </View>
-
-                        <TouchableOpacity
-                            style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
-                            onPress={handleUpgrade}
-                            disabled={isUpgrading}
-                        >
-                            {isUpgrading ? (
-                                <ActivityIndicator color={colors.buttonText} />
-                            ) : (
-                                <Text style={[
-                                    styles.upgradeButtonText,
-                                    {
-                                        color: colors.buttonText,
-                                        fontFamily: fonts.semibold,
-                                        fontSize: fontSize.md,
-                                        includeFontPadding: false
-                                    }
-                                ]}>
-                                    Upgrade to Pro
-                                </Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-        );
-    }
-
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <SubHeader title="Team" />
@@ -390,74 +274,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    centeredContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    upgradeCard: {
-        width: '100%',
-        maxWidth: 400,
-        alignItems: 'center',
-        gap: 16,
-        paddingHorizontal: 16,
-        borderRadius: 16,
-        padding: 24,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    upgradeContent: {
-        padding: 20,
-        alignItems: 'center',
-    },
-    membersList: {
-        padding: 12,
-        gap: 8,
-    },
-    iconWrapper: {
-        marginBottom: 8,
-    },
-    title: {
-        textAlign: 'center',
-    },
-    subtitle: {
-        textAlign: 'center',
-        lineHeight: 24,
-        marginBottom: 8,
-    },
-    features: {
-        width: '100%',
-        gap: 20,
-        marginBottom: 24,
-        marginTop: 8,
-    },
-    featureItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    featureText: {
-        flex: 1,
-    },
-    upgradeButton: {
-        height: 44,
-        width: 170,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'center',
-    },
-    upgradeButtonText: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 12,
+        paddingHorizontal: 20,
         paddingVertical: 16,
     },
     headerTitle: {
@@ -473,6 +294,14 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         fontSize: 14,
+    },
+    scrollView: {
+        flex: 1,
+        paddingHorizontal: 7,
+    },
+    membersList: {
+        padding: 12,
+        gap: 8,
     },
     memberCard: {
         padding: 12,

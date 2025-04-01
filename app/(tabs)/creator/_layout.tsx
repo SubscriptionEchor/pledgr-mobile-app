@@ -16,7 +16,7 @@ export default function CreatorTabLayout() {
             tabBarInactiveTintColor: colors.textSecondary,
             tabBarLabelStyle: {
                 fontFamily: fonts.medium,
-                fontSize: fontSize.xs,
+                fontSize: 10,
                 marginBottom: 4,
             },
         }}>
