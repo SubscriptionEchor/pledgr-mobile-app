@@ -36,6 +36,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   const { user, updateUserRole, logout, isCreatorCreated } = useAuth();
 
   const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
+  const isCreatorAssociate = user?.role === UserRole.CREATOR_ASSOCIATE;
+
 
   const roleOptions: RoleOption[] = [
     {
@@ -211,11 +213,13 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity
-                style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
-                onPress={() => handleNavigation('profile')}>
-                <Pencil size={20} color={colors.primary} />
-              </TouchableOpacity>
+              {!isCreatorAssociate && (
+                <TouchableOpacity
+                  style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
+                  onPress={() => handleNavigation('profile')}>
+                  <Pencil size={20} color={colors.primary} />
+                </TouchableOpacity>
+              )}
             </View>
 
             <View style={styles.section}>
@@ -422,29 +426,31 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
               </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-              onPress={() => handleNavigation('settings')}>
-              <View style={styles.settingsContent}>
-                <View style={[styles.settingsIcon, { backgroundColor: `${colors.primary}15` }]}>
-                  <Settings size={20} color={colors.primary} />
+            {!isCreatorAssociate && (
+              <TouchableOpacity
+                style={[styles.settingsButton, { backgroundColor: colors.surface }]}
+                onPress={() => handleNavigation('settings')}>
+                <View style={styles.settingsContent}>
+                  <View style={[styles.settingsIcon, { backgroundColor: `${colors.primary}15` }]}>
+                    <Settings size={20} color={colors.primary} />
+                  </View>
+                  <Text style={[
+                    styles.settingsText,
+                    {
+                      color: colors.textPrimary,
+                      fontFamily: fonts.medium,
+                      fontSize: fontSize.md,
+                      includeFontPadding: false
+                    }
+                  ]}>
+                    Settings
+                  </Text>
                 </View>
-                <Text style={[
-                  styles.settingsText,
-                  {
-                    color: colors.textPrimary,
-                    fontFamily: fonts.medium,
-                    fontSize: fontSize.md,
-                    includeFontPadding: false
-                  }
-                ]}>
-                  Settings
-                </Text>
-              </View>
-              <View style={styles.chevronContainer}>
-                <ChevronRight size={20} color={colors.textSecondary} />
-              </View>
-            </TouchableOpacity>
+                <View style={styles.chevronContainer}>
+                  <ChevronRight size={20} color={colors.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity
               style={[styles.signOutButton, { backgroundColor: `${colors.error}15` }]}

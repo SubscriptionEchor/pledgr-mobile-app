@@ -2,12 +2,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useState } from 'react';
-import { Search, Users, Crown, ChevronRight } from 'lucide-react-native';
+import { Search, Users, Crown, MoreVertical } from 'lucide-react-native';
 import { TextInput } from 'react-native';
 import { showToast } from '@/components/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { UserRole } from '@/lib/enums';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 // Mock creators data
 const MOCK_CREATORS = [
@@ -34,17 +35,18 @@ const MOCK_CREATORS = [
 export default function CreatorAssociateOnboardScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const [search, setSearch] = useState('');
-  const [selectedCreator, setSelectedCreator] = useState<string | null>(null);
+  const [creators, setCreators] = useState(MOCK_CREATORS);
+  const [showRevokeConfirmation, setShowRevokeConfirmation] = useState(false);
+  const [creatorToRevoke, setCreatorToRevoke] = useState<typeof MOCK_CREATORS[0] | null>(null);
   const { updateUserRole } = useAuth();
   const router = useRouter();
 
-  const filteredCreators = MOCK_CREATORS.filter(creator =>
+  const filteredCreators = creators.filter(creator =>
     creator.name.toLowerCase().includes(search.toLowerCase()) ||
     creator.title.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleCreatorSelect = async (creatorId: string) => {
-    setSelectedCreator(creatorId);
     try {
       await updateUserRole(UserRole.CREATOR_ASSOCIATE);
       showToast.success(
@@ -57,6 +59,24 @@ export default function CreatorAssociateOnboardScreen() {
         'Please try again later'
       );
     }
+  };
+
+  const handleRevokeAccess = (creator: typeof MOCK_CREATORS[0], event: any) => {
+    event.stopPropagation();
+    setCreatorToRevoke(creator);
+    setShowRevokeConfirmation(true);
+  };
+
+  const handleConfirmRevoke = () => {
+    if (!creatorToRevoke) return;
+
+    setCreators(prev => prev.filter(c => c.id !== creatorToRevoke.id));
+    showToast.success(
+      'Access revoked',
+      `You no longer have access to ${creatorToRevoke.name}'s page`
+    );
+    setShowRevokeConfirmation(false);
+    setCreatorToRevoke(null);
   };
 
   return (
@@ -181,13 +201,33 @@ export default function CreatorAssociateOnboardScreen() {
                       {creator.title}
                     </Text>
                   </View>
-                  <ChevronRight size={20} color={colors.textSecondary} />
+                  <View style={styles.actions}>
+                    <TouchableOpacity
+                      onPress={(e) => handleRevokeAccess(creator, e)}
+                      style={[styles.actionButton, { backgroundColor: colors.surface }]}
+                    >
+                      <MoreVertical size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
         )}
       </ScrollView>
+
+      <ConfirmationModal
+        visible={showRevokeConfirmation}
+        onClose={() => {
+          setShowRevokeConfirmation(false);
+          setCreatorToRevoke(null);
+        }}
+        onConfirm={handleConfirmRevoke}
+        title="Revoke Access"
+        description={`Are you sure you want to revoke your access to ${creatorToRevoke?.name}'s page? This action cannot be undone.`}
+        confirmLabel="Revoke Access"
+        confirmVariant="error"
+      />
     </View>
   );
 }
@@ -271,5 +311,17 @@ const styles = StyleSheet.create({
   },
   creatorTitle: {
     lineHeight: 20,
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

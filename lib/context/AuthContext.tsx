@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           router.replace('/creator/home');
           break;
         case UserRole.CREATOR_ASSOCIATE:
-          router.replace('/creator-associate/home');
+          router.replace('/creator/home');
           break;
         case UserRole.MEMBER:
           router.replace('/member/home');

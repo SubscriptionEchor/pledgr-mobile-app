@@ -3,6 +3,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Header } from '@/components/Header';
 import { Megaphone, Users, ChartLine as LineChart, Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX } from 'lucide-react-native';
+import { useAuth } from '@/lib/context/AuthContext';
+import { UserRole } from '@/lib/enums';
 
 const MENU_ITEMS = [
     {
@@ -34,13 +36,6 @@ const MENU_ITEMS = [
         color: '#9333ea',
     },
     {
-        id: 'settings',
-        icon: Settings,
-        label: 'Settings',
-        description: 'Customize your experience',
-        color: '#64748b',
-    },
-    {
         id: 'help',
         icon: HelpCircle,
         label: 'Help & Support',
@@ -48,6 +43,17 @@ const MENU_ITEMS = [
         color: '#0ea5e9',
     },
 ];
+
+const CREATOR_ONLY_ITEMS = [
+    {
+        id: 'settings',
+        icon: Settings,
+        label: 'Settings',
+        description: 'Customize your experience',
+        color: '#64748b',
+    },
+];
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CONTENT_PADDING = 20;
@@ -59,6 +65,11 @@ const CARD_HEIGHT = 150;
 export default function MenuScreen() {
     const { colors, fonts, fontSize } = useTheme();
     const router = useRouter();
+    const { user } = useAuth();
+
+    const isCreatorAssociate = user?.role === UserRole.CREATOR_ASSOCIATE;
+
+    const menuItems = isCreatorAssociate ? MENU_ITEMS : [...MENU_ITEMS, ...CREATOR_ONLY_ITEMS];
 
     const handleItemPress = (id: string) => {
         if (id === 'settings') {
@@ -117,7 +128,7 @@ export default function MenuScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Header />
             <FlatList
-                data={MENU_ITEMS}
+                data={menuItems}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 numColumns={NUM_COLUMNS}

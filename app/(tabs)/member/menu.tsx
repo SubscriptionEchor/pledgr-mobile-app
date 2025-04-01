@@ -46,6 +46,12 @@ const MENU_ITEMS = [
         label: 'Blocked Users',
         description: 'Manage blocked accounts',
         color: '#dc2626',
+    },{
+        id: 'help',
+        icon: HelpCircle,
+        label: 'Help & Support',
+        description: 'Get assistance',
+        color: '#0ea5e9',
     },
     {
         id: 'settings',
@@ -53,13 +59,6 @@ const MENU_ITEMS = [
         label: 'Settings',
         description: 'Customize your experience',
         color: '#64748b',
-    },
-    {
-        id: 'help',
-        icon: HelpCircle,
-        label: 'Help & Support',
-        description: 'Get assistance',
-        color: '#0ea5e9',
     },
 ];
 
