@@ -1,11 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 import { useRouter } from 'expo-router';
-import { Library, MessageSquare, Store, Crown, CircleUser as UserCircle, Sparkles, Chrome as Home, Pencil, Share2, MoveVertical as MoreVertical, Palette } from 'lucide-react-native';
+import { Library, MessageSquare, Store, Crown, CircleUser as UserCircle, Sparkles, Chrome as Home, Pencil, Share2, MoveVertical as MoreVertical, Palette, Settings } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { showToast } from '@/components/Toast';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CONTENT_PADDING = 20;
@@ -70,17 +69,27 @@ export default function HomeScreen() {
     const router = useRouter();
     const [showOptions, setShowOptions] = useState(false);
 
-    const handleShare = async () => {
-        try {
-            // Implement share functionality
-            showToast.success('Link copied', 'Share link has been copied to clipboard');
-        } catch (error) {
-            showToast.error('Share failed', 'Please try again');
-        }
+    const handleShare = () => {
+        router.push('/screens/creator/share');
     };
 
     const handleColorPicker = () => {
         // Handle color picker action
+    };
+
+    const handleEditPage = () => {
+        setShowOptions(false);
+        router.push('/screens/creator/edit-page');
+    };
+
+    const handleGoToLibrary = () => {
+        setShowOptions(false);
+        router.push('/screens/creator/library');
+    };
+
+    const handleEditTiers = () => {
+        setShowOptions(false);
+        router.push('/screens/creator/tiers');
     };
 
     const renderActionButton = (button: ActionButton) => (
@@ -108,6 +117,11 @@ export default function HomeScreen() {
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Header />
+            {showOptions && (
+                <TouchableWithoutFeedback onPress={() => setShowOptions(false)}>
+                    <View style={styles.overlay} />
+                </TouchableWithoutFeedback>
+            )}
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
@@ -132,11 +146,67 @@ export default function HomeScreen() {
                             onPress={handleShare}>
                             <Share2 size={16} color="#fff" />
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.actionIconButton, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
-                            onPress={() => setShowOptions(true)}>
-                            <MoreVertical size={16} color="#fff" />
-                        </TouchableOpacity>
+                        <View>
+                            <TouchableOpacity
+                                style={[styles.actionIconButton, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
+                                onPress={() => setShowOptions(!showOptions)}>
+                                <MoreVertical size={16} color="#fff" />
+                            </TouchableOpacity>
+                            {showOptions && (
+                                <View style={[styles.optionsMenu, { backgroundColor: colors.surface }]}>
+                                    <TouchableOpacity
+                                        style={styles.optionItem}
+                                        onPress={handleEditPage}>
+                                        <Pencil size={20} color={colors.textPrimary} />
+                                        <Text style={[
+                                            styles.optionText,
+                                            {
+                                                color: colors.textPrimary,
+                                                fontFamily: fonts.medium,
+                                                fontSize: fontSize.md,
+                                                includeFontPadding: false
+                                            }
+                                        ]}>
+                                            Edit page
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        style={styles.optionItem}
+                                        onPress={handleGoToLibrary}>
+                                        <Library size={20} color={colors.textPrimary} />
+                                        <Text style={[
+                                            styles.optionText,
+                                            {
+                                                color: colors.textPrimary,
+                                                fontFamily: fonts.medium,
+                                                fontSize: fontSize.md,
+                                                includeFontPadding: false
+                                            }
+                                        ]}>
+                                            Go to library
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        style={styles.optionItem}
+                                        onPress={handleEditTiers}>
+                                        <Settings size={20} color={colors.textPrimary} />
+                                        <Text style={[
+                                            styles.optionText,
+                                            {
+                                                color: colors.textPrimary,
+                                                fontFamily: fonts.medium,
+                                                fontSize: fontSize.md,
+                                                includeFontPadding: false
+                                            }
+                                        ]}>
+                                            Edit tiers
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                        </View>
                     </View>
                     <View style={styles.coverContent}>
                         <View style={styles.coverProfile}>
@@ -169,22 +239,6 @@ export default function HomeScreen() {
                                 </Text>
                             </View>
                         </View>
-                        <TouchableOpacity
-                            style={[styles.editButton, { backgroundColor: colors.primary }]}
-                            onPress={() => router.push('/screens/creator/edit-page')}>
-                            <Pencil size={20} color={colors.buttonText} />
-                            <Text style={[
-                                styles.editButtonText,
-                                {
-                                    color: colors.buttonText,
-                                    fontFamily: fonts.semibold,
-                                    fontSize: fontSize.sm,
-                                    includeFontPadding: false
-                                }
-                            ]}>
-                                Edit Page
-                            </Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -199,6 +253,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1,
     },
     scrollView: {
         flex: 1,
@@ -227,6 +289,7 @@ const styles = StyleSheet.create({
         right: 20,
         flexDirection: 'row',
         gap: 8,
+        zIndex: 2,
     },
     actionIconButton: {
         width: 32,
@@ -269,17 +332,6 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
     },
-    editButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        height: 40,
-        borderRadius: 20,
-    },
-    editButtonText: {
-        fontSize: 14,
-    },
     actionButtons: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -304,5 +356,32 @@ const styles = StyleSheet.create({
     },
     actionLabel: {
         textAlign: 'center',
+    },
+    optionsMenu: {
+        position: 'absolute',
+        top: 40,
+        right: 0,
+        borderRadius: 12,
+        padding: 8,
+        minWidth: 200,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 2,
+    },
+    optionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        gap: 12,
+        borderRadius: 8,
+    },
+    optionText: {
+        fontSize: 16,
     },
 });
