@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from '
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Header } from '@/components/Header';
-import { Megaphone, Users, ChartLine as LineChart, Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX } from 'lucide-react-native';
+import { Megaphone, Users, ChartLine as LineChart, Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX, Shield } from 'lucide-react-native';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
 
@@ -34,6 +34,13 @@ const MENU_ITEMS = [
         label: 'Notifications',
         description: 'Manage your alerts',
         color: '#9333ea',
+    },
+    {
+        id: 'moderation',
+        icon: Shield,
+        label: 'Moderation Hub',
+        description: 'Manage content and user reports',
+        color: '#dc2626',
     },
     {
         id: 'help',
