@@ -165,7 +165,8 @@ export default function NotificationsScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.regular,
                                 fontSize: fontSize.md,
-                                includeFontPadding: false
+                                includeFontPadding: false,
+                                width: "80%"
                             }
                         ]}>
                             {item.title}
@@ -337,7 +338,7 @@ export default function NotificationsScreen() {
                                                 color: colors.textPrimary,
                                                 fontFamily: fonts.semibold,
                                                 fontSize: fontSize.md,
-                                                includeFontPadding: false
+                                                includeFontPadding: false,
                                             }
                                         ]}>
                                             {setting.title}

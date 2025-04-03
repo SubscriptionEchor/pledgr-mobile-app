@@ -10,55 +10,47 @@ const MENU_ITEMS = [
         icon: Download,
         label: 'Downloads',
         description: 'Access your offline content',
-        color: '#60a5fa',
     },
     {
         id: 'history',
         icon: History,
         label: 'History',
         description: 'View your activity history',
-        color: '#f59e0b',
     },
     {
         id: 'liked',
         icon: Heart,
         label: 'Liked',
         description: 'Your favorite content',
-        color: '#ef4444',
     },
     {
         id: 'notifications',
         icon: Bell,
         label: 'Notifications',
         description: 'Manage your alerts',
-        color: '#22c55e',
     },
     {
         id: 'wallet',
         icon: Wallet,
         label: 'Wallet',
         description: 'Manage your payments',
-        color: '#9333ea',
     },
     {
         id: 'blocked',
         icon: UserX,
         label: 'Blocked Users',
         description: 'Manage blocked accounts',
-        color: '#dc2626',
     },{
         id: 'help',
         icon: HelpCircle,
         label: 'Help & Support',
         description: 'Get assistance',
-        color: '#0ea5e9',
     },
     {
         id: 'settings',
         icon: Settings,
         label: 'Settings',
         description: 'Customize your experience',
-        color: '#64748b',
     },
 ];
 
@@ -91,8 +83,8 @@ export default function MenuScreen() {
             ]}
             onPress={() => handleItemPress(item.id)}>
             <View style={styles.cardInner}>
-                <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
-                    <item.icon size={24} color={item.color} />
+                <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                    <item.icon size={24} color={colors.textPrimary} />
                 </View>
                 <View style={styles.cardContent}>
                     <Text

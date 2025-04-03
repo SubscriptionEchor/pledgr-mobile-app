@@ -147,7 +147,7 @@ export default function SettingsScreen() {
                                     <View style={styles.settingItemLeft}>
                                         <View style={[
                                             styles.iconContainer,
-                                            { backgroundColor: `${colors.primary}15` }
+                                            { backgroundColor: 'transparent' }
                                         ]}>
                                             <item.icon size={20} color={colors.textPrimary} />
                                         </View>

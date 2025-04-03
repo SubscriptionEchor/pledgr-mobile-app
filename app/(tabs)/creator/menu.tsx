@@ -12,42 +12,36 @@ const MENU_ITEMS = [
         icon: Megaphone,
         label: 'Promotions',
         description: 'Manage your promotional campaigns',
-        color: '#60a5fa',
     },
     {
         id: 'audience',
         icon: Users,
         label: 'Audience',
         description: 'View audience insights',
-        color: '#f59e0b',
     },
     {
         id: 'insights',
         icon: LineChart,
         label: 'Insights',
         description: 'Analytics and performance',
-        color: '#22c55e',
     },
     {
         id: 'notifications',
         icon: Bell,
         label: 'Notifications',
         description: 'Manage your alerts',
-        color: '#9333ea',
     },
     {
         id: 'moderation',
         icon: Shield,
         label: 'Moderation Hub',
         description: 'Manage content and user reports',
-        color: '#dc2626',
     },
     {
         id: 'help',
         icon: HelpCircle,
         label: 'Help & Support',
         description: 'Get assistance',
-        color: '#0ea5e9',
     },
 ];
 
@@ -57,7 +51,6 @@ const CREATOR_ONLY_ITEMS = [
         icon: Settings,
         label: 'Settings',
         description: 'Customize your experience',
-        color: '#64748b',
     },
 ];
 
@@ -96,8 +89,8 @@ export default function MenuScreen() {
             ]}
             onPress={() => handleItemPress(item.id)}>
             <View style={styles.cardInner}>
-                <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
-                    <item.icon size={24} color={item.color} />
+                <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                    <item.icon size={24} color={colors.textPrimary} />
                 </View>
                 <View style={styles.cardContent}>
                     <Text
