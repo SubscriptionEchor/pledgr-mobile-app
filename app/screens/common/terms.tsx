@@ -16,7 +16,7 @@ export default function TermsScreen() {
             >
                 <View style={styles.header}>
                     <FileText size={32} color={colors.primary} />
-                    <Text style={[
+                    {/* <Text style={[
                         styles.title,
                         {
                             color: colors.textPrimary,
@@ -26,7 +26,7 @@ export default function TermsScreen() {
                         }
                     ]}>
                         Terms of Service
-                    </Text>
+                    </Text> */}
                     <Text style={[
                         styles.subtitle,
                         {

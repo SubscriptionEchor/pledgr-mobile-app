@@ -227,7 +227,7 @@ export function SubscriptionDetailsModal({
                     value={value}
                     onValueChange={() => handleNotificationToggle(key as keyof typeof notificationSettings)}
                     trackColor={{ false: colors.border, true: colors.primary }}
-                    thumbColor={value ? colors.buttonText : colors.surface}
+                    thumbColor="#FFFFFF"
                   />
                 </View>
               ))}
@@ -401,6 +401,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButton: {
-    width: 100, // Fixed width for the close button
+    width: 100,
   },
 });

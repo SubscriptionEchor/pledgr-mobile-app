@@ -16,7 +16,7 @@ export default function PrivacyScreen() {
             >
                 <View style={styles.header}>
                     <Lock size={32} color={colors.primary} />
-                    <Text style={[
+                    {/* <Text style={[
                         styles.title,
                         {
                             color: colors.textPrimary,
@@ -26,7 +26,7 @@ export default function PrivacyScreen() {
                         }
                     ]}>
                         Privacy Policy
-                    </Text>
+                    </Text> */}
                     <Text style={[
                         styles.subtitle,
                         {

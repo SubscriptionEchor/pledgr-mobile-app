@@ -144,7 +144,7 @@ export default function PlanScreen() {
                             </View>
                         </View>
                         <Button
-                            label="Upgrade to Pro"
+                            label="Upgrade Now"
                             onPress={() => setShowPlanModal(true)}
                             variant="primary"
                         />

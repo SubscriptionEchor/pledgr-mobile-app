@@ -293,7 +293,7 @@ export function AddTeamMemberModal({ visible, onClose }: AddTeamMemberModalProps
                 value={permission.enabled}
                 onValueChange={() => handleTogglePermission(permission.id)}
                 trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={permission.enabled ? colors.buttonText : colors.surface}
+                thumbColor="#FFFFFF"
               />
             </View>
 

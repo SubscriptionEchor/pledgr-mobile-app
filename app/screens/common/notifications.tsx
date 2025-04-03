@@ -174,7 +174,7 @@ export default function NotificationsScreen() {
                             value={item.enabled}
                             onValueChange={() => toggleCreatorSetting(section, category, item.id)}
                             trackColor={{ false: colors.border, true: colors.primary }}
-                            thumbColor={item.enabled ? colors.buttonText : colors.surface}
+                            thumbColor="#FFFFFF"
                         />
                     </View>
                 ))}
@@ -359,7 +359,7 @@ export default function NotificationsScreen() {
                                     value={setting.enabled}
                                     onValueChange={() => toggleMemberSetting(setting.id)}
                                     trackColor={{ false: colors.border, true: colors.primary }}
-                                    thumbColor={setting.enabled ? colors.buttonText : colors.surface}
+                                    thumbColor="#FFFFFF"
                                 />
                             </View>
                         ))}

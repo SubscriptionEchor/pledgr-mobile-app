@@ -12,7 +12,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export default function SignUpScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { login, loginWithGoogle } = useAuth();
+  const { signUp, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -48,7 +48,7 @@ export default function SignUpScreen() {
     setIsLoading(true);
 
     try {
-      await login(form.email, form.password);
+      await signUp(form.email, form.password);
       router.replace('/member/home');
     } catch (error) {
       showToast.error('Sign up failed', 'Please try again');

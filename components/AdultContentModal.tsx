@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Switch, Platform, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { X, TriangleAlert as AlertTriangle, Globe, Shield, Eye } from 'lucide-react-native';
+import { X, Globe, Users, Lock, TriangleAlert as AlertTriangle, Store, Eye, Shield } from 'lucide-react-native';
+import { useState } from 'react';
 
 interface AdultContentModalProps {
   visible: boolean;
@@ -60,7 +61,7 @@ export function AdultContentModal({
               {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.sm,
+                fontSize: fontSize.md,
                 includeFontPadding: false
               }
             ]}>
@@ -75,7 +76,7 @@ export function AdultContentModal({
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
+                  fontSize: fontSize.lg,
                   includeFontPadding: false
                 }
               ]}>
@@ -97,7 +98,7 @@ export function AdultContentModal({
               value={initialSettings.enabled}
               onValueChange={handleToggle}
               trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={initialSettings.enabled ? colors.buttonText : colors.surface}
+              thumbColor="#FFFFFF"
             />
           </View>
 

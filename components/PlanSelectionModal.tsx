@@ -87,7 +87,8 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.bold,
                     fontSize: fontSize['3xl'],
-                    includeFontPadding: false
+                    includeFontPadding: false,
+                    marginRight: 5
                   }
                 ]}>
                   15%
@@ -105,7 +106,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                 </Text>
               </View>
 
-              <Text style={[
+              {/* <Text style={[
                 styles.currentPlanText,
                 {
                   color: colors.textSecondary,
@@ -115,7 +116,7 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                 }
               ]}>
                 Current plan
-              </Text>
+              </Text> */}
             </View>
 
             <View style={[styles.planCard, { backgroundColor: colors.surface }]}>
@@ -140,7 +141,8 @@ export function PlanSelectionModal({ visible, onClose }: PlanSelectionModalProps
                     color: colors.textPrimary,
                     fontFamily: fonts.bold,
                     fontSize: fontSize['3xl'],
-                    includeFontPadding: false
+                    includeFontPadding: false,
+                    marginRight: 5
                   }
                 ]}>
                   8%

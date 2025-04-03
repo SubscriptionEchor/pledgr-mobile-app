@@ -27,6 +27,7 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   isCreatorCreated: boolean;
   setIsCreatorCreated: (value: boolean) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -174,6 +175,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUp = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const mockUser = {
+        id: Date.now().toString(),
+        name: email.split('@')[0], // Use email username as initial name
+        email,
+        role: UserRole.MEMBER,
+        avatar: `https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400`
+      };
+
+      await Promise.all([
+        AsyncStorage.setItem(TOKEN_KEY, 'mock_token'),
+        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
+        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+      ]);
+
+      setUser(mockUser);
+      setIsCreatorCreated(false);
+      router.replace('/member/home');
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loginWithGoogle = async () => {
     if (!request) return;
     await promptAsync();
@@ -235,7 +268,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateUserRole,
       checkAuth,
       isCreatorCreated,
-      setIsCreatorCreated: handleSetIsCreatorCreated
+      setIsCreatorCreated: handleSetIsCreatorCreated,
+      signUp
     }}>
       {children}
     </AuthContext.Provider>

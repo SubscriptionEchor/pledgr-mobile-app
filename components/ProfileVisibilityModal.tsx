@@ -60,8 +60,8 @@ export function ProfileVisibilityModal({
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.warningBox, { backgroundColor: '#FFF9F0' }]}>
-            <AlertTriangle size={24} color="#F59E0B" />
+          <View style={[styles.warningBox, { backgroundColor: `${colors.warning}15` }]}>
+            <AlertTriangle size={24} color={colors.warning} />
             <Text style={[
               styles.warningText,
               {
@@ -106,7 +106,7 @@ export function ProfileVisibilityModal({
                   value={isPublic}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor={Platform.OS === 'ios' ? '#FFFFFF' : isPublic ? colors.primary : colors.surface}
+                  thumbColor="#FFFFFF"
                 />
               </View>
 
@@ -206,7 +206,7 @@ export function ProfileVisibilityModal({
                   value={isPublic}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor={Platform.OS === 'ios' ? '#FFFFFF' : isPublic ? colors.primary : colors.surface}
+                  thumbColor="#FFFFFF"
                 />
               </View>
 
@@ -225,8 +225,8 @@ export function ProfileVisibilityModal({
 
               <View style={styles.infoCards}>
                 <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                  <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
-                    <Globe size={24} color="#0EA5E9" />
+                  <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                    <Globe size={24} color={colors.primary} />
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
@@ -255,8 +255,8 @@ export function ProfileVisibilityModal({
                 </View>
 
                 <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                  <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
-                    <Users size={24} color="#0EA5E9" />
+                  <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                    <Users size={24} color={colors.primary} />
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
@@ -285,8 +285,8 @@ export function ProfileVisibilityModal({
                 </View>
 
                 <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-                  <View style={[styles.iconContainer, { backgroundColor: '#E8F3FF' }]}>
-                    <Lock size={24} color="#0EA5E9" />
+                  <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                    <Lock size={24} color={colors.primary} />
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[
@@ -431,3 +431,5 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 });
+
+export { ProfileVisibilityModal }

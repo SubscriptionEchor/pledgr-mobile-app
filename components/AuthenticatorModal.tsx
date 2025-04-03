@@ -220,7 +220,7 @@ export function AuthenticatorModal({
                   value={isEnabled}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor={isEnabled ? colors.buttonText : colors.surface}
+                  thumbColor="#FFFFFF"
                 />
               </View>
             </View>
@@ -270,7 +270,7 @@ export function AuthenticatorModal({
                   value={isEnabled}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor={isEnabled ? colors.buttonText : colors.surface}
+                  thumbColor="#FFFFFF"
                 />
               </View>
 

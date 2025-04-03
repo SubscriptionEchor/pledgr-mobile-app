@@ -89,7 +89,8 @@ export default function FeatureRequestScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
-                                includeFontPadding: false
+                                includeFontPadding: false,
+                                textAlign: 'center'
                             }
                         ]}>
                             Innovation Welcome
@@ -117,7 +118,8 @@ export default function FeatureRequestScreen() {
                                 color: colors.textPrimary,
                                 fontFamily: fonts.semibold,
                                 fontSize: fontSize.md,
-                                includeFontPadding: false
+                                includeFontPadding: false,
+                                textAlign: 'center'
                             }
                         ]}>
                             Quick Implementation
