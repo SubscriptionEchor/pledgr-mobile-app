@@ -18,14 +18,6 @@ interface ProfileSheetProps {
   onClose: () => void;
 }
 
-interface RoleOption {
-  id: UserRole | 'creator_onboard' | 'creator_associate';
-  label: string;
-  description: string;
-  icon: any;
-  color: string;
-}
-
 export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   const { colors, fonts, fontSize, isDark, toggleTheme } = useTheme();
   const router = useRouter();
@@ -37,31 +29,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
 
   const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
   const isCreatorAssociate = user?.role === UserRole.CREATOR_ASSOCIATE;
-
-
-  const roleOptions: RoleOption[] = [
-    {
-      id: UserRole.MEMBER,
-      label: 'Member',
-      description: 'Browse and interact with content',
-      icon: Sparkles,
-      color: colors.primary
-    },
-    ...(isCreatorCreated ? [{
-      id: UserRole.CREATOR,
-      label: 'Creator',
-      description: 'Manage your creator profile',
-      icon: Crown,
-      color: colors.primary
-    }] : []),
-    {
-      id: 'creator_associate',
-      label: 'Creator Associate',
-      description: 'Help manage creator content',
-      icon: Users,
-      color: colors.primary
-    }
-  ];
 
   useEffect(() => {
     setSheetVisible(visible);
@@ -82,7 +49,19 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     }
   }, [visible]);
 
-  if (!visible || !user) return null;
+  const mockUser = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: UserRole.MEMBER,
+    avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400',
+  };
+
+  const currentUser = user || mockUser;
+
+  if (!visible) {
+    return null;
+  }
 
   const handleNavigation = (route: string) => {
     onClose();
@@ -138,7 +117,31 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     });
   };
 
-  const handleRoleSelect = async (option: RoleOption) => {
+  const roleOptions = [
+    {
+      id: UserRole.MEMBER,
+      label: 'Member',
+      description: 'Browse and interact with content',
+      icon: Sparkles,
+      color: colors.primary
+    },
+    ...(isCreatorCreated ? [{
+      id: UserRole.CREATOR,
+      label: 'Creator',
+      description: 'Manage your creator profile',
+      icon: Crown,
+      color: colors.primary
+    }] : []),
+    {
+      id: 'creator_associate',
+      label: 'Creator Associate',
+      description: 'Help manage creator content',
+      icon: Users,
+      color: colors.primary
+    }
+  ];
+
+  const handleRoleSelect = async (option: typeof roleOptions[0]) => {
     setShowRoleDropdown(false);
 
     if (option.id === 'creator_onboard') {
@@ -163,7 +166,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   };
 
   return (
-    <View style={styles.overlay}>
+    <View style={[StyleSheet.absoluteFillObject, styles.container]}>
       <Pressable style={styles.backdrop} onPress={handleClose} />
       <Animated.View
         style={[
@@ -185,7 +188,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             <View style={[styles.profileSection, { backgroundColor: colors.surface }]}>
               <View style={styles.profileLeft}>
                 <Image
-                  source={{ uri: user.avatar }}
+                  source={{ uri: currentUser.avatar }}
                   style={styles.avatar}
                 />
                 <View style={styles.profileInfo}>
@@ -198,7 +201,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       includeFontPadding: false
                     }
                   ]}>
-                    {user.name}
+                    {currentUser.name}
                   </Text>
                   <Text style={[
                     styles.profileEmail,
@@ -209,7 +212,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       includeFontPadding: false
                     }
                   ]}>
-                    {user.email}
+                    {currentUser.email}
                   </Text>
                 </View>
               </View>
@@ -239,9 +242,9 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 onPress={() => setShowRoleDropdown(!showRoleDropdown)}>
                 <View style={styles.roleSwitcherContent}>
                   <View style={[styles.roleIcon, { backgroundColor: `${colors.primary}15` }]}>
-                    {user.role === UserRole.CREATOR ? (
+                    {currentUser.role === UserRole.CREATOR ? (
                       <Crown size={20} color={colors.primary} />
-                    ) : user.role === UserRole.CREATOR_ASSOCIATE ? (
+                    ) : currentUser.role === UserRole.CREATOR_ASSOCIATE ? (
                       <Users size={20} color={colors.primary} />
                     ) : (
                       <Sparkles size={20} color={colors.primary} />
@@ -256,8 +259,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       includeFontPadding: false
                     }
                   ]}>
-                    {user.role === UserRole.CREATOR ? 'Creator' : 
-                     user.role === UserRole.CREATOR_ASSOCIATE ? 'Creator Associate' : 
+                    {currentUser.role === UserRole.CREATOR ? 'Creator' : 
+                     currentUser.role === UserRole.CREATOR_ASSOCIATE ? 'Creator Associate' : 
                      'Member'}
                   </Text>
                 </View>
@@ -271,7 +274,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       key={option.id}
                       style={[
                         styles.roleOption,
-                        user.role === option.id && { backgroundColor: `${colors.primary}15` }
+                        currentUser.role === option.id && { backgroundColor: `${colors.primary}15` }
                       ]}
                       onPress={() => handleRoleSelect(option)}>
                       <View style={styles.roleOptionContent}>
@@ -303,7 +306,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                           </Text>
                         </View>
                       </View>
-                      {user.role === option.id && (
+                      {currentUser.role === option.id && (
                         <View style={[styles.activeRole, { backgroundColor: colors.primary }]}>
                           <Text style={[
                             styles.activeRoleText,
@@ -324,7 +327,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   {!isCreatorCreated && (
                     <TouchableOpacity
                       style={styles.creatorCardWrapper}
-                      onPress={() => handleRoleSelect({ id: 'creator_onboard' } as RoleOption)}>
+                      onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}>
                       <LinearGradient
                         colors={['#1E88E5', '#9333EA']}
                         start={{ x: 0, y: 0 }}
@@ -486,13 +489,14 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 1000,
+    zIndex: 9999,
+    elevation: 9999,
   },
   backdrop: {
     position: 'absolute',
@@ -510,6 +514,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 5,
   },
   handle: {
     width: 32,
@@ -546,6 +558,13 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     gap: 2,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  profileEmail: {
+    fontSize: 14,
   },
   editButton: {
     width: 36,
@@ -728,5 +747,3 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
-
-export { ProfileSheet }

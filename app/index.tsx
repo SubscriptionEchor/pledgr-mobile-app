@@ -4,9 +4,11 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Crown } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StorageKeys, UserRole } from '@/lib/enums';
+import { router } from 'expo-router';
 
 export default function SplashScreen() {
-  const { checkAuth } = useAuth();
   const { fonts } = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -74,18 +76,56 @@ export default function SplashScreen() {
 
     animateDots();
 
-    const initializeApp = async () => {
-      // Wait for 3 seconds
-      await new Promise(resolve => setTimeout(resolve, 3000));
+    const checkAuthStatus = async () => {
+      try {
+        console.log(await AsyncStorage.getItem(StorageKeys.USER_ROLE), "USER ROLE");
+        
+        // 1. Check if token exists
+        const token = await AsyncStorage.getItem(StorageKeys.TOKEN);
+        if (!token) {
+          router.replace('/auth/sign-in');
+          return;
+        }
 
-      // Check authentication status
-      await checkAuth();
+        // 2. Check if access_token_member exists
+        const accessTokenMember = await AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_MEMBER);
+        if (!accessTokenMember) {
+          router.replace('/auth/sign-in');
+          return;
+        }
+
+        // 3. Check user role and navigate accordingly
+        const userRole = await AsyncStorage.getItem(StorageKeys.USER_ROLE);
+        if (!userRole) {
+          router.replace('/auth/sign-in');
+          return;
+        }
+
+        // Navigate based on user role
+        switch (userRole) {
+          case UserRole.CREATOR:
+            router.replace('/creator/home');
+            break;
+          case UserRole.CREATOR_ASSOCIATE:
+            router.replace('/creator-associate/home');
+            break;
+          case UserRole.MEMBER:
+            router.replace('/member/home');
+            break;
+          default:
+            router.replace('/auth/sign-in');
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        router.replace('/auth/sign-in');
+      }
     };
 
-    initializeApp();
+    // Wait for 3 seconds before checking auth status
+    const timer = setTimeout(checkAuthStatus, 3000);
 
-    // Cleanup animation on unmount
     return () => {
+      clearTimeout(timer);
       dot1Opacity.setValue(0.3);
       dot2Opacity.setValue(0.3);
       dot3Opacity.setValue(0.3);

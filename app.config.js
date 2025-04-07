@@ -25,8 +25,9 @@ export default {
       typedRoutes: true
     },
     extra: {
-      // Only keep the native client ID since we're focusing on mobile
+      // Include both native and web client IDs for Google auth
       googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
+      webClientId: 'YOUR_WEB_GOOGLE_CLIENT_ID'
     },
     scheme: 'pledgr'
   }
