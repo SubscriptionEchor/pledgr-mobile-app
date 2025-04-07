@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Image, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Image, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Settings, LogOut, Crown, ChevronRight, Sparkles, Pencil, ChevronDown, Users } from 'lucide-react-native';
@@ -27,6 +27,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   const [showSignOutConfirmation, setShowSignOutConfirmation] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const { user, updateUserRole, logout, isCreatorCreated } = useAuth();
+  const [isCreatorLoading, setIsCreatorLoading] = useState(false);
 
   const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
   const isCreatorAssociate = user?.role === UserRole.CREATOR_ASSOCIATE;
@@ -47,6 +48,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
         duration: 200,
         useNativeDriver: true,
       }).start();
+      // Close role dropdown when closing the sheet
+      setShowRoleDropdown(false);
     }
   }, [visible]);
 
@@ -115,6 +118,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
       useNativeDriver: true,
     }).start(() => {
       onClose();
+      // Close role dropdown when closing the sheet
+      setShowRoleDropdown(false);
     });
   };
 
@@ -143,45 +148,47 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   ];
 
   const handleRoleSelect = async (option: typeof roleOptions[0]) => {
-  setShowRoleDropdown(false);
+    if (option.id === 'creator_onboard') {
+      setIsCreatorLoading(true);
+      try {
+        const response = await memberAPI.checkCreatorExists();
+        
+        if (response.data.exists) {
+          showToast.error(
+            'Already a creator',
+            'You already have a creator account'
+          );
+          return;
+        }
 
-  if (option.id === 'creator_onboard') {
-    try {
-      const response = await memberAPI.checkCreatorExists();
-      
-      if (response.data.exists) {
+        handleNavigation('creatorOnboard');
+      } catch (error) {
         showToast.error(
-          'Already a creator',
-          'You already have a creator account'
+          'Error',
+          'Failed to check creator status. Please try again.'
         );
-        return;
+      } finally {
+        setIsCreatorLoading(false);
       }
-
-      handleNavigation('creatorOnboard');
-    } catch (error) {
-      showToast.error(
-        'Error',
-        'Failed to check creator status. Please try again.'
-      );
+      return;
     }
-    return;
-  }
 
-  if (option.id === 'creator_associate') {
-    handleNavigation('creatorAssociate');
-    return;
-  }
+    if (option.id === 'creator_associate') {
+      handleNavigation('creatorAssociate');
+      return;
+    }
 
-  try {
-    await updateUserRole(option.id as UserRole);
-    showToast.success(
-      'Role switched',
-      `You are now in ${option.id === UserRole.CREATOR ? 'creator' : 'member'} mode`
-    );
-  } catch (error) {
-    showToast.error('Failed to switch role', 'Please try again');
-  }
-};
+    try {
+      await updateUserRole(option.id as UserRole);
+      showToast.success(
+        'Role switched',
+        `You are now in ${option.id === UserRole.CREATOR ? 'creator' : 'member'} mode`
+      );
+      setShowRoleDropdown(false);
+    } catch (error) {
+      showToast.error('Failed to switch role', 'Please try again');
+    }
+  };
 
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>
@@ -345,7 +352,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   {!isCreatorCreated && (
                     <TouchableOpacity
                       style={styles.creatorCardWrapper}
-                      onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}>
+                      onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}
+                      disabled={isCreatorLoading}>
                       <LinearGradient
                         colors={['#1E88E5', '#9333EA']}
                         start={{ x: 0, y: 0 }}
@@ -355,7 +363,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                           <View style={styles.creatorLeft}>
                             <View style={styles.creatorIconGroup}>
                               <View style={styles.creatorMainIcon}>
-                                <Crown size={24} color="#fff" />
+                                  <Crown size={24} color="#fff" />
                               </View>
                               <View style={styles.creatorSecondaryIcon}>
                                 <Sparkles size={16} color="#fff" />
@@ -386,7 +394,11 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                               </Text>
                             </View>
                           </View>
-                          <ChevronRight size={20} color="#fff" />
+                          {isCreatorLoading ? (
+                                  <ActivityIndicator color="#fff" size="small" />
+                                ) : (
+                                  <ChevronRight size={20} color="#fff" />
+                                )}
                         </View>
                       </LinearGradient>
                     </TouchableOpacity>
