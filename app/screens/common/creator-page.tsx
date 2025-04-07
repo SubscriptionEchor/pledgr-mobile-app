@@ -5,8 +5,11 @@ import { useState, useEffect } from 'react';
 import { Image as ImageIcon } from 'lucide-react-native';
 import { showToast } from '@/components/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
-import { UserRole } from '@/lib/enums';
+import { UserRole, StorageKeys } from '@/lib/enums';
 import { useRouter } from 'expo-router';
+import { creatorAPI } from '@/lib/api/creator';
+import { authAPI } from '@/lib/api/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function convertToUrlFriendly(text: string): string {
     return text
@@ -25,10 +28,13 @@ export default function CreatePageScreen() {
     const [pageUrl, setPageUrl] = useState('');
     const [logo, setLogo] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
+    const [urlError, setUrlError] = useState<string | null>(null);
 
     useEffect(() => {
         // Update page URL whenever page name changes
         setPageUrl(convertToUrlFriendly(pageName));
+        // Clear any previous URL error when URL changes
+        setUrlError(null);
     }, [pageName]);
 
     const handleLogoUpload = () => {
@@ -49,8 +55,35 @@ export default function CreatePageScreen() {
         setIsCreating(true);
 
         try {
-            // Update user role to creator
+            // First check if the page URL is available
+            const urlCheckResponse = await creatorAPI.checkPageUrl(pageUrl);
+            
+            if (!urlCheckResponse.data.available) {
+                setUrlError('This page URL has already been taken');
+                setIsCreating(false);
+                return;
+            }
+
+            // Initialize the campaign
+            const initResponse = await creatorAPI.initializeCampaign(pageUrl, pageName);
+
+            if (!initResponse.data) {
+                throw new Error('Failed to initialize campaign');
+            }
+
+            // Fetch base info to get new access tokens
+            const baseInfoResponse = await authAPI.fetchBaseInfo();
+
+            // Store new access token and update role
+            await Promise.all([
+                AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse.data.accessTokenCampaign),
+                // AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.CREATOR),
+                // AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'true'),
+            ]);
+
+            // Update user role in context
             await updateUserRole(UserRole.CREATOR);
+            
             // Set creator created flag
             await setIsCreatorCreated(true);
 
@@ -59,13 +92,15 @@ export default function CreatePageScreen() {
                 'Welcome to your creator journey!'
             );
 
-            // Navigate back to home screen
-            router.replace('/creator/home');
+            // Navigate to creator home
+            // router.replace('/creator/home');
         } catch (error) {
+            console.error('Error creating page:', error);
             showToast.error(
                 'Error',
                 'Failed to create page. Please try again.'
             );
+        } finally {
             setIsCreating(false);
         }
     };
@@ -174,7 +209,11 @@ export default function CreatePageScreen() {
                             </Text>
                             <View style={[
                                 styles.urlInput,
-                                { backgroundColor: colors.surface }
+                                { 
+                                    backgroundColor: colors.surface,
+                                    borderColor: urlError ? colors.error : 'transparent',
+                                    borderWidth: urlError ? 1 : 0,
+                                }
                             ]}>
                                 <Text style={[
                                     styles.urlPrefix,
@@ -206,17 +245,31 @@ export default function CreatePageScreen() {
                                     editable={false}
                                 />
                             </View>
-                            <Text style={[
-                                styles.urlHint,
-                                {
-                                    color: colors.textSecondary,
-                                    fontFamily: fonts.regular,
-                                    fontSize: fontSize.sm,
-                                    includeFontPadding: false
-                                }
-                            ]}>
-                                This URL will be used to access your creator page
-                            </Text>
+                            {urlError ? (
+                                <Text style={[
+                                    styles.errorText,
+                                    {
+                                        color: colors.error,
+                                        fontFamily: fonts.regular,
+                                        fontSize: fontSize.sm,
+                                        includeFontPadding: false
+                                    }
+                                ]}>
+                                    {urlError}
+                                </Text>
+                            ) : (
+                                <Text style={[
+                                    styles.urlHint,
+                                    {
+                                        color: colors.textSecondary,
+                                        fontFamily: fonts.regular,
+                                        fontSize: fontSize.sm,
+                                        includeFontPadding: false
+                                    }
+                                ]}>
+                                    This URL will be used to access your creator page
+                                </Text>
+                            )}
                         </View>
                     </View>
                 </ScrollView>
@@ -329,6 +382,9 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     urlHint: {
+        marginLeft: 4,
+    },
+    errorText: {
         marginLeft: 4,
     },
     footer: {

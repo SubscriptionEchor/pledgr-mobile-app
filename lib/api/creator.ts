@@ -40,7 +40,35 @@ interface Post {
   visibility: 'public' | 'members' | 'paid';
 }
 
+interface CheckPageUrlResponse {
+  data: {
+    available: boolean;
+  };
+  status: string;
+  timestamp: string;
+  path: string;
+}
+
+interface InitializeCampaignResponse {
+  data: any;
+  status: string;
+  timestamp: string;
+  path: string;
+}
+
 export const creatorAPI = {
+  checkPageUrl: (pageUrl: string) =>
+    fetchAPI<CheckPageUrlResponse>('/campaigns/check-page-url', {
+      method: 'POST',
+      data: { pageUrl },
+    }),
+
+  initializeCampaign: (pageUrl: string, pageName: string) =>
+    fetchAPI<InitializeCampaignResponse>('/campaigns/initialize', {
+      method: 'POST',
+      data: { pageUrl, pageName },
+    }),
+
   getProfile: () =>
     fetchAPI<CreatorProfile>('/creator/profile'),
 

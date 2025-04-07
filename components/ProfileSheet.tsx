@@ -2,14 +2,15 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Image, S
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Settings, LogOut, Crown, ChevronRight, Sparkles, Pencil, ChevronDown, Users } from 'lucide-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useBottomSheet } from '@/lib/context/BottomSheetContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ConfirmationModal } from './ConfirmationModal';
 import { showToast } from './Toast';
 import { useAuth } from '@/lib/context/AuthContext';
-import { UserRole } from '@/lib/enums';
+import { UserRole, StorageKeys } from '@/lib/enums';
 import { memberAPI } from '@/lib/api/member';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_SHEET_HEIGHT = SCREEN_HEIGHT * 0.8;
@@ -26,11 +27,18 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   const { setSheetVisible } = useBottomSheet();
   const [showSignOutConfirmation, setShowSignOutConfirmation] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-  const { user, updateUserRole, logout, isCreatorCreated } = useAuth();
   const [isCreatorLoading, setIsCreatorLoading] = useState(false);
+  const { user, updateUserRole, logout, isCreatorCreated } = useAuth();
+  const [hasCreatorToken, setHasCreatorToken] = useState(false);
 
   const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
   const isCreatorAssociate = user?.role === UserRole.CREATOR_ASSOCIATE;
+
+  useEffect(() => {
+    AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN).then(token => {
+      setHasCreatorToken(!!token);
+    });
+  }, [visible]);
 
   useEffect(() => {
     setSheetVisible(visible);
@@ -48,7 +56,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
         duration: 200,
         useNativeDriver: true,
       }).start();
-      // Close role dropdown when closing the sheet
       setShowRoleDropdown(false);
     }
   }, [visible]);
@@ -68,6 +75,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   }
 
   const handleNavigation = (route: string) => {
+    setShowRoleDropdown(false);
     onClose();
 
     switch (route) {
@@ -118,7 +126,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
       useNativeDriver: true,
     }).start(() => {
       onClose();
-      // Close role dropdown when closing the sheet
       setShowRoleDropdown(false);
     });
   };
@@ -131,7 +138,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
       icon: Sparkles,
       color: colors.primary
     },
-    ...(isCreatorCreated ? [{
+    ...(hasCreatorToken ? [{
       id: UserRole.CREATOR,
       label: 'Creator',
       description: 'Manage your creator profile',
@@ -179,12 +186,14 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     }
 
     try {
+      console.log(option.id);
       await updateUserRole(option.id as UserRole);
       showToast.success(
         'Role switched',
         `You are now in ${option.id === UserRole.CREATOR ? 'creator' : 'member'} mode`
       );
       setShowRoleDropdown(false);
+      onClose();
     } catch (error) {
       showToast.error('Failed to switch role', 'Please try again');
     }
@@ -349,7 +358,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                     </TouchableOpacity>
                   ))}
 
-                  {!isCreatorCreated && (
+                  {!hasCreatorToken && (
                     <TouchableOpacity
                       style={styles.creatorCardWrapper}
                       onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}
@@ -363,7 +372,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                           <View style={styles.creatorLeft}>
                             <View style={styles.creatorIconGroup}>
                               <View style={styles.creatorMainIcon}>
-                                  <Crown size={24} color="#fff" />
+                                <Crown size={24} color="#fff" />
                               </View>
                               <View style={styles.creatorSecondaryIcon}>
                                 <Sparkles size={16} color="#fff" />
@@ -395,10 +404,10 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                             </View>
                           </View>
                           {isCreatorLoading ? (
-                                  <ActivityIndicator color="#fff" size="small" />
-                                ) : (
-                                  <ChevronRight size={20} color="#fff" />
-                                )}
+                            <ActivityIndicator color="#fff" size="small" />
+                          ) : (
+                            <ChevronRight size={20} color="#fff" />
+                          )}
                         </View>
                       </LinearGradient>
                     </TouchableOpacity>

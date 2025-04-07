@@ -37,7 +37,7 @@ const GOOGLE_EXPO_CLIENT_ID = Constants.expoConfig?.extra?.googleExpoClientId ||
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isCreatorCreated, setIsCreatorCreated] = useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -269,9 +269,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUserRole = async (role: UserRole) => {
-    if (!user) return;
+    // if (!user) return;
 
     try {
+      setIsLoading(true);
       const updatedUser = { ...user, role };
       await Promise.all([
         AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(updatedUser)),
@@ -294,6 +295,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error updating user role:', error);
       showToast.error('Failed to update role', 'Please try again');
+    } finally {
+      setIsLoading(false);
     }
   };
 
