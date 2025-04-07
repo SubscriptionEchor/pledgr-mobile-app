@@ -20,7 +20,23 @@ interface ChangePasswordData {
   newPassword: string;
 }
 
-export const userAPI = {
+interface CheckCreatorExistsResponse {
+  data: {
+    exists: boolean;
+    campaignId?: string;
+  };
+  status: string;
+  timestamp: string;
+  path: string;
+}
+
+export const memberAPI = {
+  checkCreatorExists: () =>
+    fetchAPI<CheckCreatorExistsResponse>('/campaigns/check-exists', {
+      method: 'POST',
+      requiresAuth: true,
+    }),
+  
   getProfile: () => 
     fetchAPI<User>('/user/profile'),
 

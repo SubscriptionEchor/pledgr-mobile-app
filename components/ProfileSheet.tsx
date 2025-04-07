@@ -9,6 +9,7 @@ import { ConfirmationModal } from './ConfirmationModal';
 import { showToast } from './Toast';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
+import { memberAPI } from '@/lib/api/member';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_SHEET_HEIGHT = SCREEN_HEIGHT * 0.8;
@@ -142,28 +143,45 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   ];
 
   const handleRoleSelect = async (option: typeof roleOptions[0]) => {
-    setShowRoleDropdown(false);
+  setShowRoleDropdown(false);
 
-    if (option.id === 'creator_onboard') {
-      handleNavigation('creatorOnboard');
-      return;
-    }
-
-    if (option.id === 'creator_associate') {
-      handleNavigation('creatorAssociate');
-      return;
-    }
-
+  if (option.id === 'creator_onboard') {
     try {
-      await updateUserRole(option.id as UserRole);
-      showToast.success(
-        'Role switched',
-        `You are now in ${option.id === UserRole.CREATOR ? 'creator' : 'member'} mode`
-      );
+      const response = await memberAPI.checkCreatorExists();
+      
+      if (response.data.exists) {
+        showToast.error(
+          'Already a creator',
+          'You already have a creator account'
+        );
+        return;
+      }
+
+      handleNavigation('creatorOnboard');
     } catch (error) {
-      showToast.error('Failed to switch role', 'Please try again');
+      showToast.error(
+        'Error',
+        'Failed to check creator status. Please try again.'
+      );
     }
-  };
+    return;
+  }
+
+  if (option.id === 'creator_associate') {
+    handleNavigation('creatorAssociate');
+    return;
+  }
+
+  try {
+    await updateUserRole(option.id as UserRole);
+    showToast.success(
+      'Role switched',
+      `You are now in ${option.id === UserRole.CREATOR ? 'creator' : 'member'} mode`
+    );
+  } catch (error) {
+    showToast.error('Failed to switch role', 'Please try again');
+  }
+};
 
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>

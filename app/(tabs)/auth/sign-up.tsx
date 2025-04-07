@@ -49,11 +49,11 @@ export default function SignUpScreen() {
     setIsLoading(true);
 
     try {
-      let response = await authAPI.signUp({
+      await authAPI.signUp({
         email: form.email,
         password: form.password,
       });
-      console.log(response, "response");
+      
       showToast.success(
         'Sign up successful',
         'Please sign in with your new account'

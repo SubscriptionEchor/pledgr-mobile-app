@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StorageKeys } from '@/lib/enums';
+import { StorageKeys, UserRole } from '@/lib/enums';
 
 const API_URL = 'https://dev-core-api.divinitydelights.com/api';
 
@@ -25,6 +25,7 @@ async function handleResponse(response: Response) {
     throw new APIError(response.status, data?.message || 'An error occurred');
   }
 
+  console.log(data, "API response");
   return data;
 }
 
@@ -48,6 +49,25 @@ export async function fetchAPI<T = any>(
       throw new Error('Authentication required');
     }
     headers['Authorization'] = `Bearer ${token}`;
+
+    const personaRole = await AsyncStorage.getItem(StorageKeys.USER_ROLE);
+    if (personaRole) {
+      headers['personatype'] = personaRole;
+
+      if (personaRole === UserRole.MEMBER) {
+        const memberToken = await AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_MEMBER);
+        if (memberToken) {
+          headers['persona_auth'] = `Bearer ${memberToken}`;
+        }
+      }
+      if (personaRole === UserRole.CREATOR) {
+        const creatorToken = await AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN);
+        if (creatorToken) {
+          headers['persona_auth'] = `Bearer ${creatorToken}`;
+        }
+      }
+    }
+    
   }
 
   const config: RequestInit = {
@@ -61,7 +81,9 @@ export async function fetchAPI<T = any>(
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, config);
+    
     return await handleResponse(response);
+    
   } catch (error) {
     if (error instanceof APIError) {
       throw error;

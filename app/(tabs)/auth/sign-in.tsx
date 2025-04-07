@@ -67,7 +67,7 @@ export default function SignInScreen() {
 
       // Store auth token and user data
       await Promise.all([
-        AsyncStorage.setItem(StorageKeys.TOKEN, signInResponse.accessToken),
+        AsyncStorage.setItem(StorageKeys.TOKEN, signInResponse?.data?.accessToken),
         AsyncStorage.setItem(StorageKeys.REMEMBER_ME, form.rememberMe.toString()),
         AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
         AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
@@ -83,11 +83,11 @@ export default function SignInScreen() {
         const baseInfoResponse = await authAPI.fetchBaseInfo();
         
         // Store access tokens if present
-        if (baseInfoResponse.accessTokenMember) {
-          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_MEMBER, baseInfoResponse.accessTokenMember);
+        if (baseInfoResponse?.data?.accessTokenMember) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_MEMBER, baseInfoResponse?.data?.accessTokenMember);
         }
-        if (baseInfoResponse.accessTokenCampaign) {
-          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse.accessTokenCampaign);
+        if (baseInfoResponse?.data?.accessTokenCampaign) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse?.data?.accessTokenCampaign);
         }
 
       router.replace('/member/home');
