@@ -26,3 +26,15 @@ export enum UserRole {
   CREATOR = 'creator',
   CREATOR_ASSOCIATE = 'creator_associate'
 }
+
+export enum StorageKeys {
+  TOKEN = '@auth_token',
+  USER = '@user_data',
+  REMEMBER_ME = '@remember_me',
+  USER_ROLE = '@user_role',
+  IS_CREATOR_CREATED = '@is_creator_created',
+  BRAND_COLOR = '@brand_color',
+  REMEMBER_ME_CREDS = '@remember_me_creds',
+  ACCESS_TOKEN_MEMBER = '@access_token_member',
+  ACCESS_TOKEN_CAMPAIGN = '@access_token_campaign'
+}

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserRole } from '@/lib/enums';
+import { UserRole, StorageKeys } from '@/lib/enums';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
@@ -32,12 +32,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = '@auth_token';
-const USER_KEY = '@user_data';
-const REMEMBER_ME_KEY = '@remember_me';
-const USER_ROLE_KEY = '@user_role';
-const IS_CREATOR_CREATED_KEY = '@is_creator_created';
-
 const GOOGLE_CLIENT_ID = Constants.expoConfig?.extra?.googleClientId || '';
 const GOOGLE_EXPO_CLIENT_ID = Constants.expoConfig?.extra?.googleExpoClientId || '';
 
@@ -53,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    AsyncStorage.getItem(IS_CREATOR_CREATED_KEY).then(value => {
+    AsyncStorage.getItem(StorageKeys.IS_CREATOR_CREATED).then(value => {
       setIsCreatorCreated(value === 'true');
     });
   }, []);
@@ -83,10 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       await Promise.all([
-        AsyncStorage.setItem(TOKEN_KEY, accessToken),
-        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
-        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
-        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+        AsyncStorage.setItem(StorageKeys.TOKEN, accessToken),
+        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
+        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, 'true'), // Always remember Google sign-ins
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ email: userInfo.email }))
       ]);
 
       setUser(mockUser);
@@ -100,15 +96,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
+      // First check if "Remember Me" is enabled
+      const rememberMe = await AsyncStorage.getItem(StorageKeys.REMEMBER_ME);
+      
+      // If "Remember Me" is not enabled, clear auth data and redirect to sign in
+      if (rememberMe !== 'true') {
+        await AsyncStorage.multiRemove([
+          StorageKeys.TOKEN,
+          StorageKeys.USER,
+          StorageKeys.USER_ROLE,
+          StorageKeys.IS_CREATOR_CREATED,
+          StorageKeys.REMEMBER_ME_CREDS
+        ]);
+        router.replace('/auth/sign-in');
+        return;
+      }
+
+      // If "Remember Me" is enabled, proceed with normal auth check
       const [token, userRole, userData, creatorCreated] = await Promise.all([
-        AsyncStorage.getItem(TOKEN_KEY),
-        AsyncStorage.getItem(USER_ROLE_KEY),
-        AsyncStorage.getItem(USER_KEY),
-        AsyncStorage.getItem(IS_CREATOR_CREATED_KEY)
+        AsyncStorage.getItem(StorageKeys.TOKEN),
+        AsyncStorage.getItem(StorageKeys.USER_ROLE),
+        AsyncStorage.getItem(StorageKeys.USER),
+        AsyncStorage.getItem(StorageKeys.IS_CREATOR_CREATED)
       ]);
 
       if (!token || !userRole || !userData) {
-        await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
+        await AsyncStorage.multiRemove([
+          StorageKeys.TOKEN,
+          StorageKeys.USER,
+          StorageKeys.USER_ROLE,
+          StorageKeys.IS_CREATOR_CREATED,
+          StorageKeys.REMEMBER_ME_CREDS
+        ]);
         router.replace('/auth/sign-in');
         return;
       }
@@ -138,7 +157,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error checking auth:', error);
-      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
+      await AsyncStorage.multiRemove([
+        StorageKeys.TOKEN,
+        StorageKeys.USER,
+        StorageKeys.USER_ROLE,
+        StorageKeys.IS_CREATOR_CREATED,
+        StorageKeys.REMEMBER_ME_CREDS
+      ]);
       router.replace('/auth/sign-in');
     } finally {
       setIsLoading(false);
@@ -159,12 +184,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
       };
 
+      // Store auth data and remember me preference
       await Promise.all([
-        AsyncStorage.setItem(TOKEN_KEY, 'mock_token'),
-        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
-        AsyncStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString()),
-        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
-        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+        AsyncStorage.setItem(StorageKeys.TOKEN, 'mock_token'),
+        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, rememberMe.toString()),
+        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
+        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
+        // Store credentials if remember me is enabled
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ email, password }))
       ]);
 
       setUser(mockUser);
@@ -190,10 +218,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       await Promise.all([
-        AsyncStorage.setItem(TOKEN_KEY, 'mock_token'),
-        AsyncStorage.setItem(USER_KEY, JSON.stringify(mockUser)),
-        AsyncStorage.setItem(USER_ROLE_KEY, UserRole.MEMBER),
-        AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, 'false')
+        AsyncStorage.setItem(StorageKeys.TOKEN, 'mock_token'),
+        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
+        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
+        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, 'true'), // Always remember new sign-ups
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ email, password }))
       ]);
 
       setUser(mockUser);
@@ -215,7 +245,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, USER_ROLE_KEY, REMEMBER_ME_KEY, IS_CREATOR_CREATED_KEY]);
+      // Only remove auth-related data, preserve remember me preference if enabled
+      const rememberMe = await AsyncStorage.getItem(StorageKeys.REMEMBER_ME);
+      const keysToRemove = [
+        StorageKeys.TOKEN,
+        StorageKeys.USER,
+        StorageKeys.USER_ROLE,
+        StorageKeys.IS_CREATOR_CREATED
+      ];
+
+      // If remember me is disabled, also remove credentials
+      if (rememberMe !== 'true') {
+        keysToRemove.push(StorageKeys.REMEMBER_ME_CREDS);
+      }
+
+      await AsyncStorage.multiRemove(keysToRemove);
       setUser(null);
       setIsCreatorCreated(false);
       router.replace('/auth/sign-in');
@@ -230,8 +274,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const updatedUser = { ...user, role };
       await Promise.all([
-        AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser)),
-        AsyncStorage.setItem(USER_ROLE_KEY, role)
+        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(updatedUser)),
+        AsyncStorage.setItem(StorageKeys.USER_ROLE, role)
       ]);
       
       setUser(updatedUser);
@@ -254,7 +298,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleSetIsCreatorCreated = async (value: boolean) => {
-    await AsyncStorage.setItem(IS_CREATOR_CREATED_KEY, value.toString());
+    await AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, value.toString());
     setIsCreatorCreated(value);
   };
 

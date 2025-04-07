@@ -1,56 +1,63 @@
 import { fetchAPI } from './client';
 
-interface LoginCredentials {
+interface SignUpResponse {
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: string;
+      email: string;
+    };
+  };
+}
+
+interface SignInResponse {
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: string;
+      email: string;
+    };
+  };
+}
+
+interface BaseInfoResponse {
+  message: string;
+  data: {
+    accessTokenMember?: string;
+    accessTokenCampaign?: string;
+  };
+}
+
+interface SignUpCredentials {
   email: string;
   password: string;
 }
 
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
-
-interface SignUpCredentials extends LoginCredentials {
-  name: string;
+interface SignInCredentials {
+  login: string;
+  password: string;
 }
 
 export const authAPI = {
-  login: (credentials: LoginCredentials) =>
-    fetchAPI<LoginResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      requiresAuth: false,
-    }),
-
   signUp: (credentials: SignUpCredentials) =>
-    fetchAPI<LoginResponse>('/auth/signup', {
+    fetchAPI<SignUpResponse>('/users/register', {
       method: 'POST',
-      body: JSON.stringify(credentials),
+      data: credentials,
       requiresAuth: false,
     }),
 
-  forgotPassword: (email: string) =>
-    fetchAPI('/auth/forgot-password', {
+  signIn: (credentials: SignInCredentials) =>
+    fetchAPI<SignInResponse>('/users/login', {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      data: credentials,
       requiresAuth: false,
     }),
 
-  resetPassword: (token: string, password: string) =>
-    fetchAPI('/auth/reset-password', {
+  fetchBaseInfo: () =>
+    fetchAPI<BaseInfoResponse>('/users/fetchBaseInfo', {
       method: 'POST',
-      body: JSON.stringify({ token, password }),
-      requiresAuth: false,
-    }),
-
-  verifyEmail: (token: string) =>
-    fetchAPI('/auth/verify-email', {
-      method: 'POST',
-      body: JSON.stringify({ token }),
-      requiresAuth: false,
+      requiresAuth: true,
     }),
 };

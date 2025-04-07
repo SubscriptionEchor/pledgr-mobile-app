@@ -6,13 +6,14 @@ import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { showToast } from '@/components/Toast';
 import { emailRegex, validatePassword } from '@/lib/utils/validation';
+import { authAPI } from '@/lib/api/auth';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function SignUpScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { signUp, loginWithGoogle } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -48,10 +49,23 @@ export default function SignUpScreen() {
     setIsLoading(true);
 
     try {
-      await signUp(form.email, form.password);
-      router.replace('/member/home');
-    } catch (error) {
-      showToast.error('Sign up failed', 'Please try again');
+      let response = await authAPI.signUp({
+        email: form.email,
+        password: form.password,
+      });
+      console.log(response, "response");
+      showToast.success(
+        'Sign up successful',
+        'Please sign in with your new account'
+      );
+      
+      router.replace('/auth/sign-in');
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      showToast.error(
+        'Sign up failed',
+        error.message || 'Please try again'
+      );
     } finally {
       setIsLoading(false);
     }

@@ -10,9 +10,9 @@ import {
 } from '@expo-google-fonts/outfit';
 import { SplashScreen } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
-import { UserRole } from '@/lib/enums';
+import { UserRole, StorageKeys } from '@/lib/enums';
 
-const BRAND_COLOR_KEY = '@brand_color';
+const DEFAULT_PRIMARY_COLOR = '#1e88e5';
 
 interface ThemeColors {
   primary: string;
@@ -67,8 +67,6 @@ interface ThemeContextType {
   toggleTheme: () => void;
   updateBrandColor: (color: string) => Promise<void>;
 }
-
-const DEFAULT_PRIMARY_COLOR = '#1e88e5';
 
 const getBaseColors = (isDark: boolean, primaryColor: string = DEFAULT_PRIMARY_COLOR): ThemeColors => ({
   primary: primaryColor,
@@ -139,7 +137,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const loadBrandColor = async () => {
       try {
         if (user?.role === UserRole.CREATOR) {
-          const savedColor = await AsyncStorage.getItem(BRAND_COLOR_KEY);
+          const savedColor = await AsyncStorage.getItem(StorageKeys.BRAND_COLOR);
           if (savedColor) {
             setBrandColor(savedColor);
           }
@@ -167,7 +165,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const updateBrandColor = async (color: string) => {
     if (user?.role === UserRole.CREATOR) {
       try {
-        await AsyncStorage.setItem(BRAND_COLOR_KEY, color);
+        await AsyncStorage.setItem(StorageKeys.BRAND_COLOR, color);
         setBrandColor(color);
       } catch (error) {
         console.error('Error saving brand color:', error);

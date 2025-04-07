@@ -1,17 +1,20 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, KeyboardAvoidingView, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Eye, EyeOff, ChevronRight, Check } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { showToast } from '@/components/Toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StorageKeys, UserRole } from '@/lib/enums';
+import { authAPI } from '@/lib/api/auth';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { login, loginWithGoogle } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -20,6 +23,32 @@ export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Check for remembered credentials on mount
+  useEffect(() => {
+    const checkRememberedCredentials = async () => {
+      try {
+        const [rememberMe, rememberedCreds] = await Promise.all([
+          AsyncStorage.getItem(StorageKeys.REMEMBER_ME),
+          AsyncStorage.getItem(StorageKeys.REMEMBER_ME_CREDS)
+        ]);
+
+        if (rememberMe === 'true' && rememberedCreds) {
+          const creds = JSON.parse(rememberedCreds);
+          setForm(prev => ({
+            ...prev,
+            email: creds.email,
+            password: creds.password || '',
+            rememberMe: true
+          }));
+        }
+      } catch (error) {
+        console.error('Error checking remembered credentials:', error);
+      }
+    };
+
+    checkRememberedCredentials();
+  }, []);
 
   const handleSignIn = async () => {
     if (!form.email || !form.password) {
@@ -30,10 +59,44 @@ export default function SignInScreen() {
     setIsLoading(true);
 
     try {
-      await login(form.email, form.password, form.rememberMe);
+      // Sign in
+      const signInResponse = await authAPI.signIn({
+        login: form.email,
+        password: form.password,
+      });
+
+      // Store auth token and user data
+      await Promise.all([
+        AsyncStorage.setItem(StorageKeys.TOKEN, signInResponse.accessToken),
+        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, form.rememberMe.toString()),
+        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
+        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
+        // Store credentials if remember me is enabled
+        form.rememberMe ? 
+          AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ 
+            email: form.email, 
+            password: form.password 
+          })) :
+          AsyncStorage.removeItem(StorageKeys.REMEMBER_ME_CREDS)
+      ]);
+
+        const baseInfoResponse = await authAPI.fetchBaseInfo();
+        
+        // Store access tokens if present
+        if (baseInfoResponse.accessTokenMember) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_MEMBER, baseInfoResponse.accessTokenMember);
+        }
+        if (baseInfoResponse.accessTokenCampaign) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse.accessTokenCampaign);
+        }
+
       router.replace('/member/home');
-    } catch (error) {
-      showToast.error('Sign in failed', 'Invalid email or password');
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      showToast.error(
+        'Sign in failed',
+        error.message || 'Invalid email or password'
+      );
     } finally {
       setIsLoading(false);
     }
