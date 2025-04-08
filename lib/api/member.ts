@@ -20,10 +20,41 @@ interface ChangePasswordData {
   newPassword: string;
 }
 
-interface CheckCreatorExistsResponse {
+interface MemberSettings {
+  type: string;
+  profile: {
+    display_name: string;
+  };
+  security: {
+    public_profile: boolean;
+  };
+  social_media: {
+    public_profile_enabled: boolean;
+  };
+  content_preferences: {
+    language: string;
+    adult_content: boolean;
+  };
+  notification_preferences: {
+    email: {
+      marketing: boolean;
+      newsletter: boolean;
+      special_offers: boolean;
+      comment_replies: boolean;
+      creator_updates: boolean;
+    };
+  };
+}
+
+interface MemberResponse {
   data: {
-    exists: boolean;
-    campaignId?: string;
+    id: string;
+    user_id: string;
+    persona_setting_id: string | null;
+    type: string;
+    settings: MemberSettings;
+    created_at: string;
+    updated_at: string;
   };
   status: string;
   timestamp: string;
@@ -31,8 +62,21 @@ interface CheckCreatorExistsResponse {
 }
 
 export const memberAPI = {
+  getCurrentMember: () =>
+    fetchAPI<MemberResponse>('/members/current', {
+      method: 'GET',
+      requiresAuth: true,
+    }),
+
+  updateMemberSettings: (settings: Partial<MemberSettings>) =>
+    fetchAPI<MemberResponse>('/members/settings', {
+      method: 'PATCH',
+      data: settings,
+      requiresAuth: true,
+    }),
+
   checkCreatorExists: () =>
-    fetchAPI<CheckCreatorExistsResponse>('/campaigns/check-exists', {
+    fetchAPI<{ data: { exists: boolean; campaignId?: string } }>('/campaigns/check-exists', {
       method: 'POST',
       requiresAuth: true,
     }),
@@ -43,19 +87,19 @@ export const memberAPI = {
   updateProfile: (data: UpdateProfileData) =>
     fetchAPI<User>('/user/profile', {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      data,
     }),
 
   changePassword: (data: ChangePasswordData) =>
     fetchAPI('/user/change-password', {
       method: 'POST',
-      body: JSON.stringify(data),
+      data,
     }),
 
   updateNotificationSettings: (settings: Record<string, boolean>) =>
     fetchAPI('/user/notifications', {
       method: 'PATCH',
-      body: JSON.stringify(settings),
+      data: settings,
     }),
 
   deleteAccount: () =>

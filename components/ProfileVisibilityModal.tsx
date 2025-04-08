@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ProfileVisibility } from '@/lib/enums';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
+import { useMemberSettings } from '@/hooks/useMemberSettings';
 
 interface ProfileVisibilityModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ export function ProfileVisibilityModal({
   const { colors, fonts, fontSize } = useTheme();
   const [isPublic, setIsPublic] = useState(selectedVisibility === ProfileVisibility.PUBLIC);
   const { user } = useAuth();
+  const { memberSettings } = useMemberSettings();
 
   const isCreator = user?.role === UserRole.CREATOR;
 
@@ -203,7 +205,7 @@ export function ProfileVisibilityModal({
                   </Text>
                 </View>
                 <Switch
-                  value={isPublic}
+                  value={memberSettings?.security.public_profile || false}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor="#FFFFFF"

@@ -1,52 +1,81 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Platform, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Platform, TextInput, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, X, Check } from 'lucide-react-native';
-import { useState, useMemo } from 'react';
-import { useUserContext } from '@/lib/context/UserContext';
+import { useState, useMemo, useEffect } from 'react';
+import { commonAPI } from '@/lib/api/common';
 
-interface CountryPickerProps {
-  visible: boolean;
-  onClose: () => void;
-  onSelect: (country: string) => void;
-  selectedCountry?: string;
+interface State {
+  id: string;
+  name: string;
+  state_code: string;
+  country_code: string;
 }
 
-export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: CountryPickerProps) {
+interface StatePickerProps {
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (state: string) => void;
+  countryCode?: string;
+  selectedState?: string;
+}
+
+export function StatePicker({ visible, onClose, onSelect, countryCode, selectedState }: StatePickerProps) {
   const { colors, fonts, fontSize } = useTheme();
   const [search, setSearch] = useState('');
-  const { countries, isLoading } = useUserContext();
+  const [states, setStates] = useState<State[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredAndSortedCountries = useMemo(() => {
-    const filtered = countries.filter((country) =>
-      country.name.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!countryCode) return;
+
+      setIsLoading(true);
+      try {
+        const response = await commonAPI.getStates(countryCode);
+        setStates(response.data);
+      } catch (error) {
+        console.error('Error fetching states:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (visible && countryCode) {
+      fetchStates();
+    }
+  }, [countryCode, visible]);
+
+  const filteredAndSortedStates = useMemo(() => {
+    const filtered = states.filter((state) =>
+      state.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    if (!selectedCountry || !search) {
+    if (!selectedState || !search) {
       return filtered;
     }
 
-    // Move selected country to the top if it's in the filtered results
+    // Move selected state to the top if it's in the filtered results
     return filtered.sort((a, b) => {
-      if (a.name === selectedCountry) return -1;
-      if (b.name === selectedCountry) return 1;
+      if (a.name === selectedState) return -1;
+      if (b.name === selectedState) return 1;
       return 0;
     });
-  }, [search, countries, selectedCountry]);
+  }, [search, states, selectedState]);
 
   const handleClose = () => {
     setSearch('');
     onClose();
   };
 
-  const handleSelect = (country: typeof countries[0]) => {
+  const handleSelect = (state: State) => {
     setSearch('');
-    onSelect(country.name);
+    onSelect(state.name);
   };
 
-  const renderSelectedCountry = () => {
-    if (!selectedCountry || search) return null;
+  const renderSelectedState = () => {
+    if (!selectedState || search) return null;
 
-    const selected = countries.find(c => c.name === selectedCountry);
+    const selected = states.find(s => s.name === selectedState);
     if (!selected) return null;
 
     return (
@@ -64,7 +93,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
         </Text>
         <TouchableOpacity
           style={[
-            styles.countryItem,
+            styles.stateItem,
             { 
               borderBottomColor: colors.border,
               backgroundColor: `${colors.primary}15`,
@@ -72,29 +101,17 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
             }
           ]}
           onPress={() => handleSelect(selected)}>
-          <View style={styles.countryInfo}>
-            <Text style={[
-              styles.emoji,
-              {
-                fontFamily: fonts.regular,
-                fontSize: fontSize.xl,
-                includeFontPadding: false
-              }
-            ]}>
-              {selected.emoji}
-            </Text>
-            <Text style={[
-              styles.countryName,
-              {
-                color: colors.primary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-                includeFontPadding: false
-              }
-            ]}>
-              {selected.name}
-            </Text>
-          </View>
+          <Text style={[
+            styles.stateName,
+            {
+              color: colors.primary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.md,
+              includeFontPadding: false
+            }
+          ]}>
+            {selected.name}
+          </Text>
           <Check size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -119,7 +136,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
               includeFontPadding: false
             }
           ]}>
-            Select Country
+            Select State
           </Text>
           <TouchableOpacity onPress={handleClose}>
             <X size={24} color={colors.textPrimary} />
@@ -131,7 +148,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search countries"
+            placeholder="Search states"
             placeholderTextColor={colors.textSecondary}
             style={[
               styles.searchInput,
@@ -145,7 +162,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
           />
         </View>
 
-        {renderSelectedCountry()}
+        {renderSelectedState()}
 
         {isLoading ? (
           <View style={styles.loadingContainer}>
@@ -160,12 +177,12 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
                 marginTop: 12
               }
             ]}>
-              Loading countries...
+              Loading states...
             </Text>
           </View>
         ) : (
           <>
-            {!search && selectedCountry && (
+            {!search && selectedState && (
               <View style={[styles.listHeader, { backgroundColor: `${colors.primary}08` }]}>
                 <Text style={[
                   styles.listHeaderText,
@@ -176,50 +193,38 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
                     includeFontPadding: false
                   }
                 ]}>
-                  All Countries
+                  All States
                 </Text>
               </View>
             )}
             <FlatList
-              data={filteredAndSortedCountries}
+              data={filteredAndSortedStates}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => {
-                const isSelected = item.name === selectedCountry;
+                const isSelected = item.name === selectedState;
                 if (isSelected && !search) return null;
 
                 return (
                   <TouchableOpacity
                     style={[
-                      styles.countryItem,
+                      styles.stateItem,
                       { 
                         borderBottomColor: colors.border,
                         backgroundColor: isSelected ? `${colors.primary}15` : 'transparent'
                       }
                     ]}
                     onPress={() => handleSelect(item)}>
-                    <View style={styles.countryInfo}>
-                      <Text style={[
-                        styles.emoji,
-                        {
-                          fontFamily: fonts.regular,
-                          fontSize: fontSize.xl,
-                          includeFontPadding: false
-                        }
-                      ]}>
-                        {item.emoji}
-                      </Text>
-                      <Text style={[
-                        styles.countryName,
-                        {
-                          color: isSelected ? colors.primary : colors.textPrimary,
-                          fontFamily: isSelected ? fonts.semibold : fonts.regular,
-                          fontSize: fontSize.md,
-                          includeFontPadding: false
-                        }
-                      ]}>
-                        {item.name}
-                      </Text>
-                    </View>
+                    <Text style={[
+                      styles.stateName,
+                      {
+                        color: isSelected ? colors.primary : colors.textPrimary,
+                        fontFamily: isSelected ? fonts.semibold : fonts.regular,
+                        fontSize: fontSize.md,
+                        includeFontPadding: false
+                      }
+                    ]}>
+                      {item.name}
+                    </Text>
                     {isSelected && (
                       <Check size={20} color={colors.primary} />
                     )}
@@ -237,7 +242,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
                       includeFontPadding: false
                     }
                   ]}>
-                    No countries found
+                    No states found
                   </Text>
                 </View>
               }
@@ -290,7 +295,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  countryItem: {
+  stateItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -298,15 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
   },
-  countryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  emoji: {
-    marginRight: 12,
-  },
-  countryName: {
+  stateName: {
     fontSize: 16,
   },
   loadingContainer: {

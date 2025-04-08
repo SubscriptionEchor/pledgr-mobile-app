@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Switch, Platform, Scro
 import { useTheme } from '@/hooks/useTheme';
 import { X, Globe, Users, Lock, TriangleAlert as AlertTriangle, Store, Eye, Shield } from 'lucide-react-native';
 import { useState } from 'react';
+import { useMemberSettings } from '@/hooks/useMemberSettings';
 
 interface AdultContentModalProps {
   visible: boolean;
@@ -19,6 +20,7 @@ export function AdultContentModal({
   onSave
 }: AdultContentModalProps) {
   const { colors, fonts, fontSize } = useTheme();
+  const { memberSettings } = useMemberSettings();
 
   const handleToggle = (value: boolean) => {
     onSave({ enabled: value });
@@ -95,7 +97,7 @@ export function AdultContentModal({
               </Text>
             </View>
             <Switch
-              value={initialSettings.enabled}
+              value={memberSettings?.content_preferences.adult_content || false}
               onValueChange={handleToggle}
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor="#FFFFFF"
@@ -259,6 +261,9 @@ const styles = StyleSheet.create({
   },
   settingDescription: {
     lineHeight: 20,
+  },
+  info: {
+    marginTop: 24,
   },
   infoSection: {
     gap: 16,

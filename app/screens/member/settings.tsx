@@ -1,15 +1,16 @@
-import { useRouter } from 'expo-router';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProfileVisibilityModal } from '@/components/ProfileVisibilityModal';
 import { AdultContentModal } from '@/components/AdultContentModal';
 import { LanguagePicker } from '@/components/LanguagePicker';
 import { AuthenticatorModal } from '@/components/AuthenticatorModal';
 import { DeviceManagementModal } from '@/components/DeviceManagementModal';
-import { User, Key, Languages, Bell, Shield, Smartphone, Crown, FileText, Lightbulb, Lock, ChevronRight, Eye, TriangleAlert as AlertTriangle, X } from 'lucide-react-native';
+import { User, Key, Languages, Bell, Shield, Smartphone, Crown, FileText, Lightbulb, Lock, ChevronRight, Eye, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { MOCK_DEVICES } from '@/lib/constants';
+import { useMemberSettings } from '@/hooks/useMemberSettings';
 
 const SETTINGS_SECTIONS = [
     {
@@ -59,16 +60,13 @@ export default function SettingsScreen() {
     const [showLanguagePicker, setShowLanguagePicker] = useState(false);
     const [showAuthenticatorModal, setShowAuthenticatorModal] = useState(false);
     const [showDeviceManagementModal, setShowDeviceManagementModal] = useState(false);
-    const [selectedVisibility, setSelectedVisibility] = useState('public');
-    const [selectedLanguage, setSelectedLanguage] = useState({
-        code: 'en',
-        name: 'English'
-    });
-    const [adultContentSettings, setAdultContentSettings] = useState({
-        enabled: false
-    });
     const [isAuthenticatorEnabled, setIsAuthenticatorEnabled] = useState(false);
     const [devices, setDevices] = useState(MOCK_DEVICES);
+    const { memberSettings, isLoading, fetchMemberSettings, updateMemberSettings } = useMemberSettings();
+
+    useEffect(() => {
+        fetchMemberSettings();
+    }, []);
 
     const handleNavigation = (route?: string, action?: string) => {
         if (action === 'visibility') {
@@ -94,9 +92,92 @@ export default function SettingsScreen() {
         setDevices(devices.filter(device => device.isCurrentDevice));
     };
 
+    const handleVisibilityChange = async (visibility: string) => {
+        try {
+            await updateMemberSettings({
+                security: {
+                    public_profile: visibility === 'public'
+                }
+            });
+            setShowVisibilityModal(false);
+        } catch (error) {
+            console.error('Error updating visibility:', error);
+        }
+    };
+
+    const handleAdultContentChange = async (settings: { enabled: boolean }) => {
+        try {
+            await updateMemberSettings({
+                content_preferences: {
+                    ...memberSettings?.content_preferences,
+                    adult_content: settings.enabled
+                }
+            });
+            setShowAdultContentModal(false);
+        } catch (error) {
+            console.error('Error updating adult content settings:', error);
+        }
+    };
+
+    const handleLanguageChange = async (language: { code: string; name: string }) => {
+        try {
+            await updateMemberSettings({
+                content_preferences: {
+                    ...memberSettings?.content_preferences,
+                    language: language.code
+                }
+            });
+            setShowLanguagePicker(false);
+        } catch (error) {
+            console.error('Error updating language:', error);
+        }
+    };
+
+    if (isLoading && !memberSettings) {
+        return (
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <SubHeader title="Settings" />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={[
+                        styles.loadingText,
+                        {
+                            color: colors.textSecondary,
+                            fontFamily: fonts.regular,
+                            fontSize: fontSize.md,
+                            includeFontPadding: false,
+                            marginTop: 12
+                        }
+                    ]}>
+                        Loading settings...
+                    </Text>
+                </View>
+            </View>
+        );
+    }
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <SubHeader title="Settings" />
+            {isLoading && (
+                <View style={styles.updatingOverlay}>
+                    <View style={[styles.updatingContainer, { backgroundColor: colors.surface }]}>
+                        <ActivityIndicator size="small" color={colors.primary} />
+                        <Text style={[
+                            styles.updatingText,
+                            {
+                                color: colors.textPrimary,
+                                fontFamily: fonts.medium,
+                                fontSize: fontSize.sm,
+                                includeFontPadding: false,
+                                marginLeft: 8
+                            }
+                        ]}>
+                            Updating...
+                        </Text>
+                    </View>
+                </View>
+            )}
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 <View style={styles.content}>
                     {SETTINGS_SECTIONS.map((section) => (
@@ -112,18 +193,20 @@ export default function SettingsScreen() {
                             ]}>
                                 {section.title}
                             </Text>
+
                             <View style={[styles.sectionContent, { backgroundColor: colors.surface }]}>
                                 {section.items.map((item, index) => (
                                     <TouchableOpacity
                                         key={item.label}
-                                        onPress={() => handleNavigation(item.route, item.action)}
                                         style={[
                                             styles.settingItem,
                                             index !== section.items.length - 1 && {
                                                 borderBottomWidth: 1,
                                                 borderBottomColor: colors.border,
                                             },
-                                        ]}>
+                                        ]}
+                                        onPress={() => handleNavigation(item.route, item.action)}
+                                        disabled={isLoading}>
                                         <View style={styles.settingItemLeft}>
                                             <View style={[styles.iconContainer, { backgroundColor: 'transparent' }]}>
                                                 <item.icon size={20} color={colors.textPrimary} />
@@ -152,25 +235,22 @@ export default function SettingsScreen() {
             <ProfileVisibilityModal
                 visible={showVisibilityModal}
                 onClose={() => setShowVisibilityModal(false)}
-                selectedVisibility={selectedVisibility}
-                onSelect={setSelectedVisibility}
+                selectedVisibility={memberSettings?.security.public_profile ? 'public' : 'private'}
+                onSelect={handleVisibilityChange}
             />
 
             <AdultContentModal
                 visible={showAdultContentModal}
                 onClose={() => setShowAdultContentModal(false)}
-                initialSettings={adultContentSettings}
-                onSave={setAdultContentSettings}
+                initialSettings={{ enabled: memberSettings?.content_preferences.adult_content || false }}
+                onSave={handleAdultContentChange}
             />
 
             <LanguagePicker
                 visible={showLanguagePicker}
                 onClose={() => setShowLanguagePicker(false)}
-                onSelect={(language) => {
-                    setSelectedLanguage(language);
-                    setShowLanguagePicker(false);
-                }}
-                selectedCode={selectedLanguage.code}
+                onSelect={handleLanguageChange}
+                selectedCode={memberSettings?.content_preferences.language}
             />
 
             <AuthenticatorModal
@@ -195,6 +275,41 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        textAlign: 'center',
+    },
+    updatingOverlay: {
+        position: 'absolute',
+        top: 100,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    updatingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 3,
+    },
+    updatingText: {
+        textAlign: 'center',
+    },
     scrollView: {
         flex: 1,
     },
@@ -216,18 +331,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: 12,
     },
     settingItemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
+        flex: 1,
     },
     iconContainer: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    settingItemLabel: {
+        lineHeight: 22,
     },
 });
