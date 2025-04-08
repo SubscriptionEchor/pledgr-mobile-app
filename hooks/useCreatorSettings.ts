@@ -126,10 +126,39 @@ export function useCreatorSettings() {
     }
   };
 
+  const updateCreatorNotifications = async (notificationSettings: {
+    notification_preferences: {
+    email?: Record<string, boolean>;
+    notification_feed?: Record<string, boolean>;
+  };
+  marketing_preferences: {
+    receive_marketing_emails: boolean;
+  };
+  published: boolean;
+  shop_visibility: boolean;
+  }) => {
+    if (!creatorSettings) return;
+
+    setIsLoading(true);
+    try {
+      const response = await creatorAPI.updateCampaignSettings(notificationSettings);
+      setCreatorSettings(response.data);
+      showToast.success('Notification settings updated', 'Your changes have been saved');
+      return response.data;
+    } catch (error) {
+      console.error('Error updating creator notification settings:', error);
+      showToast.error('Failed to update notification settings', 'Please try again later');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     creatorSettings,
     isLoading,
     fetchCreatorSettings,
-    updateCreatorSettings
+    updateCreatorSettings,
+    updateCreatorNotifications
   };
 }

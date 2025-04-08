@@ -64,6 +64,36 @@ interface CreatorResponse {
   path: string;
 }
 
+interface NotificationPreferences {
+  email?: {
+    receive_email_on_post?: boolean;
+    receive_email_on_comments?: boolean;
+    receive_email_on_direct_message?: boolean;
+    receive_email_on_new_paid_member?: boolean;
+    receive_email_on_shop_purchases?: boolean;
+    receive_email_on_reminder_to_share?: boolean;
+  };
+  notification_feed?: {
+    receive_notification_on_likes?: boolean;
+    receive_notification_on_comments?: boolean;
+    receive_notification_on_chat_messages?: boolean;
+    receive_notification_on_new_free_members?: boolean;
+    receive_notification_on_new_paid_members?: boolean;
+    receive_notification_on_upgraded_members?: boolean;
+    receive_notification_on_downgraded_members?: boolean;
+    receive_notification_on_cancelled_members?: boolean;
+  };
+}
+
+interface CampaignSettingsUpdatePayload {
+  notification_preferences?: NotificationPreferences;
+  marketing_preferences?: {
+    receive_marketing_emails?: boolean;
+  };
+  published?: boolean;
+  shop_visibility?: boolean;
+}
+
 export const creatorAPI = {
   getCurrentCampaign: () =>
     fetchAPI<CreatorResponse>('/campaigns/me', {
@@ -74,6 +104,13 @@ export const creatorAPI = {
   updateCampaign: (data: Partial<CreatorSettings>) =>
     fetchAPI<CreatorResponse>('/campaigns/me', {
       method: 'PATCH',
+      data,
+      requiresAuth: true,
+    }),
+
+  updateCampaignSettings: (data: CampaignSettingsUpdatePayload) =>
+    fetchAPI<CreatorResponse>('/campaigns/campaign-settings', {
+      method: 'PUT',
       data,
       requiresAuth: true,
     }),
