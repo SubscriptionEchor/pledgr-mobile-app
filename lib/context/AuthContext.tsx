@@ -19,15 +19,13 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   isLoading: boolean;
-  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateUserRole: (role: UserRole) => Promise<void>;
-  checkAuth: () => Promise<void>;
   isCreatorCreated: boolean;
   setIsCreatorCreated: (value: boolean) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,7 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await Promise.all([
         AsyncStorage.setItem(StorageKeys.TOKEN, accessToken),
-        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
         AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
         AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
         AsyncStorage.setItem(StorageKeys.REMEMBER_ME, 'true'), // Always remember Google sign-ins
@@ -94,149 +91,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const checkAuth = async () => {
-    try {
-      // First check if "Remember Me" is enabled
-      const rememberMe = await AsyncStorage.getItem(StorageKeys.REMEMBER_ME);
-      
-      // If "Remember Me" is not enabled, clear auth data and redirect to sign in
-      if (rememberMe !== 'true') {
-        await AsyncStorage.multiRemove([
-          StorageKeys.TOKEN,
-          StorageKeys.USER,
-          StorageKeys.USER_ROLE,
-          StorageKeys.IS_CREATOR_CREATED,
-          StorageKeys.REMEMBER_ME_CREDS
-        ]);
-        router.replace('/auth/sign-in');
-        return;
-      }
-
-      // If "Remember Me" is enabled, proceed with normal auth check
-      const [token, userRole, userData, creatorCreated] = await Promise.all([
-        AsyncStorage.getItem(StorageKeys.TOKEN),
-        AsyncStorage.getItem(StorageKeys.USER_ROLE),
-        AsyncStorage.getItem(StorageKeys.USER),
-        AsyncStorage.getItem(StorageKeys.IS_CREATOR_CREATED)
-      ]);
-
-      if (!token || !userRole || !userData) {
-        await AsyncStorage.multiRemove([
-          StorageKeys.TOKEN,
-          StorageKeys.USER,
-          StorageKeys.USER_ROLE,
-          StorageKeys.IS_CREATOR_CREATED,
-          StorageKeys.REMEMBER_ME_CREDS
-        ]);
-        router.replace('/auth/sign-in');
-        return;
-      }
-
-      const parsedUser = JSON.parse(userData);
-      const user = {
-        ...parsedUser,
-        role: userRole as UserRole
-      };
-
-      setUser(user);
-      setIsCreatorCreated(creatorCreated === 'true');
-
-      // Route based on stored role
-      switch (userRole) {
-        case UserRole.CREATOR:
-          router.replace('/creator/home');
-          break;
-        case UserRole.CREATOR_ASSOCIATE:
-          router.replace('/creator/home');
-          break;
-        case UserRole.MEMBER:
-          router.replace('/member/home');
-          break;
-        default:
-          router.replace('/auth/sign-in');
-      }
-    } catch (error) {
-      console.error('Error checking auth:', error);
-      await AsyncStorage.multiRemove([
-        StorageKeys.TOKEN,
-        StorageKeys.USER,
-        StorageKeys.USER_ROLE,
-        StorageKeys.IS_CREATOR_CREATED,
-        StorageKeys.REMEMBER_ME_CREDS
-      ]);
-      router.replace('/auth/sign-in');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (email: string, password: string, rememberMe: boolean) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const mockUser = {
-        id: '1',
-        name: 'John Doe',
-        email,
-        role: UserRole.MEMBER,
-        avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400'
-      };
-
-      // Store auth data and remember me preference
-      await Promise.all([
-        AsyncStorage.setItem(StorageKeys.TOKEN, 'mock_token'),
-        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
-        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, rememberMe.toString()),
-        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
-        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
-        // Store credentials if remember me is enabled
-        AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ email, password }))
-      ]);
-
-      setUser(mockUser);
-      setIsCreatorCreated(false);
-      router.replace('/member/home');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const mockUser = {
-        id: Date.now().toString(),
-        name: email.split('@')[0], // Use email username as initial name
-        email,
-        role: UserRole.MEMBER,
-        avatar: `https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400`
-      };
-
-      await Promise.all([
-        AsyncStorage.setItem(StorageKeys.TOKEN, 'mock_token'),
-        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(mockUser)),
-        AsyncStorage.setItem(StorageKeys.USER_ROLE, UserRole.MEMBER),
-        AsyncStorage.setItem(StorageKeys.IS_CREATOR_CREATED, 'false'),
-        AsyncStorage.setItem(StorageKeys.REMEMBER_ME, 'true'), // Always remember new sign-ups
-        AsyncStorage.setItem(StorageKeys.REMEMBER_ME_CREDS, JSON.stringify({ email, password }))
-      ]);
-
-      setUser(mockUser);
-      setIsCreatorCreated(false);
-      router.replace('/member/home');
-    } catch (error) {
-      console.error('Sign up error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const loginWithGoogle = async () => {
     if (!request) return;
     await promptAsync();
@@ -249,7 +103,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const rememberMe = await AsyncStorage.getItem(StorageKeys.REMEMBER_ME);
       const keysToRemove = [
         StorageKeys.TOKEN,
-        StorageKeys.USER,
+        StorageKeys.ACCESS_TOKEN_MEMBER,
+        StorageKeys.ACCESS_TOKEN_CAMPAIGN,
         StorageKeys.USER_ROLE,
         StorageKeys.IS_CREATOR_CREATED
       ];
@@ -275,7 +130,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       const updatedUser = { ...user, role };
       await Promise.all([
-        AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(updatedUser)),
         AsyncStorage.setItem(StorageKeys.USER_ROLE, role)
       ]);
       
@@ -308,15 +162,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{
       user,
+      setUser,
       isLoading,
-      login,
       loginWithGoogle,
       logout,
       updateUserRole,
-      checkAuth,
       isCreatorCreated,
       setIsCreatorCreated: handleSetIsCreatorCreated,
-      signUp
     }}>
       {children}
     </AuthContext.Provider>

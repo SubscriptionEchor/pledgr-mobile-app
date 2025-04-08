@@ -222,8 +222,8 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
             <View style={[styles.profileSection, { backgroundColor: colors.surface }]}>
               <View style={styles.profileLeft}>
                 <Image
-                  source={{ uri: currentUser.avatar }}
-                  style={styles.avatar}
+                  source={{ uri: currentUser.profile_photo || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
+                  style={[styles.avatar, { backgroundColor: `${colors.primary}15` }]}
                 />
                 <View style={styles.profileInfo}>
                   <Text style={[
@@ -235,7 +235,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       includeFontPadding: false
                     }
                   ]}>
-                    {currentUser.name}
+                    {currentUser.name || 'User'}
                   </Text>
                   <Text style={[
                     styles.profileEmail,
@@ -246,7 +246,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       includeFontPadding: false
                     }
                   ]}>
-                    {currentUser.email}
+                    {currentUser.email || 'user@gmail.com'}
                   </Text>
                 </View>
               </View>

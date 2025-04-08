@@ -14,7 +14,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export default function SignInScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, setUser } = useAuth();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -89,6 +89,17 @@ export default function SignInScreen() {
         if (baseInfoResponse?.data?.accessTokenCampaign) {
           await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse?.data?.accessTokenCampaign);
         }
+
+        const data = baseInfoResponse.data;
+        const userData = {
+          name: data?.memberObj?.settings?.profile?.display_name || '',
+          email: data?.memberObj?.settings?.profile?.email || '',
+          role: UserRole.MEMBER,
+          profile_photo: data?.memberObj?.settings?.profile?.profile_photo || ''
+        };
+
+        // Update user state
+        setUser(userData);
 
       router.replace('/member/home');
     } catch (error: any) {

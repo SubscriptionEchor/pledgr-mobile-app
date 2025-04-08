@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
-import { Globe, Utensils, Palette, Music, BookOpen, Gamepad2, PenTool, Building2, Atom, Chrome as Home } from 'lucide-react-native';
+import { Globe, Utensils, Palette, Music, BookOpen, Gamepad2, PenTool, Building2, Atom, Home } from 'lucide-react-native';
 import { useState } from 'react';
 
 interface Category {

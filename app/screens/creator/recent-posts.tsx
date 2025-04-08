@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useRouter } from 'expo-router';
-import { FileText, Globe, Clock, MoveVertical as MoreVertical, ThumbsUp, MessageCircle, Video, Crown, CircleUser as UserCircle } from 'lucide-react-native';
+import { FileText, Globe, Clock, MoreVertical, ThumbsUp, MessageCircle, Video, Crown, CircleUser as UserCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { DeletePostModal } from '@/components/DeletePostModal';
 import { showToast } from '@/components/Toast';

@@ -1,4 +1,5 @@
 import { fetchAPI } from './client';
+import { CreatorSettings } from '@/hooks/useCreatorSettings';
 
 interface CreatorProfile {
   id: string;
@@ -56,7 +57,27 @@ interface InitializeCampaignResponse {
   path: string;
 }
 
+interface CreatorResponse {
+  data: CreatorSettings;
+  status: string;
+  timestamp: string;
+  path: string;
+}
+
 export const creatorAPI = {
+  getCurrentCampaign: () =>
+    fetchAPI<CreatorResponse>('/campaigns/me', {
+      method: 'GET',
+      requiresAuth: true,
+    }),
+
+  updateCampaign: (data: Partial<CreatorSettings>) =>
+    fetchAPI<CreatorResponse>('/campaigns/me', {
+      method: 'PATCH',
+      data,
+      requiresAuth: true,
+    }),
+
   checkPageUrl: (pageUrl: string) =>
     fetchAPI<CheckPageUrlResponse>('/campaigns/check-page-url', {
       method: 'POST',
@@ -75,7 +96,7 @@ export const creatorAPI = {
   updateProfile: (data: UpdateCreatorProfileData) =>
     fetchAPI<CreatorProfile>('/creator/profile', {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      data,
     }),
 
   getPosts: (page = 1, limit = 10) =>
@@ -84,13 +105,13 @@ export const creatorAPI = {
   createPost: (data: Omit<Post, 'id' | 'createdAt'>) =>
     fetchAPI<Post>('/creator/posts', {
       method: 'POST',
-      body: JSON.stringify(data),
+      data,
     }),
 
   updatePost: (postId: string, data: Partial<Post>) =>
     fetchAPI<Post>(`/creator/posts/${postId}`, {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      data,
     }),
 
   deletePost: (postId: string) =>

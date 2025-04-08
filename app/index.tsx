@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/useTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StorageKeys, UserRole } from '@/lib/enums';
 import { router } from 'expo-router';
+import { authAPI } from '@/lib/api/auth';
 
 export default function SplashScreen() {
   const { fonts } = useTheme();
@@ -15,6 +16,7 @@ export default function SplashScreen() {
   const dot1Opacity = useRef(new Animated.Value(0.3)).current;
   const dot2Opacity = useRef(new Animated.Value(0.3)).current;
   const dot3Opacity = useRef(new Animated.Value(0.3)).current;
+  const { setUser } = useAuth();
 
   useEffect(() => {
     // Start animations
@@ -78,8 +80,6 @@ export default function SplashScreen() {
 
     const checkAuthStatus = async () => {
       try {
-        console.log(await AsyncStorage.getItem(StorageKeys.USER_ROLE), "USER ROLE");
-        
         // 1. Check if token exists
         const token = await AsyncStorage.getItem(StorageKeys.TOKEN);
         if (!token) {
@@ -96,9 +96,41 @@ export default function SplashScreen() {
 
         // 3. Check user role and navigate accordingly
         const userRole = await AsyncStorage.getItem(StorageKeys.USER_ROLE);
+        console.log("User Role : ", userRole);
         if (!userRole) {
           router.replace('/auth/sign-in');
           return;
+        }
+        
+        if (userRole === UserRole.CREATOR) {
+          const accessTokenCampaign = await AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN);
+          if (!accessTokenCampaign) {
+            router.replace('/auth/sign-in');
+            return;
+          }
+        }
+
+        // 4. Fetch base info after all checks pass
+        const baseInfoResponse = await authAPI.fetchBaseInfo();
+        
+        // Extract user info from response
+        const data = baseInfoResponse?.data;
+        const userData = {
+          name: data?.memberObj?.settings?.profile?.display_name || '',
+          email: data?.memberObj?.settings?.profile?.email || '',
+          role: userRole as UserRole,
+          profile_photo: data?.memberObj?.settings?.profile?.profile_photo || ''
+        };
+
+        // Update user state
+        setUser(userData);
+
+        // Store access tokens if present
+        if (baseInfoResponse?.data?.accessTokenMember) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_MEMBER, baseInfoResponse.data.accessTokenMember);
+        }
+        if (baseInfoResponse?.data?.accessTokenCampaign) {
+          await AsyncStorage.setItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN, baseInfoResponse.data.accessTokenCampaign);
         }
 
         // Navigate based on user role
@@ -117,6 +149,11 @@ export default function SplashScreen() {
         }
       } catch (error) {
         console.error('Error checking auth status:', error);
+        await AsyncStorage.multiRemove([
+          StorageKeys.TOKEN,
+          StorageKeys.USER_ROLE,
+          StorageKeys.IS_CREATOR_CREATED,
+        ]);
         router.replace('/auth/sign-in');
       }
     };

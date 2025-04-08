@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Menu } from 'lucide-react-native';
+import { Home, Menu } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 
 export default function CreatorAssociateTabLayout() {

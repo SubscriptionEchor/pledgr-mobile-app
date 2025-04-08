@@ -1,5 +1,8 @@
 import React, { useState, useContext, ReactNode, createContext, useEffect } from 'react';
 import { commonAPI } from '@/lib/api/common';
+import { StorageKeys } from '@/lib/enums';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CreatorSettings } from '@/hooks/useCreatorSettings';
 
 interface MemberSettings {
   type: string;
@@ -38,6 +41,8 @@ interface Country {
 interface UserContextType {
   memberSettings: MemberSettings | null;
   setMemberSettings: (settings: MemberSettings) => void;
+  creatorSettings: CreatorSettings | null;
+  setCreatorSettings: (settings: CreatorSettings) => void;
   countries: Country[];
   setCountries: (countries: Country[]) => void;
   locationInfo: {
@@ -52,6 +57,8 @@ interface UserContextType {
 export const UserContext = createContext<UserContextType>({
   memberSettings: null,
   setMemberSettings: () => {},
+  creatorSettings: null,
+  setCreatorSettings: () => {},
   countries: [],
   setCountries: () => {},
   locationInfo: {},
@@ -70,16 +77,31 @@ export const useUserContext = () => {
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [memberSettings, setMemberSettings] = useState<MemberSettings | null>(null);
+  const [creatorSettings, setCreatorSettings] = useState<CreatorSettings | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [locationInfo, setLocationInfo] = useState<{
     countryName?: string;
     stateName?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Fetch countries when the provider mounts
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem(StorageKeys.TOKEN);
+      setIsAuthenticated(!!token);
+    };
+    checkAuth();
+  }, []);
+
+  // Fetch countries when authenticated
   useEffect(() => {
     const fetchCountries = async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+      
       setIsLoading(true);
       try {
         const response = await commonAPI.getCountries();
@@ -92,12 +114,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
     
     fetchCountries();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <UserContext.Provider value={{ 
       memberSettings, 
       setMemberSettings,
+      creatorSettings,
+      setCreatorSettings,
       countries,
       setCountries,
       locationInfo,

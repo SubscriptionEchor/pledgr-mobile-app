@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Switch, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Switch, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { X, Globe, Users, Lock, TriangleAlert as AlertTriangle, Store, Eye } from 'lucide-react-native';
 import { useState } from 'react';
@@ -23,13 +23,42 @@ export function ProfileVisibilityModal({
   const { colors, fonts, fontSize } = useTheme();
   const [isPublic, setIsPublic] = useState(selectedVisibility === ProfileVisibility.PUBLIC);
   const { user } = useAuth();
-  const { memberSettings } = useMemberSettings();
+  const { memberSettings, updateMemberSettings, isLoading } = useMemberSettings();
 
   const isCreator = user?.role === UserRole.CREATOR;
 
-  const handleToggle = (value: boolean) => {
+  const handleToggle = async (value: boolean) => {
+    // Update state immediately
     setIsPublic(value);
     onSelect(value ? ProfileVisibility.PUBLIC : ProfileVisibility.PRIVATE);
+
+    try {
+      // Create updated settings object with all existing settings plus changes
+      const { type, ...settingsWithoutType } = memberSettings || {};
+      const updatedSettings = {
+        ...settingsWithoutType,
+        security: {
+          ...settingsWithoutType.security,
+          public_profile: value
+        },
+        social_media: {
+          ...settingsWithoutType.social_media,
+        },
+        content_preferences: {
+          ...settingsWithoutType.content_preferences,
+        },
+        notification_preferences: {
+          ...settingsWithoutType.notification_preferences,
+        }
+      };
+
+      await updateMemberSettings(updatedSettings);
+    } catch (error) {
+      // Revert state if API call fails
+      setIsPublic(!value);
+      onSelect(!value ? ProfileVisibility.PUBLIC : ProfileVisibility.PRIVATE);
+      console.error('Error updating visibility:', error);
+    }
   };
 
   return (
@@ -56,6 +85,26 @@ export function ProfileVisibilityModal({
             <X size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
+
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <View style={[styles.loadingContainer, { backgroundColor: colors.surface }]}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={[
+                styles.loadingText,
+                {
+                  color: colors.textPrimary,
+                  fontFamily: fonts.medium,
+                  fontSize: fontSize.sm,
+                  includeFontPadding: false,
+                  marginLeft: 8
+                }
+              ]}>
+                Updating...
+              </Text>
+            </View>
+          </View>
+        )}
 
         <ScrollView
           style={styles.scrollView}
@@ -109,6 +158,7 @@ export function ProfileVisibilityModal({
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor="#FFFFFF"
+                  disabled={isLoading}
                 />
               </View>
 
@@ -205,10 +255,11 @@ export function ProfileVisibilityModal({
                   </Text>
                 </View>
                 <Switch
-                  value={memberSettings?.security.public_profile || false}
+                  value={isPublic}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor="#FFFFFF"
+                  disabled={isLoading}
                 />
               </View>
 
@@ -337,6 +388,33 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  loadingText: {
+    textAlign: 'center',
+  },
   scrollView: {
     flex: 1,
   },
@@ -433,5 +511,3 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 });
-
-export { ProfileVisibilityModal }

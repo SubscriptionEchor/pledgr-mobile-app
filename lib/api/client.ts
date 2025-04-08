@@ -61,6 +61,7 @@ export async function fetchAPI<T = any>(
         }
       }
       if (personaRole === UserRole.CREATOR) {
+        headers['personatype'] = 'campaign';
         const creatorToken = await AsyncStorage.getItem(StorageKeys.ACCESS_TOKEN_CAMPAIGN);
         if (creatorToken) {
           headers['persona_auth'] = `Bearer ${creatorToken}`;
