@@ -142,7 +142,12 @@ export function useCreatorSettings() {
     setIsLoading(true);
     try {
       const response = await creatorAPI.updateCampaignSettings(notificationSettings);
-      setCreatorSettings(response.data);
+      setCreatorSettings(prev=> (
+        {
+          ...prev,
+          campaign_details: response.data
+        }
+      ));
       showToast.success('Notification settings updated', 'Your changes have been saved');
       return response.data;
     } catch (error) {
