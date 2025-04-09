@@ -13,7 +13,7 @@ export function BasicInformationAdvanced() {
     creatorSettings?.campaign_details.campaign_settings.about_page?.description_blob_id || ''
   );
   const [introVideo, setIntroVideo] = useState(
-    creatorSettings?.campaign_details.campaign_settings.intro_video?.url || ''
+    creatorSettings?.campaign_details.campaign_settings.intro_video_url || ''
   );
   const [socialLinks, setSocialLinks] = useState<Record<SocialPlatforms, string>>({
     [SocialPlatforms.INSTAGRAM]: creatorSettings?.campaign_details.campaign_settings.social_links?.instagram || '',
@@ -27,7 +27,7 @@ export function BasicInformationAdvanced() {
     if (creatorSettings) {
       const settings = creatorSettings.campaign_details.campaign_settings;
       setAbout(settings.about_page?.description_blob_id || '');
-      setIntroVideo(settings.intro_video?.url || '');
+      setIntroVideo(settings.intro_video_url || '');
       setSocialLinks({
         [SocialPlatforms.INSTAGRAM]: settings.social_links?.instagram || '',
         [SocialPlatforms.FACEBOOK]: settings.social_links?.facebook || '',

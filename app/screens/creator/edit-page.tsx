@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useState, useEffect } from 'react';
@@ -8,6 +8,7 @@ import { PageSettings } from '@/components/PageSettings';
 import { WelcomeNote } from '@/components/WelcomeNote';
 import { PostAndProduct } from '@/components/PostAndProduct';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
+import { useUserContext } from '@/lib/context/UserContext';
 
 type TabType = 'basics' | 'settings' | 'welcome' | 'content';
 
@@ -158,11 +159,18 @@ export default function EditPageScreen() {
     const [activeTab, setActiveTab] = useState<TabType>('basics');
     const [showTagModal, setShowTagModal] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const { fetchCreatorSettings } = useCreatorSettings();
+    const { creatorSettings, isLoading: isSettingsLoading, fetchCreatorSettings } = useCreatorSettings();
+    const { topics, fetchTopics, isLoading: isTopicsLoading } = useUserContext();
 
     useEffect(() => {
         fetchCreatorSettings();
     }, []);
+
+    useEffect(() => {
+        if (topics.length === 0) {
+            fetchTopics();
+        }
+    }, [topics.length, fetchTopics]);
 
     const handleTagSelect = (tags: string[]) => {
         setSelectedTags(tags);
@@ -192,6 +200,29 @@ export default function EditPageScreen() {
                 return null;
         }
     };
+
+    if (isSettingsLoading || isTopicsLoading) {
+        return (
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <SubHeader title="Edit Page" />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={[
+                        styles.loadingText,
+                        {
+                            color: colors.textSecondary,
+                            fontFamily: fonts.regular,
+                            fontSize: fontSize.md,
+                            includeFontPadding: false,
+                            marginTop: 12
+                        }
+                    ]}>
+                        Loading page settings...
+                    </Text>
+                </View>
+            </View>
+        );
+    }
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -254,6 +285,14 @@ export default function EditPageScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        textAlign: 'center',
     },
     pillContainer: {
         paddingVertical: 12,

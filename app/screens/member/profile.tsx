@@ -2,15 +2,14 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, S
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
-import { Camera } from 'lucide-react-native';
 import { useState, useEffect, useMemo } from 'react';
 import { CountryPicker } from '@/components/CountryPicker';
 import { StatePicker } from '@/components/StatePicker';
 import { showToast } from '@/components/Toast';
 import { useUserContext } from '@/lib/context/UserContext';
-import { commonAPI } from '@/lib/api/common';
 import { useMemberSettings } from '@/hooks/useMemberSettings';
 import { useAuth } from '@/lib/context/AuthContext';
+import { Camera } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const { colors, fonts, fontSize } = useTheme();
@@ -18,7 +17,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
-  const { memberSettings, locationInfo, isLoading: isContextLoading, countries } = useUserContext();
+  const { memberSettings, locationInfo, isLoading: isContextLoading, countries, fetchCountries } = useUserContext();
   const { updateMemberSettings, fetchMemberSettings, isLoading: isSettingsLoading } = useMemberSettings();
   const [isSaving, setIsSaving] = useState(false);
   
@@ -31,6 +30,13 @@ export default function ProfileScreen() {
   useEffect(() => {
     fetchMemberSettings();
   }, []);
+
+  // Add backup fetch for countries if they're not loaded
+  useEffect(() => {
+    if (countries.length === 0) {
+      fetchCountries();
+    }
+  }, [countries.length, fetchCountries]);
 
   // Update form when context data changes
   useEffect(() => {

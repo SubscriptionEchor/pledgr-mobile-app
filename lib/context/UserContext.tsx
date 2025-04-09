@@ -96,21 +96,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
     stateName?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [authToken, setAuthToken] = useState<string | null>(null);
 
-  // Check authentication status
+  // Check authentication status and get token
   useEffect(() => {
     const checkAuth = async () => {
       const token = await AsyncStorage.getItem(StorageKeys.TOKEN);
-      setIsAuthenticated(!!token);
+      setAuthToken(token);
     };
     checkAuth();
   }, []);
 
+  // Listen for auth token changes and fetch data when authenticated
   useEffect(() => {
     const fetchData = async () => {
-      if (!isAuthenticated) {
+      if (!authToken) {
         return;
       }
       
@@ -128,14 +129,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
     
     fetchData();
-  }, [isAuthenticated]);
+  }, [authToken]); // Changed dependency to authToken
 
   const fetchCountries = async () => {
-    if (countries.length > 0) return;
-    
-    if (!isAuthenticated) {
-      return;
-    }
+    if (countries.length > 0 || !authToken) return;
     
     setIsLoading(true);
     try {
@@ -149,7 +146,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchTopics = async () => {
-    if (!isAuthenticated) return;
+    if (!authToken) return;
     
     setIsLoading(true);
     try {

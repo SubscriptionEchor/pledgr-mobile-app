@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
-import { Tag, Plus, X } from 'lucide-react-native';
+import { Tag, Plus, X, Music } from 'lucide-react-native';
+import { Switch } from '@/components/Switch';
 
 interface FeaturedTag {
   id: string;
@@ -18,6 +19,7 @@ interface PostAndProductProps {
 export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAndProductProps) {
   const { colors, fonts, fontSize } = useTheme();
   const [featuredTags, setFeaturedTags] = useState<FeaturedTag[]>([]);
+  const [allowAudioDownload, setAllowAudioDownload] = useState(false);
 
   // Update featured tags when selectedTags changes
   useEffect(() => {
@@ -43,6 +45,52 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.bold,
+                fontSize: fontSize.xl,
+                includeFontPadding: false,
+                marginBottom: 16,
+              }
+            ]}>
+              Content Settings
+            </Text>
+        {/* Audio Settings Section */}
+        <View style={[styles.audioSection, { backgroundColor: colors.surface }]}>
+          <View style={styles.audioHeader}>
+            <View style={styles.audioTitleContainer}>
+              <Text style={[
+                styles.audioTitle,
+                {
+                  color: colors.textPrimary,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.lg,
+                  includeFontPadding: false
+                }
+              ]}>
+                Audio Settings
+              </Text>
+            </View>
+            <Switch
+              value={allowAudioDownload}
+              onValueChange={setAllowAudioDownload}
+            />
+          </View>
+          <Text style={[
+            styles.audioDescription,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+              includeFontPadding: false
+            }
+          ]}>
+            Allow members to download audio files from posts and products
+          </Text>
+        </View>
+
         <View style={styles.header}>
           <View style={styles.titleContainer}>
             <Text style={[
@@ -50,7 +98,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
               {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
-                fontSize: fontSize['xl'],
+                fontSize: fontSize.xl,
                 includeFontPadding: false
               }
             ]}>
@@ -172,6 +220,35 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+  },
+  audioSection: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  audioHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  audioTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // gap: 12,
+  },
+  audioIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  audioTitle: {
+    fontSize: 18,
+  },
+  audioDescription: {
+    lineHeight: 20,
+    marginBottom: 12,
   },
   header: {
     marginBottom: 8,

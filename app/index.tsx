@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Crown } from 'lucide-react-native';

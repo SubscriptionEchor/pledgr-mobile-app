@@ -124,8 +124,9 @@ export function BasicInformation() {
   };
 
   const handleResetColor = () => {
-    setBrandColor(colors.primary);
-    setColorInput(colors.primary);
+    let defaultColor = PRESET_COLORS[0].hex;
+    setBrandColor(defaultColor);
+    setColorInput(defaultColor);
     setColorError('');
   };
 

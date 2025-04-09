@@ -1,24 +1,47 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react-native';
 import { CountryPicker } from '@/components/CountryPicker';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 export function PageSettings() {
   const { colors, fonts, fontSize } = useTheme();
+  const { creatorSettings } = useCreatorSettings();
   const [form, setForm] = useState({
-    firstName: '',
-    surname: '',
-    country: '',
+    firstName: creatorSettings?.campaign_details.campaign_settings.legal_info.first_name || '',
+    surname: creatorSettings?.campaign_details.campaign_settings.legal_info.surname || '',
+    country: creatorSettings?.campaign_details.campaign_settings.legal_info.country_of_residence || '',
   });
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [settings, setSettings] = useState({
-    earningsVisibility: 'private',
-    membershipDetails: 'private',
-    membershipOptions: 'all',
-    comments: 'allow',
-    adultContent: false,
+    earningsVisibility: creatorSettings?.campaign_details.campaign_settings.visibility_settings.earnings_visibility || 'private',
+    membershipDetails: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_details_visibility || 'private',
+    membershipOptions: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_options || 'all',
+    comments: creatorSettings?.campaign_details.campaign_settings.visibility_settings.comment_access || 'enabled',
+    adultContent: creatorSettings?.campaign_details.campaign_settings.visibility_settings.adult_content || false,
   });
+
+  // Update form and settings when creatorSettings changes
+  useEffect(() => {
+    if (creatorSettings) {
+      const { campaign_settings } = creatorSettings.campaign_details;
+      
+      setForm({
+        firstName: campaign_settings.legal_info.first_name || '',
+        surname: campaign_settings.legal_info.surname || '',
+        country: campaign_settings.legal_info.country_of_residence || '',
+      });
+
+      setSettings({
+        earningsVisibility: campaign_settings.visibility_settings.earnings_visibility || 'private',
+        membershipDetails: campaign_settings.visibility_settings.membership_details_visibility || 'private',
+        membershipOptions: campaign_settings.visibility_settings.membership_options || 'all',
+        comments: campaign_settings.visibility_settings.comment_access || 'enabled',
+        adultContent: campaign_settings.visibility_settings.adult_content || false,
+      });
+    }
+  }, [creatorSettings]);
 
   const handleCountrySelect = (country: string) => {
     setForm(prev => ({ ...prev, country }));
@@ -459,13 +482,13 @@ export function PageSettings() {
             <View style={styles.radioGroup}>
               <TouchableOpacity
                 style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, comments: 'allow' }))}>
+                onPress={() => setSettings(prev => ({ ...prev, comments: 'enabled' }))}>
                 <View style={styles.radioContainer}>
                   <View style={[
                     styles.radioOuter,
                     { borderColor: colors.primary }
                   ]}>
-                    {settings.comments === 'allow' && (
+                    {settings.comments === 'enabled' && (
                       <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
                     )}
                   </View>
@@ -497,13 +520,13 @@ export function PageSettings() {
 
               <TouchableOpacity
                 style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, comments: 'disable' }))}>
+                onPress={() => setSettings(prev => ({ ...prev, comments: 'disabled' }))}>
                 <View style={styles.radioContainer}>
                   <View style={[
                     styles.radioOuter,
                     { borderColor: colors.primary }
                   ]}>
-                    {settings.comments === 'disable' && (
+                    {settings.comments === 'disabled' && (
                       <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
                     )}
                   </View>
