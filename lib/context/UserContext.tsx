@@ -53,6 +53,7 @@ interface UserContextType {
   isLoading: boolean;
   topics: Topic[];
   setTopics: (topics: Topic[]) => void;
+  fetchTopics: () => Promise<void>;
 }
 
 interface Topic {
@@ -72,6 +73,9 @@ export const UserContext = createContext<UserContextType>({
   locationInfo: {},
   setLocationInfo: () => {},
   isLoading: false,
+  topics: [],
+  setTopics: () => {},
+  fetchTopics: async () => {},
 });
 
 // Export the hook for using the context
@@ -127,32 +131,29 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated]);
 
   const fetchCountries = async () => {
-      if (countries.length > 0) return;
+    if (countries.length > 0) return;
     
-      if (!isAuthenticated) {
-        return;
-      }
-      
-      setIsLoading(true);
-      try {
-        const response = await commonAPI.getCountries();
-        setCountries(response.data);
-      } catch (error) {
-        console.error('Error fetching countries:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (!isAuthenticated) {
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const response = await commonAPI.getCountries();
+      setCountries(response.data);
+    } catch (error) {
+      console.error('Error fetching countries:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchTopics = async () => {
-    if (topics.length > 0) return; // Don't fetch if we already have topics
-    
     if (!isAuthenticated) return;
     
     setIsLoading(true);
     try {
       const response = await commonAPI.getTopics();
-      console.log(response, "resre sres");
       setTopics(response.data.topics);
     } catch (error) {
       console.error('Error fetching topics:', error);
@@ -172,6 +173,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       locationInfo,
       setLocationInfo,
       isLoading,
+      topics,
+      setTopics,
+      fetchTopics
     }}>
       {children}
     </UserContext.Provider>

@@ -8,10 +8,7 @@ import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 export function BasicInformationAdvanced() {
   const { colors, fonts, fontSize } = useTheme();
   const { creatorSettings } = useCreatorSettings();
-  
-  const [brandColor, setBrandColor] = useState(
-    creatorSettings?.campaign_details.campaign_settings.brand_color?.hex_code || colors.primary
-  );
+
   const [about, setAbout] = useState(
     creatorSettings?.campaign_details.campaign_settings.about_page?.description_blob_id || ''
   );
@@ -29,7 +26,6 @@ export function BasicInformationAdvanced() {
   useEffect(() => {
     if (creatorSettings) {
       const settings = creatorSettings.campaign_details.campaign_settings;
-      setBrandColor(settings.brand_color?.hex_code || colors.primary);
       setAbout(settings.about_page?.description_blob_id || '');
       setIntroVideo(settings.intro_video?.url || '');
       setSocialLinks({
@@ -41,10 +37,6 @@ export function BasicInformationAdvanced() {
       });
     }
   }, [creatorSettings, colors.primary]);
-
-  const handleColorSelect = (color: string) => {
-    setBrandColor(color);
-  };
 
   const handleSocialLinkChange = (platform: SocialPlatforms, value: string) => {
     setSocialLinks(prev => ({
@@ -85,64 +77,6 @@ export function BasicInformationAdvanced() {
 
   return (
     <>
-      {/* Brand Color Section */}
-      <View style={styles.section}>
-        <Text style={[
-          styles.sectionTitle,
-          {
-            color: colors.textPrimary,
-            fontFamily: fonts.semibold,
-            fontSize: fontSize.md,
-            includeFontPadding: false
-          }
-        ]}>
-          Custom Brand Color
-        </Text>
-        <Text style={[
-          styles.sectionDescription,
-          {
-            color: colors.textSecondary,
-            fontFamily: fonts.regular,
-            fontSize: fontSize.sm,
-            includeFontPadding: false
-          }
-        ]}>
-          This color will be used for buttons, links, and accents throughout your page
-        </Text>
-        <View style={[
-          styles.colorPreview,
-          { backgroundColor: brandColor }
-        ]} />
-        <View style={styles.colorSection}>
-          <Text style={[
-            styles.colorCode,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.medium,
-              fontSize: fontSize.sm,
-              includeFontPadding: false
-            }
-          ]}>
-            {brandColor.toUpperCase()}
-          </Text>
-          <TouchableOpacity
-            onPress={() => handleColorSelect(colors.primary)}
-            style={styles.resetButton}>
-            <Text style={[
-              styles.resetText,
-              {
-                color: colors.primary,
-                fontFamily: fonts.medium,
-                fontSize: fontSize.sm,
-                includeFontPadding: false
-              }
-            ]}>
-              Reset to default
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
       {/* About Section */}
       <View style={styles.section}>
         <Text style={[

@@ -1,28 +1,27 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
-import { Upload, ChevronDown, Check } from 'lucide-react-native';
+import { Upload, ChevronDown, Check, X } from 'lucide-react-native';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 import { BasicInformationAdvanced } from './BasicInformationAdvanced';
 import { useUserContext } from '@/lib/context/UserContext';
+import { showToast } from '@/components/Toast';
 
-const CATEGORIES = [
-  'Art',
-  'Writing',
-  'Music',
-  'Photography',
-  'Design',
-  'Fashion',
-  'Food',
-  'Travel',
-  'Tech',
-  'Gaming',
+const PRESET_COLORS = [
+  { name: 'Blue', hex: '#1E88E5' },
+  { name: 'Red', hex: '#E53935' },
+  { name: 'Green', hex: '#43A047' },
+  { name: 'Orange', hex: '#FB8C00' },
+  { name: 'Cyan', hex: '#00ACC1' },
+  { name: 'Purple', hex: '#8E24AA' },
+  { name: 'Pink', hex: '#D81B60' },
+  { name: 'Gray', hex: '#546E7A' },
 ];
 
 export function BasicInformation() {
   const { colors, fonts, fontSize } = useTheme();
   const { creatorSettings, isLoading } = useCreatorSettings();
-  const { topics } = useUserContext();
+  const { topics = [], fetchTopics } = useUserContext();
   
   const [pageName, setPageName] = useState(creatorSettings?.campaign_details.campaign_settings.page_name || '');
   const [headline, setHeadline] = useState(creatorSettings?.campaign_details.campaign_settings.headline || '');
@@ -36,6 +35,13 @@ export function BasicInformation() {
     creatorSettings?.campaign_details.campaign_settings.cover_photo?.media_id || ''
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [brandColor, setBrandColor] = useState(
+    creatorSettings?.campaign_details.campaign_settings.brand_color?.hex_code || colors.primary
+  );
+  const [colorInput, setColorInput] = useState(
+    creatorSettings?.campaign_details.campaign_settings.brand_color?.hex_code || colors.primary
+  );
+  const [colorError, setColorError] = useState('');
 
   useEffect(() => {
     if (creatorSettings) {
@@ -45,8 +51,16 @@ export function BasicInformation() {
       setSelectedCategories(settings.page_categories || []);
       setProfilePhoto(settings.profile_photo?.media_id || '');
       setCoverPhoto(settings.cover_photo?.media_id || '');
+      setBrandColor(settings.brand_color?.hex_code || colors.primary);
+      setColorInput(settings.brand_color?.hex_code || colors.primary);
     }
   }, [creatorSettings]);
+
+  useEffect(() => {
+    if (topics.length === 0) {
+      fetchTopics();
+    }
+  }, [topics.length, fetchTopics]);
 
   const generatePageUrl = (name: string) => {
     return name
@@ -56,8 +70,6 @@ export function BasicInformation() {
       .replace(/-+/g, '-')
       .trim();
   };
-
-  console.log(topics, "topics");
 
   const pageUrl = generatePageUrl(pageName);
 
@@ -82,6 +94,39 @@ export function BasicInformation() {
         : [...prev, topicId];
       return newCategories;
     });
+  };
+
+  const validateColor = (color: string) => {
+    const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    return hexRegex.test(color);
+  };
+
+  const handleColorChange = (text: string) => {
+    setColorInput(text);
+    setColorError('');
+
+    // Add # if user starts typing without it
+    if (text && !text.startsWith('#')) {
+      text = `#${text}`;
+    }
+
+    if (text && !validateColor(text)) {
+      setColorError('Please enter a valid hex color (e.g., #1E88E5)');
+    } else if (text) {
+      setBrandColor(text);
+    }
+  };
+
+  const handleColorSelect = (color: string) => {
+    setBrandColor(color);
+    setColorInput(color);
+    setColorError('');
+  };
+
+  const handleResetColor = () => {
+    setBrandColor(colors.primary);
+    setColorInput(colors.primary);
+    setColorError('');
   };
 
   if (isLoading) {
@@ -464,6 +509,112 @@ export function BasicInformation() {
           </View>
         </View>
 
+        {/* Brand Color Section */}
+        <View style={styles.section}>
+          <Text style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.md,
+              includeFontPadding: false
+            }
+          ]}>
+            Custom Brand Color
+          </Text>
+          <Text style={[
+            styles.sectionDescription,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.sm,
+              includeFontPadding: false
+            }
+          ]}>
+            This color will be used for buttons, links, and accents throughout your page
+          </Text>
+          
+          <View style={[styles.colorPreview, { backgroundColor: brandColor }]} />
+          
+          <View style={styles.colorSection}>
+            <View style={styles.colorInputContainer}>
+              <TextInput
+                value={colorInput}
+                onChangeText={handleColorChange}
+                placeholder="#1E88E5"
+                placeholderTextColor={colors.textSecondary}
+                style={[
+                  styles.colorInput,
+                  {
+                    backgroundColor: colors.surface,
+                    color: colors.textPrimary,
+                    fontFamily: fonts.regular,
+                    borderColor: colorError ? colors.error : colors.border,
+                  }
+                ]}
+                maxLength={7}
+              />
+              {colorError ? (
+                <Text style={[
+                  styles.colorError,
+                  {
+                    color: colors.error,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.xs,
+                  }
+                ]}>
+                  {colorError}
+                </Text>
+              ) : null}
+            </View>
+            <TouchableOpacity
+              onPress={handleResetColor}
+              style={styles.resetButton}>
+              <Text style={[
+                styles.resetText,
+                {
+                  color: colors.primary,
+                  fontFamily: fonts.medium,
+                  fontSize: fontSize.sm,
+                  includeFontPadding: false
+                }
+              ]}>
+                Reset to default
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.presetColors}>
+            <Text style={[
+              styles.presetTitle,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.sm,
+                includeFontPadding: false,
+                marginBottom: 12
+              }
+            ]}>
+              Suggested Colors
+            </Text>
+            <View style={styles.colorGrid}>
+              {PRESET_COLORS.map((color) => (
+                <TouchableOpacity
+                  key={color.hex}
+                  style={[
+                    styles.colorButton,
+                    { backgroundColor: color.hex }
+                  ]}
+                  onPress={() => handleColorSelect(color.hex)}>
+                  {brandColor === color.hex && (
+                    <Check size={16} color="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+
         {/* Advanced Settings Component */}
         <BasicInformationAdvanced />
       </View>
@@ -528,9 +679,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 48,
+    minHeight: 48,
     borderRadius: 12,
     paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  dropdownButtonText: {
+    fontSize: 14,
+    width: "90%"
   },
   dropdownContainer: {
     marginTop: 4,
@@ -586,5 +742,65 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     textAlign: 'center',
+  },
+  colorPreview: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  colorSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  colorInputContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  colorInput: {
+    height: 44,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    fontSize: 16,
+  },
+  colorError: {
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  resetButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  resetText: {
+    fontSize: 14,
+  },
+  presetColors: {
+    marginTop: 8,
+  },
+  presetTitle: {
+    marginLeft: 4,
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  colorButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });
