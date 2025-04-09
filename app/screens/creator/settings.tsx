@@ -6,6 +6,8 @@ import { Settings, CreditCard, HardDrive, Eye, Bell, Users, Ban, ChevronRight, L
 import { useState, useEffect } from 'react';
 import { ProfileVisibilityModal } from '@/components/ProfileVisibilityModal';
 import { ProfileVisibility } from '@/lib/enums';
+import { useAuth } from '@/lib/context/AuthContext';
+import { UserRole } from '@/lib/enums';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 const SETTINGS_SECTIONS = [
@@ -89,7 +91,8 @@ export default function SettingsScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
   const [showVisibilityModal, setShowVisibilityModal] = useState(false);
-  const { creatorSettings, isLoading, fetchCreatorSettings, updateCreatorSettings } = useCreatorSettings();
+  const { user } = useAuth();
+  const { creatorSettings, isLoading, fetchCreatorSettings } = useCreatorSettings();
 
   useEffect(() => {
     fetchCreatorSettings();
@@ -100,24 +103,6 @@ export default function SettingsScreen() {
       setShowVisibilityModal(true);
     } else if (route) {
       router.push(route);
-    }
-  };
-
-  const handleVisibilityChange = async (visibility: string) => {
-    try {
-      await updateCreatorSettings({
-        campaign_details: {
-          campaign_settings: {
-            visibility_settings: {
-              ...creatorSettings?.campaign_details.campaign_settings.visibility_settings,
-              earnings_visibility: visibility as 'private' | 'public'
-            }
-          }
-        }
-      });
-      setShowVisibilityModal(false);
-    } catch (error) {
-      console.error('Error updating visibility:', error);
     }
   };
 
@@ -223,8 +208,8 @@ export default function SettingsScreen() {
       <ProfileVisibilityModal
         visible={showVisibilityModal}
         onClose={() => setShowVisibilityModal(false)}
-        selectedVisibility={creatorSettings?.campaign_details.campaign_settings.visibility_settings.earnings_visibility || 'private'}
-        onSelect={handleVisibilityChange}
+        selectedVisibility={creatorSettings?.campaign_details.owner_settings.shop_visibility ? ProfileVisibility.PUBLIC : ProfileVisibility.PRIVATE}
+        onSelect={() => {}} // We don't need this anymore since the modal handles the update internally
       />
     </View>
   );

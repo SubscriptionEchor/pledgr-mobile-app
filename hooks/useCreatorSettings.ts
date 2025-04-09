@@ -108,51 +108,31 @@ export function useCreatorSettings() {
     }
   };
 
-  const updateCreatorSettings = async (newSettings: Partial<CreatorSettings>) => {
-    if (!creatorSettings) return;
-
-    setIsLoading(true);
-    try {
-      const response = await creatorAPI.updateCampaign(newSettings);
-      setCreatorSettings(response.data);
-      showToast.success('Settings updated', 'Your changes have been saved');
-      return response.data;
-    } catch (error) {
-      console.error('Error updating creator settings:', error);
-      showToast.error('Failed to update settings', 'Please try again later');
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const updateCreatorNotifications = async (notificationSettings: {
     notification_preferences: {
-    email?: Record<string, boolean>;
-    notification_feed?: Record<string, boolean>;
-  };
-  marketing_preferences: {
-    receive_marketing_emails: boolean;
-  };
-  published: boolean;
-  shop_visibility: boolean;
+      email?: Record<string, boolean>;
+      notification_feed?: Record<string, boolean>;
+    };
+    marketing_preferences: {
+      receive_marketing_emails: boolean;
+    };
+    published: boolean;
+    shop_visibility: boolean;
   }) => {
     if (!creatorSettings) return;
 
     setIsLoading(true);
     try {
       const response = await creatorAPI.updateCampaignSettings(notificationSettings);
-      setCreatorSettings(prev=> (
-        {
-          ...prev,
-          campaign_details: response.data
-        }
-      ));
-      showToast.success('Notification settings updated', 'Your changes have been saved');
+      setCreatorSettings(prev => ({
+        ...prev,
+        campaign_details: response.data
+      }));
+      showToast.success('Settings updated', 'Your changes have been saved');
       return response.data;
     } catch (error) {
       console.error('Error updating creator notification settings:', error);
-      showToast.error('Failed to update notification settings', 'Please try again later');
+      showToast.error('Failed to update settings', 'Please try again later');
       throw error;
     } finally {
       setIsLoading(false);
@@ -163,7 +143,6 @@ export function useCreatorSettings() {
     creatorSettings,
     isLoading,
     fetchCreatorSettings,
-    updateCreatorSettings,
     updateCreatorNotifications
   };
 }

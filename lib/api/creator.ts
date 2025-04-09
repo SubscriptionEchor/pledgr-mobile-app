@@ -101,13 +101,6 @@ export const creatorAPI = {
       requiresAuth: true,
     }),
 
-  updateCampaign: (data: Partial<CreatorSettings>) =>
-    fetchAPI<CreatorResponse>('/campaigns/me', {
-      method: 'PATCH',
-      data,
-      requiresAuth: true,
-    }),
-
   updateCampaignSettings: (data: CampaignSettingsUpdatePayload) =>
     fetchAPI<CreatorResponse>('/campaigns/campaign-settings', {
       method: 'PUT',

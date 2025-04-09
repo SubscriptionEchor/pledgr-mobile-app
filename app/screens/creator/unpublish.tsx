@@ -2,21 +2,58 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { TriangleAlert as AlertTriangle } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { showToast } from '@/components/Toast';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 export default function UnpublishScreen() {
     const { colors, fonts, fontSize } = useTheme();
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const { creatorSettings, updateCreatorNotifications, isLoading } = useCreatorSettings();
 
-    const handleUnpublish = () => {
-        showToast.success(
-            'Page unpublished',
-            'Your page has been unpublished successfully'
-        );
-        setShowConfirmation(false);
+    const handleUnpublishClick = () => {
+        if (!creatorSettings?.campaign_details.owner_settings.published) {
+            showToast.error(
+                'Already unpublished',
+                'Your page is already unpublished'
+            );
+            return;
+        }
+        setShowConfirmation(true);
     };
+
+    const handleUnpublish = async () => {
+        try {
+            const payload = {
+                notification_preferences: {
+                    email: creatorSettings?.campaign_details.owner_settings.notification_preferences.email || {},
+                    notification_feed: creatorSettings?.campaign_details.owner_settings.notification_preferences.notification_feed || {}
+                },
+                marketing_preferences: {
+                    receive_marketing_emails: creatorSettings?.campaign_details.owner_settings.marketing_preferences.receive_marketing_emails || false
+                },
+                published: false,
+                shop_visibility: creatorSettings?.campaign_details.owner_settings.shop_visibility || false
+            };
+
+            await updateCreatorNotifications(payload);
+            showToast.success(
+                'Page unpublished',
+                'Your page has been unpublished successfully'
+            );
+            setShowConfirmation(false);
+        } catch (error) {
+            console.error('Error unpublishing page:', error);
+            showToast.error(
+                'Failed to unpublish',
+                'Please try again later'
+            );
+        }
+    };
+
+    const isPagePublished = creatorSettings?.campaign_details.owner_settings.published;
+  console.log(isPagePublished);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -84,8 +121,15 @@ export default function UnpublishScreen() {
                 </View>
 
                 <TouchableOpacity
-                    style={[styles.unpublishButton, { backgroundColor: `${colors.error}15` }]}
-                    onPress={() => setShowConfirmation(true)}
+                    style={[
+                        styles.unpublishButton,
+                        { 
+                            backgroundColor: `${colors.error}15`,
+                            opacity: (!isPagePublished || isLoading) ? 0.5 : 1
+                        }
+                    ]}
+                    onPress={handleUnpublishClick}
+                    disabled={!isPagePublished || isLoading}
                 >
                     <AlertTriangle size={20} color={colors.error} />
                     <Text style={[
@@ -97,7 +141,7 @@ export default function UnpublishScreen() {
                             includeFontPadding: false
                         }
                     ]}>
-                        Unpublish your page
+                        {isPagePublished ? 'Unpublish your page' : 'Page is already unpublished'}
                     </Text>
                 </TouchableOpacity>
             </ScrollView>

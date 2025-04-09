@@ -6,6 +6,7 @@ import { ProfileVisibility } from '@/lib/enums';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
 import { useMemberSettings } from '@/hooks/useMemberSettings';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 interface ProfileVisibilityModalProps {
   visible: boolean;
@@ -23,9 +24,11 @@ export function ProfileVisibilityModal({
   const { colors, fonts, fontSize } = useTheme();
   const [isPublic, setIsPublic] = useState(selectedVisibility === ProfileVisibility.PUBLIC);
   const { user } = useAuth();
-  const { memberSettings, updateMemberSettings, isLoading } = useMemberSettings();
+  const { memberSettings, updateMemberSettings, isLoading: isMemberLoading } = useMemberSettings();
+  const { creatorSettings, updateCreatorNotifications, isLoading: isCreatorLoading } = useCreatorSettings();
 
   const isCreator = user?.role === UserRole.CREATOR;
+  const isLoading = isCreator ? isCreatorLoading : isMemberLoading;
 
   const handleToggle = async (value: boolean) => {
     // Update state immediately
@@ -33,26 +36,42 @@ export function ProfileVisibilityModal({
     onSelect(value ? ProfileVisibility.PUBLIC : ProfileVisibility.PRIVATE);
 
     try {
-      // Create updated settings object with all existing settings plus changes
-      const { type, ...settingsWithoutType } = memberSettings || {};
-      const updatedSettings = {
-        ...settingsWithoutType,
-        security: {
-          ...settingsWithoutType.security,
-          public_profile: value
-        },
-        social_media: {
-          ...settingsWithoutType.social_media,
-        },
-        content_preferences: {
-          ...settingsWithoutType.content_preferences,
-        },
-        notification_preferences: {
-          ...settingsWithoutType.notification_preferences,
-        }
-      };
+      if (isCreator) {
+        // Handle creator settings update
+        const payload = {
+          notification_preferences: {
+            email: creatorSettings?.campaign_details.owner_settings.notification_preferences.email || {},
+            notification_feed: creatorSettings?.campaign_details.owner_settings.notification_preferences.notification_feed || {}
+          },
+          marketing_preferences: {
+            receive_marketing_emails: creatorSettings?.campaign_details.owner_settings.marketing_preferences.receive_marketing_emails || false
+          },
+          published: creatorSettings?.campaign_details.owner_settings.published || false,
+          shop_visibility: value // This is the only value we're updating
+        };
 
-      await updateMemberSettings(updatedSettings);
+        await updateCreatorNotifications(payload);
+      } else {
+        // Handle member settings update (existing functionality)
+        const { type, ...settingsWithoutType } = memberSettings || {};
+        const updatedSettings = {
+          ...settingsWithoutType,
+          security: {
+            ...settingsWithoutType.security,
+            public_profile: value
+          },
+          social_media: {
+            ...settingsWithoutType.social_media,
+          },
+          content_preferences: {
+            ...settingsWithoutType.content_preferences,
+          },
+          notification_preferences: {
+            ...settingsWithoutType.notification_preferences,
+          }
+        };
+        await updateMemberSettings(updatedSettings);
+      }
     } catch (error) {
       // Revert state if API call fails
       setIsPublic(!value);
@@ -154,7 +173,7 @@ export function ProfileVisibilityModal({
                   </Text>
                 </View>
                 <Switch
-                  value={isPublic}
+                  value={creatorSettings?.campaign_details.owner_settings.shop_visibility || false}
                   onValueChange={handleToggle}
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor="#FFFFFF"
@@ -511,3 +530,5 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 });
+
+export { ProfileVisibilityModal }
