@@ -1,7 +1,10 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { X, Upload, Link as LinkIcon, Check, ChevronDown } from 'lucide-react-native';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Upload, ChevronDown, Check } from 'lucide-react-native';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
+import { BasicInformationAdvanced } from './BasicInformationAdvanced';
+import { useUserContext } from '@/lib/context/UserContext';
 
 const CATEGORIES = [
   'Art',
@@ -16,31 +19,34 @@ const CATEGORIES = [
   'Gaming',
 ];
 
-const SUGGESTED_COLORS = [
-  '#1E88E5',
-  '#E53935',
-  '#43A047',
-  '#FB8C00',
-  '#039BE5',
-  '#8E24AA',
-  '#E91E63',
-  '#616161',
-];
-
 export function BasicInformation() {
-  const { colors, fonts, fontSize, updateBrandColor } = useTheme();
-  const [pageName, setPageName] = useState('Solo Levelling');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['Art', 'Writing', 'Music']);
-  const [profilePhoto, setProfilePhoto] = useState('https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=400');
-  const [coverPhoto, setCoverPhoto] = useState('https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=800');
-  const [brandColor, setBrandColor] = useState(colors.primary);
-  const [about, setAbout] = useState('Only I Level Up is a South Korean portal fantasy web novel');
+  const { colors, fonts, fontSize } = useTheme();
+  const { creatorSettings, isLoading } = useCreatorSettings();
+  const { topics } = useUserContext();
+  
+  const [pageName, setPageName] = useState(creatorSettings?.campaign_details.campaign_settings.page_name || '');
+  const [headline, setHeadline] = useState(creatorSettings?.campaign_details.campaign_settings.headline || '');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    creatorSettings?.campaign_details.campaign_settings.page_categories || []
+  );
+  const [profilePhoto, setProfilePhoto] = useState(
+    creatorSettings?.campaign_details.campaign_settings.profile_photo?.media_id || ''
+  );
+  const [coverPhoto, setCoverPhoto] = useState(
+    creatorSettings?.campaign_details.campaign_settings.cover_photo?.media_id || ''
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    setBrandColor(colors.primary);
-  }, [colors.primary]);
+    if (creatorSettings) {
+      const settings = creatorSettings.campaign_details.campaign_settings;
+      setPageName(settings.page_name || '');
+      setHeadline(settings.headline || '');
+      setSelectedCategories(settings.page_categories || []);
+      setProfilePhoto(settings.profile_photo?.media_id || '');
+      setCoverPhoto(settings.cover_photo?.media_id || '');
+    }
+  }, [creatorSettings]);
 
   const generatePageUrl = (name: string) => {
     return name
@@ -51,55 +57,64 @@ export function BasicInformation() {
       .trim();
   };
 
+  console.log(topics, "topics");
+
   const pageUrl = generatePageUrl(pageName);
 
   const handlePageNameChange = (text: string) => {
     setPageName(text);
   };
 
-  const handleColorSelect = (color: string) => {
-    setBrandColor(color);
-    updateBrandColor(color);
+  const handleHeadlineChange = (text: string) => {
+    if (text.length <= 100) {
+      setHeadline(text);
+    }
   };
 
   const handlePhotoUpload = (type: 'profile' | 'cover') => {
     // Implement photo upload logic
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = (topicId: string) => {
     setSelectedCategories(prev => {
-      const newCategories = prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category];
+      const newCategories = prev.includes(topicId)
+        ? prev.filter(id => id !== topicId)
+        : [...prev, topicId];
       return newCategories;
     });
   };
 
-  const handleScroll = () => {
-    if (isDropdownOpen) {
-      setIsDropdownOpen(false);
-    }
-  };
+  if (isLoading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[
+          styles.loadingText,
+          {
+            color: colors.textSecondary,
+            fontFamily: fonts.regular,
+            fontSize: fontSize.md,
+            includeFontPadding: false,
+            marginTop: 12
+          }
+        ]}>
+          Loading profile settings...
+        </Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
+        {/* Basic Information Section */}
         <View style={styles.section}>
           <Text style={[
             styles.sectionTitle,
             {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
+              fontSize: fontSize.md,
               includeFontPadding: false
             }
           ]}>
@@ -125,7 +140,7 @@ export function BasicInformation() {
                 backgroundColor: colors.surface,
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.md,
+                fontSize: fontSize.sm,
                 includeFontPadding: false
               }
             ]}
@@ -134,15 +149,124 @@ export function BasicInformation() {
           />
         </View>
 
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
+        {/* Page URL Section */}
         <View style={styles.section}>
           <Text style={[
             styles.sectionTitle,
             {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
+              fontSize: fontSize.md,
+              includeFontPadding: false
+            }
+          ]}>
+            Page URL
+          </Text>
+          <View style={[
+            styles.urlContainer,
+            {
+              backgroundColor: colors.surface,
+              opacity: 0.8
+            }
+          ]}>
+            <Text style={[
+              styles.urlPrefix,
+              {
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+                includeFontPadding: false
+              }
+            ]}>
+              pledgr.com/
+            </Text>
+            <Text style={[
+              styles.urlText,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+                includeFontPadding: false
+              }
+            ]}>
+              {pageUrl}
+            </Text>
+          </View>
+          <Text style={[
+            styles.urlHint,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.xs,
+              includeFontPadding: false
+            }
+          ]}>
+            Your page URL is automatically generated from your page name
+          </Text>
+        </View>
+
+        {/* Headline Section */}
+        <View style={styles.section}>
+          <Text style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.md,
+              includeFontPadding: false
+            }
+          ]}>
+            Headline
+          </Text>
+          <Text style={[
+            styles.sectionDescription,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.sm,
+              includeFontPadding: false
+            }
+          ]}>
+            A short description that appears under your page name
+          </Text>
+          <TextInput
+            value={headline}
+            onChangeText={handleHeadlineChange}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.surface,
+                color: colors.textPrimary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+                includeFontPadding: false
+              }
+            ]}
+            placeholder="Enter a catchy headline (max 100 characters)"
+            placeholderTextColor={colors.textSecondary}
+            maxLength={100}
+          />
+          <Text style={[
+            styles.characterCount,
+            {
+              color: colors.textSecondary,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.xs,
+              includeFontPadding: false
+            }
+          ]}>
+            {headline.length}/100 characters
+          </Text>
+        </View>
+
+        {/* Categories Section */}
+        <View style={styles.section}>
+          <Text style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+              fontFamily: fonts.semibold,
+              fontSize: fontSize.md,
               includeFontPadding: false
             }
           ]}>
@@ -153,18 +277,21 @@ export function BasicInformation() {
               styles.dropdownButton,
               { backgroundColor: colors.surface }
             ]}
-            onPress={toggleDropdown}>
+            onPress={() => setIsDropdownOpen(!isDropdownOpen)}>
             <Text style={[
               styles.dropdownButtonText,
               {
                 color: selectedCategories.length > 0 ? colors.textPrimary : colors.textSecondary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.md,
+                fontSize: fontSize.sm,
                 includeFontPadding: false
               }
             ]}>
-              {selectedCategories.length > 0
-                ? selectedCategories.join(', ')
+              {selectedCategories?.length > 0
+                ? topics
+                    .filter(topic => selectedCategories.includes(topic.id))
+                    .map(topic => topic.name)
+                    .join(', ')
                 : 'Select categories...'}
             </Text>
             <ChevronDown
@@ -183,28 +310,28 @@ export function BasicInformation() {
                 nestedScrollEnabled
                 showsVerticalScrollIndicator={false}
               >
-                {CATEGORIES.map(category => (
+                {topics.map(topic => (
                   <TouchableOpacity
-                    key={category}
+                    key={topic.id}
                     style={[
                       styles.categoryItem,
-                      selectedCategories.includes(category) && {
+                      selectedCategories.includes(topic.id) && {
                         backgroundColor: `${colors.primary}15`,
                       }
                     ]}
-                    onPress={() => handleCategorySelect(category)}>
+                    onPress={() => handleCategorySelect(topic.id)}>
                     <Text style={[
                       styles.categoryText,
                       {
-                        color: selectedCategories.includes(category) ? colors.primary : colors.textPrimary,
+                        color: selectedCategories.includes(topic.id) ? colors.primary : colors.textPrimary,
                         fontFamily: fonts.regular,
-                        fontSize: fontSize.md,
+                        fontSize: fontSize.sm,
                         includeFontPadding: false
                       }
                     ]}>
-                      {category}
+                      {topic.name}
                     </Text>
-                    {selectedCategories.includes(category) && (
+                    {selectedCategories.includes(topic.id) && (
                       <Check size={16} color={colors.primary} />
                     )}
                   </TouchableOpacity>
@@ -214,15 +341,14 @@ export function BasicInformation() {
           )}
         </View>
 
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
+        {/* Profile and Cover Photos */}
         <View style={styles.section}>
           <Text style={[
             styles.sectionTitle,
             {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
+              fontSize: fontSize.md,
               includeFontPadding: false
             }
           ]}>
@@ -241,7 +367,7 @@ export function BasicInformation() {
           </Text>
           <View style={styles.photoContainer}>
             <Image
-              source={{ uri: profilePhoto }}
+              source={{ uri: profilePhoto || 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=400' }}
               style={styles.profilePhoto}
             />
             <TouchableOpacity
@@ -277,15 +403,13 @@ export function BasicInformation() {
           </View>
         </View>
 
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
         <View style={styles.section}>
           <Text style={[
             styles.sectionTitle,
             {
               color: colors.textPrimary,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
+              fontSize: fontSize.md,
               includeFontPadding: false
             }
           ]}>
@@ -304,7 +428,7 @@ export function BasicInformation() {
           </Text>
           <View style={styles.photoContainer}>
             <Image
-              source={{ uri: coverPhoto }}
+              source={{ uri: coverPhoto || 'https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=800' }}
               style={styles.coverPhoto}
             />
             <TouchableOpacity
@@ -340,286 +464,8 @@ export function BasicInformation() {
           </View>
         </View>
 
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
-        <View style={styles.section}>
-          <Text style={[
-            styles.sectionTitle,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
-              includeFontPadding: false
-            }
-          ]}>
-            Page URL
-          </Text>
-          <View style={[
-            styles.urlContainer,
-            {
-              backgroundColor: colors.surface,
-              opacity: 0.8
-            }
-          ]}>
-            <Text style={[
-              styles.urlPrefix,
-              {
-                color: colors.textSecondary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-                includeFontPadding: false
-              }
-            ]}>
-              pledgr.com/
-            </Text>
-            <Text style={[
-              styles.urlText,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-                includeFontPadding: false
-              }
-            ]}>
-              {pageUrl}
-            </Text>
-          </View>
-          <Text style={[
-            styles.urlHint,
-            {
-              color: colors.textSecondary,
-              fontFamily: fonts.regular,
-              fontSize: fontSize.xs,
-              includeFontPadding: false
-            }
-          ]}>
-            Your page URL is automatically generated from your page name
-          </Text>
-        </View>
-
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
-        <View style={styles.section}>
-          <Text style={[
-            styles.sectionTitle,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
-              includeFontPadding: false
-            }
-          ]}>
-            Custom Brand Color
-          </Text>
-          <Text style={[
-            styles.sectionDescription,
-            {
-              color: colors.textSecondary,
-              fontFamily: fonts.regular,
-              fontSize: fontSize.sm,
-              includeFontPadding: false
-            }
-          ]}>
-            This color will be used for buttons, links, and accents throughout your page. Choose a color that reflects your brand and ensures good contrast.
-          </Text>
-          <View style={[
-            styles.colorPreview,
-            { backgroundColor: brandColor }
-          ]} />
-          <View style={styles.colorSection}>
-            <Text style={[
-              styles.colorCode,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.medium,
-                fontSize: fontSize.sm,
-                includeFontPadding: false
-              }
-            ]}>
-              {brandColor.toUpperCase()}
-            </Text>
-            <TouchableOpacity
-              onPress={() => handleColorSelect('#1E88E5')}
-              style={styles.resetButton}>
-              <Text style={[
-                styles.resetText,
-                {
-                  color: colors.primary,
-                  fontFamily: fonts.medium,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Reset to default
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.colorPreviewButtons}>
-            <TouchableOpacity
-              style={[
-                styles.previewButton,
-                { backgroundColor: brandColor }
-              ]}>
-              <Text style={[
-                styles.previewButtonText,
-                {
-                  color: colors.buttonText,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Button Preview
-              </Text>
-            </TouchableOpacity>
-            <Text style={[
-              styles.previewLink,
-              {
-                color: brandColor,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.sm,
-                includeFontPadding: false
-              }
-            ]}>
-              Link Preview
-            </Text>
-          </View>
-          <View style={styles.suggestedColors}>
-            <Text style={[
-              styles.suggestedTitle,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.sm,
-                includeFontPadding: false
-              }
-            ]}>
-              Suggested Colors
-            </Text>
-            <View style={styles.colorGrid}>
-              {SUGGESTED_COLORS.map(color => (
-                <TouchableOpacity
-                  key={color}
-                  onPress={() => handleColorSelect(color)}
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color }
-                  ]}>
-                  {color === brandColor && (
-                    <Check size={16} color="#fff" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.sectionDivider, { backgroundColor: colors.border }]} />
-
-        <View style={styles.section}>
-          <Text style={[
-            styles.sectionTitle,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
-              includeFontPadding: false
-            }
-          ]}>
-            About Your Page
-          </Text>
-          <Text style={[
-            styles.sectionDescription,
-            {
-              color: colors.textSecondary,
-              fontFamily: fonts.regular,
-              fontSize: fontSize.sm,
-              includeFontPadding: false
-            }
-          ]}>
-            Let visitors know what your page is about. You can style your text below.
-          </Text>
-          <View style={[
-            styles.editorToolbar,
-            { backgroundColor: colors.surface }
-          ]}>
-            <TouchableOpacity style={styles.toolbarButton}>
-              <Text style={[
-                styles.toolbarButtonText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Normal
-              </Text>
-            </TouchableOpacity>
-            <View style={[styles.toolbarDivider, { backgroundColor: colors.border }]} />
-            <TouchableOpacity style={styles.toolbarButton}>
-              <Text style={[
-                styles.toolbarButtonText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.bold,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                B
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarButton}>
-              <Text style={[
-                styles.toolbarButtonText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  fontStyle: 'italic',
-                  includeFontPadding: false
-                }
-              ]}>
-                I
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarButton}>
-              <Text style={[
-                styles.toolbarButtonText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  textDecorationLine: 'underline',
-                  includeFontPadding: false
-                }
-              ]}>
-                U
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarButton}>
-              <LinkIcon size={16} color={colors.textPrimary} />
-            </TouchableOpacity>
-          </View>
-          <TextInput
-            value={about}
-            onChangeText={setAbout}
-            multiline
-            style={[
-              styles.aboutInput,
-              {
-                backgroundColor: colors.surface,
-                color: colors.textPrimary,
-                fontFamily: fonts.regular,
-                fontSize: fontSize.md,
-                includeFontPadding: false
-              }
-            ]}
-            placeholder="Write about your page..."
-            placeholderTextColor={colors.textSecondary}
-          />
-        </View>
+        {/* Advanced Settings Component */}
+        <BasicInformationAdvanced />
       </View>
     </ScrollView>
   );
@@ -627,58 +473,79 @@ export function BasicInformation() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  content: {
     padding: 20,
-    gap: 32,
+    gap: 20,
   },
   section: {
-    gap: 12,
-  },
-  sectionDivider: {
-    height: 1,
-    width: '100%',
-    opacity: 0.6,
+    gap: 8,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
   },
   sectionTitle: {
     marginBottom: 4,
+    fontSize: 14,
   },
   sectionDescription: {
     marginBottom: 8,
+    fontSize: 12,
   },
   input: {
+    height: 44,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 14,
+  },
+  characterCount: {
+    textAlign: 'right',
+    marginTop: 4,
+    fontSize: 12,
+  },
+  urlContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 48,
     borderRadius: 12,
     paddingHorizontal: 16,
   },
+  urlPrefix: {
+    opacity: 0.5,
+    fontSize: 14,
+  },
+  urlText: {
+    flex: 1,
+    fontSize: 14,
+  },
+  urlHint: {
+    marginTop: 4,
+    marginLeft: 4,
+    fontSize: 12,
+  },
   dropdownButton: {
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  dropdownButtonText: {
-    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
   },
   dropdownContainer: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    marginTop: 8,
+    marginTop: 4,
     borderRadius: 12,
-    zIndex: 1000,
-    maxHeight: 260,
-    overflow: 'hidden'
+    maxHeight: 200,
   },
   categoriesList: {
-    maxHeight: 260,
+    padding: 8,
   },
   categoryItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 12,
+    borderRadius: 8,
   },
   categoryText: {
     fontSize: 16,
@@ -706,111 +573,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   uploadButtonText: {
-    fontSize: 14,
+    fontSize: 13,
   },
   photoHint: {
     textAlign: 'center',
+    fontSize: 12,
   },
-  urlContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-  },
-  urlPrefix: {
-    opacity: 0.5,
-  },
-  urlText: {
+  loadingContainer: {
     flex: 1,
-    paddingVertical: 12,
-  },
-  urlHint: {
-    marginTop: 8,
-    marginLeft: 4,
-  },
-  colorSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16
-  },
-  colorPreview: {
-    width: '100%',
-    height: 120,
-    borderRadius: 8,
-  },
-  colorCode: {
-    flex: 1,
-  },
-  resetButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  resetText: {
-    fontSize: 14,
-  },
-  colorPreviewButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    marginBottom: 24,
-  },
-  previewButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  previewButtonText: {
-    fontSize: 14,
-  },
-  previewLink: {
-    fontSize: 14,
-  },
-  suggestedColors: {
-    gap: 12,
-  },
-  suggestedTitle: {
-    marginBottom: 8,
-  },
-  colorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  colorOption: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  editorToolbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 40,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: -1,
-  },
-  toolbarButton: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  toolbarButtonText: {
-    fontSize: 14,
-  },
-  toolbarDivider: {
-    width: 1,
-    height: 24,
-    marginHorizontal: 8,
-  },
-  aboutInput: {
-    height: 120,
-    borderRadius: 8,
-    padding: 16,
-    textAlignVertical: 'top',
+  loadingText: {
+    textAlign: 'center',
   },
 });

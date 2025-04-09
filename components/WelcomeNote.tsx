@@ -65,7 +65,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
           {
             color: colors.textPrimary,
             fontFamily: fonts.bold,
-            fontSize: fontSize['2xl'],
+            fontSize: fontSize['xl'],
             includeFontPadding: false
           }
         ]}>

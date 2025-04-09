@@ -38,3 +38,11 @@ export enum StorageKeys {
   ACCESS_TOKEN_MEMBER = '@access_token_member',
   ACCESS_TOKEN_CAMPAIGN = '@access_token_campaign'
 }
+
+export enum SocialPlatforms {
+  INSTAGRAM = 'instagram',
+  FACEBOOK = 'facebook',
+  TWITTER = 'twitter',
+  YOUTUBE = 'youtube',
+  WEBSITE = 'website'
+}

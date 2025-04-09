@@ -51,6 +51,14 @@ interface UserContextType {
   };
   setLocationInfo: (info: { countryName?: string; stateName?: string; }) => void;
   isLoading: boolean;
+  topics: Topic[];
+  setTopics: (topics: Topic[]) => void;
+}
+
+interface Topic {
+  id: string;
+  name: string;
+  active: boolean;
 }
 
 // Create the context with a default value
@@ -85,6 +93,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [topics, setTopics] = useState<Topic[]>([]);
 
   // Check authentication status
   useEffect(() => {
@@ -95,9 +104,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // Fetch countries when authenticated
   useEffect(() => {
-    const fetchCountries = async () => {
+    const fetchData = async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          fetchCountries(),
+          fetchTopics()
+        ]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [isAuthenticated]);
+
+  const fetchCountries = async () => {
+      if (countries.length > 0) return;
+    
       if (!isAuthenticated) {
         return;
       }
@@ -112,9 +143,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     };
+
+  const fetchTopics = async () => {
+    if (topics.length > 0) return; // Don't fetch if we already have topics
     
-    fetchCountries();
-  }, [isAuthenticated]);
+    if (!isAuthenticated) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await commonAPI.getTopics();
+      console.log(response, "resre sres");
+      setTopics(response.data.topics);
+    } catch (error) {
+      console.error('Error fetching topics:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <UserContext.Provider value={{ 

@@ -181,8 +181,8 @@ export function ProfileVisibilityModal({
                 />
               </View>
 
-              <View style={[styles.infoBox, { backgroundColor: isPublic ? `${colors.success}15` : `${colors.warning}15` }]}>
-                <View style={[styles.infoIcon, { backgroundColor: isPublic ? colors.success : colors.warning }]}>
+              <View style={[styles.infoBox, { backgroundColor: isPublic ? `${colors.primary}15` : `${colors.warning}15` }]}>
+                <View style={[styles.infoIcon, { backgroundColor: isPublic ? colors.primary : colors.warning }]}>
                   {isPublic ? (
                     <Store size={20} color={colors.buttonText} />
                   ) : (

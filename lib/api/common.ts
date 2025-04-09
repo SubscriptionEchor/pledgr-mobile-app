@@ -34,6 +34,22 @@ interface LocationInfoResponse {
   path: string;
 }
 
+interface Topic {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
+interface TopicsResponse {
+  data: {
+    topics: Topic[];
+    count: number;
+  };
+  status: string;
+  timestamp: string;
+  path: string;
+}
+
 export const commonAPI = {
   getCountries: () =>
     fetchAPI<CountriesResponse>('/platform/locations/countries', {
@@ -49,6 +65,12 @@ export const commonAPI = {
 
   getLocationInfo: (countryCode: string, stateCode: string) =>
     fetchAPI<LocationInfoResponse>(`/platform/locations/info?countryCode=${countryCode}&stateCode=${stateCode}`, {
+      method: 'GET',
+      requiresAuth: true,
+    }),
+
+  getTopics: () =>
+    fetchAPI<TopicsResponse>('/platform/topics/list', {
       method: 'GET',
       requiresAuth: true,
     }),

@@ -50,7 +50,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
               {
                 color: colors.textPrimary,
                 fontFamily: fonts.bold,
-                fontSize: fontSize['2xl'],
+                fontSize: fontSize['xl'],
                 includeFontPadding: false
               }
             ]}>

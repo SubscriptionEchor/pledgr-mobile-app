@@ -7,6 +7,7 @@ import { BasicInformation } from '@/components/BasicInformation';
 import { PageSettings } from '@/components/PageSettings';
 import { WelcomeNote } from '@/components/WelcomeNote';
 import { PostAndProduct } from '@/components/PostAndProduct';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 type TabType = 'basics' | 'settings' | 'welcome' | 'content';
 
@@ -157,6 +158,11 @@ export default function EditPageScreen() {
     const [activeTab, setActiveTab] = useState<TabType>('basics');
     const [showTagModal, setShowTagModal] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const { fetchCreatorSettings } = useCreatorSettings();
+
+    useEffect(() => {
+        fetchCreatorSettings();
+    }, []);
 
     const handleTagSelect = (tags: string[]) => {
         setSelectedTags(tags);
