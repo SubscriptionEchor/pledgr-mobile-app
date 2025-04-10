@@ -10,7 +10,7 @@ import { router } from 'expo-router';
 import { authAPI } from '@/lib/api/auth';
 
 export default function SplashScreen() {
-  const { fonts } = useTheme();
+  const { fonts, updateBrandColor } = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const dot1Opacity = useRef(new Animated.Value(0.3)).current;
@@ -124,6 +124,13 @@ export default function SplashScreen() {
 
         // Update user state
         setUser(userData);
+
+        // Brand color
+        if (data?.campaignObj && data?.campaignObj?.campaign_settings?.brand_color?.hex_code) {
+          let color = data?.campaignObj?.campaign_settings?.brand_color?.hex_code;
+          await AsyncStorage.setItem(StorageKeys.BRAND_COLOR, color);
+          updateBrandColor(color);
+        }
 
         // Store access tokens if present
         if (baseInfoResponse?.data?.accessTokenMember) {

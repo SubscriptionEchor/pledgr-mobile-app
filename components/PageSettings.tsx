@@ -1,13 +1,29 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react-native';
 import { CountryPicker } from '@/components/CountryPicker';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
+// Create enums for the settings options
+enum VisibilityOption {
+  PRIVATE = 'private',
+  PUBLIC = 'public'
+}
+
+enum MembershipOption {
+  ALL = 'all',
+  PAID_ONLY = 'paid_only'
+}
+
+enum CommentAccess {
+  ENABLED = 'enabled',
+  DISABLED = 'disabled'
+}
+
 export function PageSettings() {
   const { colors, fonts, fontSize } = useTheme();
-  const { creatorSettings } = useCreatorSettings();
+  const { creatorSettings, isLoading, updateGeneralSettings } = useCreatorSettings();
   const [form, setForm] = useState({
     firstName: creatorSettings?.campaign_details.campaign_settings.legal_info.first_name || '',
     surname: creatorSettings?.campaign_details.campaign_settings.legal_info.surname || '',
@@ -15,11 +31,23 @@ export function PageSettings() {
   });
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [settings, setSettings] = useState({
-    earningsVisibility: creatorSettings?.campaign_details.campaign_settings.visibility_settings.earnings_visibility || 'private',
-    membershipDetails: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_details_visibility || 'private',
-    membershipOptions: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_options || 'all',
-    comments: creatorSettings?.campaign_details.campaign_settings.visibility_settings.comment_access || 'enabled',
+    earningsVisibility: creatorSettings?.campaign_details.campaign_settings.visibility_settings.earnings_visibility || VisibilityOption.PRIVATE,
+    membershipDetails: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_details_visibility || VisibilityOption.PRIVATE,
+    membershipOptions: creatorSettings?.campaign_details.campaign_settings.visibility_settings.membership_options || MembershipOption.ALL,
+    comments: creatorSettings?.campaign_details.campaign_settings.visibility_settings.comment_access || CommentAccess.ENABLED,
     adultContent: creatorSettings?.campaign_details.campaign_settings.visibility_settings.adult_content || false,
+  });
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    firstName: '',
+    surname: '',
+    country: '',
+    earningsVisibility: VisibilityOption.PRIVATE,
+    membershipDetails: VisibilityOption.PRIVATE,
+    membershipOptions: MembershipOption.ALL,
+    comments: CommentAccess.ENABLED,
+    adultContent: false,
   });
 
   // Update form and settings when creatorSettings changes
@@ -27,585 +55,711 @@ export function PageSettings() {
     if (creatorSettings) {
       const { campaign_settings } = creatorSettings.campaign_details;
       
-      setForm({
+      const newForm = {
         firstName: campaign_settings.legal_info.first_name || '',
         surname: campaign_settings.legal_info.surname || '',
         country: campaign_settings.legal_info.country_of_residence || '',
-      });
-
-      setSettings({
-        earningsVisibility: campaign_settings.visibility_settings.earnings_visibility || 'private',
-        membershipDetails: campaign_settings.visibility_settings.membership_details_visibility || 'private',
-        membershipOptions: campaign_settings.visibility_settings.membership_options || 'all',
-        comments: campaign_settings.visibility_settings.comment_access || 'enabled',
+      };
+      
+      const newSettings = {
+        earningsVisibility: campaign_settings.visibility_settings.earnings_visibility || VisibilityOption.PRIVATE,
+        membershipDetails: campaign_settings.visibility_settings.membership_details_visibility || VisibilityOption.PRIVATE,
+        membershipOptions: campaign_settings.visibility_settings.membership_options || MembershipOption.ALL,
+        comments: campaign_settings.visibility_settings.comment_access || CommentAccess.ENABLED,
         adultContent: campaign_settings.visibility_settings.adult_content || false,
-      });
+      };
+
+      setForm(newForm);
+      setSettings(newSettings);
+      setInitialValues({...newForm, ...newSettings});
     }
   }, [creatorSettings]);
+
+  // Check for changes
+  useEffect(() => {
+    const hasFormChanges = 
+      form.firstName !== initialValues.firstName ||
+      form.surname !== initialValues.surname ||
+      form.country !== initialValues.country;
+    
+    const hasSettingsChanges = 
+      settings.earningsVisibility !== initialValues.earningsVisibility ||
+      settings.membershipDetails !== initialValues.membershipDetails ||
+      settings.membershipOptions !== initialValues.membershipOptions ||
+      settings.comments !== initialValues.comments ||
+      settings.adultContent !== initialValues.adultContent;
+    
+    setHasChanges(hasFormChanges || hasSettingsChanges);
+  }, [form, settings, initialValues]);
 
   const handleCountrySelect = (country: string) => {
     setForm(prev => ({ ...prev, country }));
     setShowCountryPicker(false);
   };
 
+  const handleSaveChanges = async () => {
+    if (!hasChanges || isSaving || !creatorSettings) return;
+    
+    setIsSaving(true);
+    
+    try {
+      // Prepare the payload with the same structure as updateGeneralSettings expects
+      const payload = {
+        page_name: creatorSettings.campaign_details.campaign_settings.page_name,
+        headline: creatorSettings.campaign_details.campaign_settings.headline,
+        intro_video_url: creatorSettings.campaign_details.campaign_settings.intro_video_url || '',
+        page_categories: creatorSettings.campaign_details.campaign_settings.page_categories || [],
+        profile_photo: {
+          media_id: creatorSettings.campaign_details.campaign_settings.profile_photo?.media_id || ''
+        },
+        cover_photo: {
+          media_id: creatorSettings.campaign_details.campaign_settings.cover_photo?.media_id || ''
+        },
+        brand_color: {
+          hex_code: creatorSettings.campaign_details.campaign_settings.brand_color?.hex_code || ''
+        },
+        visibility_settings: {
+          earnings_visibility: settings.earningsVisibility,
+          membership_details_visibility: settings.membershipDetails,
+          membership_options: settings.membershipOptions,
+          comment_access: settings.comments,
+          adult_content: settings.adultContent
+        },
+        legal_info: {
+          first_name: form.firstName,
+          surname: form.surname,
+          country_of_residence: form.country
+        },
+        featured_tags: {
+          tags: creatorSettings.campaign_details.campaign_settings.featured_tags?.tags.map(tag => ({ name: tag })) || []
+        },
+        page_url: creatorSettings.campaign_details.page_url
+      };
+      
+      await updateGeneralSettings(payload);
+      
+      // Update initial values after successful save
+      setInitialValues({
+        firstName: form.firstName,
+        surname: form.surname,
+        country: form.country,
+        earningsVisibility: settings.earningsVisibility,
+        membershipDetails: settings.membershipDetails,
+        membershipOptions: settings.membershipOptions,
+        comments: settings.comments,
+        adultContent: settings.adultContent
+      });
+      
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
-            Legal first name
-          </Text>
-          <TextInput
-            value={form.firstName}
-            onChangeText={(text) => setForm(prev => ({ ...prev, firstName: text }))}
-            placeholder="Enter your first name"
-            placeholderTextColor={colors.textSecondary}
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.textPrimary,
-                fontFamily: fonts.regular,
-                includeFontPadding: false
-              }
-            ]}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
-            Legal surname
-          </Text>
-          <TextInput
-            value={form.surname}
-            onChangeText={(text) => setForm(prev => ({ ...prev, surname: text }))}
-            placeholder="Enter your surname"
-            placeholderTextColor={colors.textSecondary}
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.textPrimary,
-                fontFamily: fonts.regular,
-                includeFontPadding: false
-              }
-            ]}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
-            Country of residence
-          </Text>
-          <TouchableOpacity
-            onPress={() => setShowCountryPicker(true)}
-            style={[
-              styles.input,
-              styles.countrySelector,
-              { backgroundColor: colors.surface }
-            ]}>
-            <Text style={[
-              styles.countryText,
-              {
-                color: form.country ? colors.textPrimary : colors.textSecondary,
-                fontFamily: fonts.regular,
-                includeFontPadding: false
-              }
-            ]}>
-              {form.country || 'Select a country'}
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
+              Legal first name
             </Text>
-            <ChevronDown size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <Text style={[
-            styles.hint,
-            {
-              color: colors.textSecondary,
-              fontFamily: fonts.regular,
-              fontSize: fontSize.sm,
-              includeFontPadding: false
-            }
-          ]}>
-            This information is used for tax purposes
-          </Text>
-        </View>
-
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
-          <Text style={[
-            styles.cardTitle,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.semibold,
-              fontSize: fontSize.lg,
-              includeFontPadding: false
-            }
-          ]}>
-            Visibility Settings
-          </Text>
-
-          <View style={styles.settingGroup}>
-            <View style={styles.settingHeader}>
-              <Text style={[
-                styles.settingTitle,
+            <TextInput
+              value={form.firstName}
+              onChangeText={(text) => setForm(prev => ({ ...prev, firstName: text }))}
+              placeholder="Enter your first name"
+              placeholderTextColor={colors.textSecondary}
+              style={[
+                styles.input,
                 {
+                  backgroundColor: colors.surface,
                   color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  includeFontPadding: false
-                }
-              ]}>
-                Earnings visibility
-              </Text>
-              <Text style={[
-                styles.settingDescription,
-                {
-                  color: colors.textSecondary,
                   fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
                   includeFontPadding: false
                 }
-              ]}>
-                Choose whether to display your earnings publicly
-              </Text>
-            </View>
-
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, earningsVisibility: 'private' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.earningsVisibility === 'private' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Keep private
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Only you can see your earnings
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, earningsVisibility: 'public' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.earningsVisibility === 'public' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Make public
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Everyone can see your earnings
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.settingGroup}>
-            <View style={styles.settingHeader}>
-              <Text style={[
-                styles.settingTitle,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  includeFontPadding: false
-                }
-              ]}>
-                Membership Details
-              </Text>
-              <Text style={[
-                styles.settingDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Control who can see your membership details
-              </Text>
-            </View>
-
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, membershipDetails: 'private' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.membershipDetails === 'private' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Keep private
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Only you can see membership details
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, membershipDetails: 'public' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.membershipDetails === 'public' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Make public
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Everyone can see membership details
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.settingGroup}>
-            <View style={styles.settingHeader}>
-              <Text style={[
-                styles.settingTitle,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  includeFontPadding: false
-                }
-              ]}>
-                Membership Options
-              </Text>
-              <Text style={[
-                styles.settingDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Choose which membership options to display
-              </Text>
-            </View>
-
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, membershipOptions: 'all' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.membershipOptions === 'all' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Show free and paid options
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Display all membership tiers
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, membershipOptions: 'paid' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.membershipOptions === 'paid' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Show paid options only
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Hide free membership tier
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.settingGroup}>
-            <View style={styles.settingHeader}>
-              <Text style={[
-                styles.settingTitle,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  includeFontPadding: false
-                }
-              ]}>
-                Comment access
-              </Text>
-              <Text style={[
-                styles.settingDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Manage comment settings for your page
-              </Text>
-            </View>
-
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, comments: 'enabled' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.comments === 'enabled' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Allow comments
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Members can comment on your posts
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioOption}
-                onPress={() => setSettings(prev => ({ ...prev, comments: 'disabled' }))}>
-                <View style={styles.radioContainer}>
-                  <View style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary }
-                  ]}>
-                    {settings.comments === 'disabled' && (
-                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                    )}
-                  </View>
-                  <View style={styles.radioContent}>
-                    <Text style={[
-                      styles.radioLabel,
-                      {
-                        color: colors.textPrimary,
-                        fontFamily: fonts.medium,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Turn off comments
-                    </Text>
-                    <Text style={[
-                      styles.radioDescription,
-                      {
-                        color: colors.textSecondary,
-                        fontFamily: fonts.regular,
-                        fontSize: fontSize.sm,
-                        includeFontPadding: false
-                      }
-                    ]}>
-                      Disable comments on all posts
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.adultContentSection, { backgroundColor: colors.surface }]}>
-          <View style={styles.adultContentHeader}>
-            <View>
-              <Text style={[
-                styles.adultContentTitle,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.lg,
-                  includeFontPadding: false
-                }
-              ]}>
-                Adult content
-              </Text>
-              <Text style={[
-                styles.adultContentDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                My work isn't suitable for people under 18
-              </Text>
-            </View>
-            <Switch
-              value={settings.adultContent}
-              onValueChange={(value) => setSettings(prev => ({ ...prev, adultContent: value }))}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.buttonText}
+              ]}
             />
           </View>
+
+          <View style={styles.section}>
+            <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
+              Legal surname
+            </Text>
+            <TextInput
+              value={form.surname}
+              onChangeText={(text) => setForm(prev => ({ ...prev, surname: text }))}
+              placeholder="Enter your surname"
+              placeholderTextColor={colors.textSecondary}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.surface,
+                  color: colors.textPrimary,
+                  fontFamily: fonts.regular,
+                  includeFontPadding: false
+                }
+              ]}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
+              Country of residence
+            </Text>
+            <TouchableOpacity
+              onPress={() => setShowCountryPicker(true)}
+              style={[
+                styles.input,
+                styles.countrySelector,
+                { backgroundColor: colors.surface }
+              ]}>
+              <Text style={[
+                styles.countryText,
+                {
+                  color: form.country ? colors.textPrimary : colors.textSecondary,
+                  fontFamily: fonts.regular,
+                  includeFontPadding: false
+                }
+              ]}>
+                {form.country || 'Select a country'}
+              </Text>
+              <ChevronDown size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <Text style={[
+              styles.hint,
+              {
+                color: colors.textSecondary,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.sm,
+                includeFontPadding: false
+              }
+            ]}>
+              This information is used for tax purposes
+            </Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <Text style={[
+              styles.cardTitle,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.lg,
+                includeFontPadding: false
+              }
+            ]}>
+              Visibility Settings
+            </Text>
+
+            <View style={styles.settingGroup}>
+              <View style={styles.settingHeader}>
+                <Text style={[
+                  styles.settingTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Earnings visibility
+                </Text>
+                <Text style={[
+                  styles.settingDescription,
+                  {
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Choose whether to display your earnings publicly
+                </Text>
+              </View>
+
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, earningsVisibility: VisibilityOption.PRIVATE }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.earningsVisibility === VisibilityOption.PRIVATE && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Keep private
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Only you can see your earnings
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, earningsVisibility: VisibilityOption.PUBLIC }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.earningsVisibility === VisibilityOption.PUBLIC && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Make public
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Everyone can see your earnings
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingGroup}>
+              <View style={styles.settingHeader}>
+                <Text style={[
+                  styles.settingTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Membership Details
+                </Text>
+                <Text style={[
+                  styles.settingDescription,
+                  {
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Control who can see your membership details
+                </Text>
+              </View>
+
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, membershipDetails: VisibilityOption.PRIVATE }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.membershipDetails === VisibilityOption.PRIVATE && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Keep private
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Only you can see membership details
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, membershipDetails: VisibilityOption.PUBLIC }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.membershipDetails === VisibilityOption.PUBLIC && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Make public
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Everyone can see membership details
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingGroup}>
+              <View style={styles.settingHeader}>
+                <Text style={[
+                  styles.settingTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Membership Options
+                </Text>
+                <Text style={[
+                  styles.settingDescription,
+                  {
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Choose which membership options to display
+                </Text>
+              </View>
+
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, membershipOptions: MembershipOption.ALL }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.membershipOptions === MembershipOption.ALL && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Show free and paid options
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Display all membership tiers
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, membershipOptions: MembershipOption.PAID_ONLY }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.membershipOptions === MembershipOption.PAID_ONLY && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Show paid options only
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Hide free membership tier
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingGroup}>
+              <View style={styles.settingHeader}>
+                <Text style={[
+                  styles.settingTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Comment access
+                </Text>
+                <Text style={[
+                  styles.settingDescription,
+                  {
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Manage comment settings for your page
+                </Text>
+              </View>
+
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, comments: CommentAccess.ENABLED }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.comments === CommentAccess.ENABLED && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Allow comments
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Members can comment on your posts
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setSettings(prev => ({ ...prev, comments: CommentAccess.DISABLED }))}>
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary }
+                    ]}>
+                      {settings.comments === CommentAccess.DISABLED && (
+                        <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                      )}
+                    </View>
+                    <View style={styles.radioContent}>
+                      <Text style={[
+                        styles.radioLabel,
+                        {
+                          color: colors.textPrimary,
+                          fontFamily: fonts.medium,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Turn off comments
+                      </Text>
+                      <Text style={[
+                        styles.radioDescription,
+                        {
+                          color: colors.textSecondary,
+                          fontFamily: fonts.regular,
+                          fontSize: fontSize.sm,
+                          includeFontPadding: false
+                        }
+                      ]}>
+                        Disable comments on all posts
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          <View style={[styles.adultContentSection, { backgroundColor: colors.surface }]}>
+            <View style={styles.adultContentHeader}>
+              <View>
+                <Text style={[
+                  styles.adultContentTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.lg,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Adult content
+                </Text>
+                <Text style={[
+                  styles.adultContentDescription,
+                  {
+                    color: colors.textSecondary,
+                    fontFamily: fonts.regular,
+                    fontSize: fontSize.sm,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  My work isn't suitable for people under 18
+                </Text>
+              </View>
+              <Switch
+                value={settings.adultContent}
+                onValueChange={(value) => setSettings(prev => ({ ...prev, adultContent: value }))}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={colors.buttonText}
+              />
+            </View>
+          </View>
+          
+          {/* Add extra padding at the bottom to ensure content isn't hidden behind the save button */}
+          <View style={{ height: 80 }} />
         </View>
-      </View>
+      </ScrollView>
 
       <CountryPicker
         visible={showCountryPicker}
         onClose={() => setShowCountryPicker(false)}
         onSelect={handleCountrySelect}
       />
-    </ScrollView>
+      
+      {/* Sticky Save Button */}
+      <View style={[
+        styles.saveButtonContainer, 
+        { 
+          backgroundColor: colors.background,
+          borderTopColor: colors.border
+        }
+      ]}>
+        <TouchableOpacity
+          style={[
+            styles.saveButton,
+            {
+              backgroundColor: colors.primary,
+              opacity: (!hasChanges || isSaving) ? 0.5 : 1
+            }
+          ]}
+          onPress={handleSaveChanges}
+          disabled={!hasChanges || isSaving}>
+          {isSaving ? (
+            <ActivityIndicator color={colors.buttonText} />
+          ) : (
+            <Text style={[
+              styles.saveButtonText,
+              {
+                color: colors.buttonText,
+                fontFamily: fonts.semibold,
+                fontSize: fontSize.md,
+                includeFontPadding: false
+              }
+            ]}>
+              Save Changes
+            </Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
   content: {
@@ -709,5 +863,22 @@ const styles = StyleSheet.create({
   },
   adultContentDescription: {
     lineHeight: 20,
+  },
+  saveButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    borderTopWidth: 1,
+  },
+  saveButton: {
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    fontSize: 16,
   },
 });

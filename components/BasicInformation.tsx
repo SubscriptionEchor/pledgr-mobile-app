@@ -160,6 +160,24 @@ export function BasicInformation() {
     hasIntroVideoChanges
   ]);
 
+  // In the useEffect where we handle brand color
+useEffect(() => {
+  if (creatorSettings) {
+    const defaultColor = creatorSettings?.campaign_details.campaign_settings.brand_color?.hex_code || DEFAULT_PRIMARY_COLOR;
+    setBrandColor(defaultColor);
+    setColorInput(defaultColor);
+  }
+
+  // Cleanup function to reset color when unmounting
+  return () => {
+    if (creatorSettings) {
+      const defaultColor = creatorSettings?.campaign_details.campaign_settings.brand_color?.hex_code || DEFAULT_PRIMARY_COLOR;
+      updateBrandColor(defaultColor);
+    }
+  };
+}, [creatorSettings]);
+
+
   const generatePageUrl = (name: string) => {
     return name
       .toLowerCase()

@@ -128,11 +128,26 @@ export interface GeneralSettingsPayload {
     tags: Array<{ name: string }>;
   };
   page_url: string;
+  welcome_notes?: {
+    use_unified_welcome: boolean;
+    default_welcome_message: {
+      message: string;
+      intro_video_url: string;
+    };
+  };
 }
 
 export interface PageContentPayload {
   about_page: {
     formatted_content: string;
+  };
+}
+
+export interface WelcomeNotePayload {
+  use_unified_welcome: boolean;
+  default_welcome_message: {
+    message: string;
+    intro_video_url: string;
   };
 }
 
@@ -213,6 +228,43 @@ export function useCreatorSettings() {
     }
   };
 
+  const updateWelcomeNote = async (payload: WelcomeNotePayload) => {
+    if (!creatorSettings) return;
+
+    setIsLoading(true);
+    try {
+      const response = await creatorAPI.updateWelcomeMessage(payload);
+      
+      // Update the creatorSettings with the new welcome note data
+      setCreatorSettings(prev => {
+        if (!prev) return prev;
+        
+        return {
+          ...prev,
+          campaign_details: {
+            ...prev.campaign_details,
+            campaign_settings: {
+              ...prev.campaign_details.campaign_settings,
+              welcome_notes: {
+                use_unified_welcome: payload.use_unified_welcome,
+                default_welcome_message: payload.default_welcome_message
+              }
+            }
+          }
+        };
+      });
+      
+      showToast.success('Welcome note updated', 'Your changes have been saved');
+      return response.data;
+    } catch (error) {
+      console.error('Error updating welcome note:', error);
+      showToast.error('Failed to update welcome note', 'Please try again later');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateAboutPage = async (content: string) => {
     if (!creatorSettings) return;
 
@@ -255,6 +307,7 @@ export function useCreatorSettings() {
     updateCreatorNotifications,
     updateGeneralSettings,
     updateAboutPage,
+    updateWelcomeNote,
     getAboutPageContent
   };
 }

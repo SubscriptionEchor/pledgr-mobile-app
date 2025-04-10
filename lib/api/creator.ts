@@ -94,6 +94,14 @@ interface CampaignSettingsUpdatePayload {
   shop_visibility?: boolean;
 }
 
+interface WelcomeMessagePayload {
+  use_unified_welcome: boolean;
+  default_welcome_message: {
+    message: string;
+    intro_video_url: string;
+  };
+}
+
 export const creatorAPI = {
   getCurrentCampaign: () =>
     fetchAPI<CreatorResponse>('/campaigns/me', {
@@ -117,6 +125,13 @@ export const creatorAPI = {
     
   updatePageContent: (data: PageContentPayload) =>
     fetchAPI<CreatorResponse>('/campaigns/page-content', {
+      method: 'PUT',
+      data,
+      requiresAuth: true,
+    }),
+
+  updateWelcomeMessage: (data: WelcomeMessagePayload) =>
+    fetchAPI<CreatorResponse>('/campaigns/welcome-message', {
       method: 'PUT',
       data,
       requiresAuth: true,
