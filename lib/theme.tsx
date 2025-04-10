@@ -11,6 +11,7 @@ import {
 import { SplashScreen } from 'expo-router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole, StorageKeys } from '@/lib/enums';
+import { Platform } from 'react-native';
 
 const DEFAULT_PRIMARY_COLOR = '#1e88e5';
 
@@ -133,6 +134,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     'Outfit-Bold': Outfit_700Bold,
   });
 
+  // Listen for changes to the brand color in AsyncStorage
   useEffect(() => {
     const loadBrandColor = async () => {
       try {
@@ -150,6 +152,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadBrandColor();
+
+    // Only set up web-specific listeners if we're in a web environment
+    if (Platform.OS === 'web') {
+      // Set up a polling mechanism to check for changes
+      const interval = setInterval(loadBrandColor, 1000);
+      return () => clearInterval(interval);
+    }
   }, [user?.role]);
 
   useEffect(() => {

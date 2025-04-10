@@ -1,5 +1,5 @@
 import { fetchAPI } from './client';
-import { CreatorSettings } from '@/hooks/useCreatorSettings';
+import { CreatorSettings, GeneralSettingsPayload, PageContentPayload } from '@/hooks/useCreatorSettings';
 
 interface CreatorProfile {
   id: string;
@@ -103,6 +103,20 @@ export const creatorAPI = {
 
   updateCampaignSettings: (data: CampaignSettingsUpdatePayload) =>
     fetchAPI<CreatorResponse>('/campaigns/campaign-settings', {
+      method: 'PUT',
+      data,
+      requiresAuth: true,
+    }),
+
+  updateGeneralSettings: (data: GeneralSettingsPayload) =>
+    fetchAPI<CreatorResponse>('/campaigns/general-settings', {
+      method: 'PUT',
+      data,
+      requiresAuth: true,
+    }),
+    
+  updatePageContent: (data: PageContentPayload) =>
+    fetchAPI<CreatorResponse>('/campaigns/page-content', {
       method: 'PUT',
       data,
       requiresAuth: true,

@@ -1,33 +1,43 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Instagram, Facebook, Twitter, Youtube, Globe } from 'lucide-react-native';
 import { SocialPlatforms } from '@/lib/enums';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 export function BasicInformationAdvanced() {
   const { colors, fonts, fontSize } = useTheme();
-  const { creatorSettings } = useCreatorSettings();
+  const { creatorSettings, getAboutPageContent } = useCreatorSettings();
 
-  const [about, setAbout] = useState(
-    creatorSettings?.campaign_details.campaign_settings.about_page?.description_blob_id || ''
-  );
-  const [introVideo, setIntroVideo] = useState(
-    creatorSettings?.campaign_details.campaign_settings.intro_video_url || ''
-  );
+  const [about, setAbout] = useState('');
+  const [initialAbout, setInitialAbout] = useState('');
+  const [introVideo, setIntroVideo] = useState('');
+  const [initialIntroVideo, setInitialIntroVideo] = useState('');
   const [socialLinks, setSocialLinks] = useState<Record<SocialPlatforms, string>>({
-    [SocialPlatforms.INSTAGRAM]: creatorSettings?.campaign_details.campaign_settings.social_links?.instagram || '',
-    [SocialPlatforms.FACEBOOK]: creatorSettings?.campaign_details.campaign_settings.social_links?.facebook || '',
-    [SocialPlatforms.TWITTER]: creatorSettings?.campaign_details.campaign_settings.social_links?.twitter || '',
-    [SocialPlatforms.YOUTUBE]: creatorSettings?.campaign_details.campaign_settings.social_links?.youtube || '',
-    [SocialPlatforms.WEBSITE]: creatorSettings?.campaign_details.campaign_settings.social_links?.website || '',
+    [SocialPlatforms.INSTAGRAM]: '',
+    [SocialPlatforms.FACEBOOK]: '',
+    [SocialPlatforms.TWITTER]: '',
+    [SocialPlatforms.YOUTUBE]: '',
+    [SocialPlatforms.WEBSITE]: '',
   });
+  
+  // Use a ref to track if this is the first render
+  const isFirstRender = useRef(true);
 
+  // Initialize state from creatorSettings only once
   useEffect(() => {
-    if (creatorSettings) {
+    if (creatorSettings && isFirstRender.current) {
       const settings = creatorSettings.campaign_details.campaign_settings;
-      setAbout(settings.about_page?.description_blob_id || '');
-      setIntroVideo(settings.intro_video_url || '');
+      
+      // Get about content from rich_blobs
+      const aboutContent = getAboutPageContent();
+      setAbout(aboutContent);
+      setInitialAbout(aboutContent);
+      
+      const videoUrl = settings.intro_video_url || '';
+      setIntroVideo(videoUrl);
+      setInitialIntroVideo(videoUrl);
+      
       setSocialLinks({
         [SocialPlatforms.INSTAGRAM]: settings.social_links?.instagram || '',
         [SocialPlatforms.FACEBOOK]: settings.social_links?.facebook || '',
@@ -35,8 +45,21 @@ export function BasicInformationAdvanced() {
         [SocialPlatforms.YOUTUBE]: settings.social_links?.youtube || '',
         [SocialPlatforms.WEBSITE]: settings.social_links?.website || '',
       });
+      
+      isFirstRender.current = false;
     }
-  }, [creatorSettings, colors.primary]);
+  }, [creatorSettings]);
+
+  // Make these functions available to the parent component
+  useEffect(() => {
+    if (window.updateAboutContent && typeof window.updateAboutContent === 'function') {
+      window.updateAboutContent(about, initialAbout);
+    }
+    
+    if (window.updateIntroVideo && typeof window.updateIntroVideo === 'function') {
+      window.updateIntroVideo(introVideo, initialIntroVideo);
+    }
+  }, [about, initialAbout, introVideo, initialIntroVideo]);
 
   const handleSocialLinkChange = (platform: SocialPlatforms, value: string) => {
     setSocialLinks(prev => ({
