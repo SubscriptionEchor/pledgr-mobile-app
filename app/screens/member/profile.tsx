@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, S
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { CountryPicker } from '@/components/CountryPicker';
 import { StatePicker } from '@/components/StatePicker';
 import { showToast } from '@/components/Toast';
@@ -10,6 +10,15 @@ import { useUserContext } from '@/lib/context/UserContext';
 import { useMemberSettings } from '@/hooks/useMemberSettings';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Camera } from 'lucide-react-native';
+import { uploadImage } from '@/lib/utils/uploadImage';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+}
 
 export default function ProfileScreen() {
   const { colors, fonts, fontSize } = useTheme();
@@ -20,11 +29,13 @@ export default function ProfileScreen() {
   const { memberSettings, locationInfo, isLoading: isContextLoading, countries, fetchCountries } = useUserContext();
   const { updateMemberSettings, fetchMemberSettings, isLoading: isSettingsLoading } = useMemberSettings();
   const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   
   const [form, setForm] = useState({
     name: memberSettings?.profile.display_name || '',
     country: locationInfo?.countryName || '',
     state: locationInfo?.stateName || '',
+    profilePhoto: memberSettings?.profile.profile_photo || '',
   });
 
   useEffect(() => {
@@ -45,43 +56,83 @@ export default function ProfileScreen() {
         name: memberSettings.profile.display_name || '',
         country: locationInfo.countryName || '',
         state: locationInfo.stateName || '',
+        profilePhoto: memberSettings.profile.profile_photo || '',
       });
     }
   }, [memberSettings, locationInfo]);
 
-  // Check if form has changes
-  const hasChanges = useMemo(() => {
-    if (!memberSettings || !locationInfo) return false;
+  // Check for changes in form data
+  useEffect(() => {
+    if (memberSettings && locationInfo) {
+      const initialValues = {
+        name: memberSettings.profile.display_name || '',
+        country: locationInfo.countryName || '',
+        state: locationInfo.stateName || '',
+        profilePhoto: memberSettings.profile.profile_photo || '',
+      };
 
-    return (
-      form.name.trim() !== memberSettings.profile.display_name ||
-      form.country !== locationInfo.countryName ||
-      form.state !== locationInfo.stateName
-    );
+      const hasFormChanges = 
+        form.name !== initialValues.name ||
+        form.country !== initialValues.country ||
+        form.state !== initialValues.state ||
+        form.profilePhoto !== initialValues.profilePhoto;
+
+      setHasChanges(hasFormChanges);
+    }
   }, [form, memberSettings, locationInfo]);
 
-  const handleImageUpload = () => {
-    // Implement image upload logic
+  const handleImageUpload = async () => {
+    const imageUri = await uploadImage({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!imageUri) return;
+
+    // Store the image URI in form state instead of immediately uploading
+    setForm(prev => ({
+      ...prev,
+      profilePhoto: imageUri
+    }));
+  };
+
+  const generatePageUrl = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  const pageUrl = generatePageUrl(form.name);
+
+  const handlePageNameChange = (text: string) => {
+    setForm(prev => ({ ...prev, name: text }));
+  };
+
+  const handleCountrySelect = (country: string) => {
+    setForm(prev => ({ ...prev, country, state: '' }));
+    setShowCountryPicker(false);
+  };
+
+  const handleStateSelect = (state: string) => {
+    setForm(prev => ({ ...prev, state }));
+    setShowStatePicker(false);
+  };
+
+  const handleStatePickerOpen = () => {
+    if (form.country) {
+      setShowStatePicker(true);
+    }
   };
 
   const handleSave = async () => {
+    if (!hasChanges || isSaving) return;
+
     try {
       setIsSaving(true);
-
-      // Find country code from name
-      const selectedCountry = countries.find(c => c.name === form.country);
-      if (!selectedCountry) {
-        showToast.error('Invalid country', 'Please select a valid country');
-        return;
-      }
-
-      // Find state code from name
-      const states = await commonAPI.getStates(selectedCountry.iso2);
-      const selectedState = states.data.find((s: any) => s.name === form.state);
-      if (!selectedState) {
-        showToast.error('Invalid state', 'Please select a valid state');
-        return;
-      }
 
       // Create updated settings object with all existing settings plus changes
       const { type, ...settingsWithoutType } = memberSettings || {};
@@ -89,44 +140,28 @@ export default function ProfileScreen() {
         ...settingsWithoutType,
         profile: {
           ...settingsWithoutType.profile,
-          display_name: form.name.trim(),
-          country: selectedCountry.iso2,
-          state: selectedState.state_code,
+          display_name: form.name,
+          profile_photo: form.profilePhoto,
         },
-        security: {
-          ...settingsWithoutType.security,
-        },
-        social_media: {
-          ...settingsWithoutType.social_media,
-        },
-        content_preferences: {
-          ...settingsWithoutType.content_preferences,
-        },
-        notification_preferences: {
-          ...settingsWithoutType.notification_preferences,
-        }
       };
 
       await updateMemberSettings(updatedSettings);
-
-      setUser(prev=>({
+      
+      // Update user context with new name and avatar
+      setUser(prev => prev ? {
         ...prev,
-        name: form.name.trim()
-      }));
+        name: form.name,
+        avatar: form.profilePhoto
+      } : null);
+      
+      showToast.success('Profile updated', 'Your profile has been updated successfully');
+      setHasChanges(false);
     } catch (error) {
-      console.error('Error saving profile:', error);
-      showToast.error('Failed to save changes', 'Please try again later');
+      console.error('Error updating profile:', error);
+      showToast.error('Failed to update profile', 'Please try again later');
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleStatePickerOpen = () => {
-    if (!form.country) {
-      showToast.error('Country required', 'Please select a country first');
-      return;
-    }
-    setShowStatePicker(true);
   };
 
   const getCountryCode = (countryName: string) => {
@@ -188,7 +223,7 @@ export default function ProfileScreen() {
             <View style={styles.imageSection}>
               <View style={[styles.imageContainer, { backgroundColor: colors.surface }]}>
                 <Image
-                  source={{ uri: memberSettings?.profile.profile_photo || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
+                  source={{ uri: form.profilePhoto }}
                   style={styles.profileImage}
                 />
                 <TouchableOpacity
@@ -206,7 +241,7 @@ export default function ProfileScreen() {
                 </Text>
                 <TextInput
                   value={form.name}
-                  onChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
+                  onChangeText={handlePageNameChange}
                   placeholder="Enter your name"
                   placeholderTextColor={colors.textSecondary}
                   style={[
@@ -250,7 +285,7 @@ export default function ProfileScreen() {
                   State/Province
                 </Text>
                 <TouchableOpacity
-                  onPress={handleStatePickerOpen}
+                  onPress={() => handleStatePickerOpen()}
                   style={[
                     styles.input,
                     styles.countrySelector,
@@ -305,20 +340,13 @@ export default function ProfileScreen() {
       <CountryPicker
         visible={showCountryPicker}
         onClose={() => setShowCountryPicker(false)}
-        onSelect={(country) => {
-          setForm(prev => ({ ...prev, country, state: '' }));
-          setShowCountryPicker(false);
-        }}
-        selectedCountry={form.country}
+        onSelect={handleCountrySelect}
       />
 
       <StatePicker
         visible={showStatePicker}
         onClose={() => setShowStatePicker(false)}
-        onSelect={(state) => {
-          setForm(prev => ({ ...prev, state }));
-          setShowStatePicker(false);
-        }}
+        onSelect={handleStateSelect}
         countryCode={getCountryCode(form.country)}
         selectedState={form.state}
       />
@@ -412,7 +440,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 12,
     paddingHorizontal: 16,
-    fontSize: 15,
+    fontSize: 16,
   },
   countrySelector: {
     flexDirection: 'row',
@@ -420,7 +448,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   countryText: {
-    fontSize: 15,
+    fontSize: 16,
   },
   hint: {
     marginTop: 4,

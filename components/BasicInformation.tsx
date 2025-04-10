@@ -6,6 +6,7 @@ import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 import { BasicInformationAdvanced } from './BasicInformationAdvanced';
 import { useUserContext } from '@/lib/context/UserContext';
 import { showToast } from '@/components/Toast';
+import { uploadImage } from '@/lib/utils/uploadImage';
 
 const PRESET_COLORS = [
   { name: 'Blue', hex: '#1E88E5' },
@@ -83,8 +84,22 @@ export function BasicInformation() {
     }
   };
 
-  const handlePhotoUpload = (type: 'profile' | 'cover') => {
-    // Implement photo upload logic
+  const handlePhotoUpload = async (type: 'profile' | 'cover') => {
+    const options = {
+      allowsEditing: true,
+      aspect: type === 'profile' ? [1, 1] : [4, 1],
+      quality: 0.8,
+    };
+    
+    const imageUri = await uploadImage(options);
+    
+    if (!imageUri) return;
+    
+    if (type === 'profile') {
+      setProfilePhoto(imageUri);
+    } else {
+      setCoverPhoto(imageUri);
+    }
   };
 
   const handleCategorySelect = (topicId: string) => {

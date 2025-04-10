@@ -172,7 +172,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       isLoading,
       topics,
       setTopics,
-      fetchTopics
+      fetchTopics,
+      fetchCountries,
     }}>
       {children}
     </UserContext.Provider>
