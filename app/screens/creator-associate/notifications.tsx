@@ -86,10 +86,6 @@ export default function NotificationsScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const router = useRouter();
 
-  const handleNavigateToChat = () => {
-    router.push('/screens/creator-associate/chat');
-  };
-
   const renderNotification = (notification: Notification) => (
     <View
       key={notification.id}

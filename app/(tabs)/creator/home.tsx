@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image
 import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 import { useRouter } from 'expo-router';
-import { Library, Store, Crown, Pencil, Share2, MoreVertical, Palette, Settings, Compass, FileText, MessageCircle, Info, Sparkles } from 'lucide-react-native';
+import { Library, MessageCircle, Store, Crown, Pencil, Share2, MoveVertical as MoreVertical, Palette, Settings, Compass, FileText, Info, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 
@@ -31,7 +31,7 @@ const ACTION_BUTTONS: ActionButton[] = [
         id: 'collection',
         label: 'Collection',
         icon: Library,
-        route: '/screens/creator/library',
+        route: '/screens/creator/collection',
         size: 'small'
     },
     {
@@ -61,7 +61,7 @@ const ACTION_BUTTONS: ActionButton[] = [
         id: 'about',
         label: 'About',
         icon: Info,
-        route: '/screens/creator/tiers',
+        route: '/screens/creator/about',
         size: 'small'
     },
     {
