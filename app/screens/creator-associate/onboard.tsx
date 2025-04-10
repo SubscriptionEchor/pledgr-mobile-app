@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useState } from 'react';
-import { Search, Users, Crown, MoreVertical } from 'lucide-react-native';
+import { Search, Users, Crown, MoreVertical, Bell, MessageCircle } from 'lucide-react-native';
 import { TextInput } from 'react-native';
 import { showToast } from '@/components/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -79,9 +79,31 @@ export default function CreatorAssociateOnboardScreen() {
     setCreatorToRevoke(null);
   };
 
+  const handleNavigateToChat = () => {
+    router.push('/screens/creator-associate/chat');
+  };
+
+  const handleNavigateToNotifications = () => {
+    router.push('/screens/creator-associate/notifications');
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SubHeader title="Associate Management" />
+      <View style={styles.headerContainer}>
+        <SubHeader title="Associate Management" />
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: colors.surface }]}
+            onPress={handleNavigateToChat}>
+            <MessageCircle size={20} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: colors.surface }]}
+            onPress={handleNavigateToNotifications}>
+            <Bell size={20} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+      </View>
       
       <ScrollView 
         style={styles.scrollView}
@@ -235,6 +257,24 @@ export default function CreatorAssociateOnboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  headerContainer: {
+    position: 'relative',
+  },
+  headerActions: {
+    position: 'absolute',
+    top: 54,
+    right: 20,
+    flexDirection: 'row',
+    gap: 12,
+    zIndex: 10,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,

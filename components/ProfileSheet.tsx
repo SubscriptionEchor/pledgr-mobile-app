@@ -250,7 +250,7 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                   </Text>
                 </View>
               </View>
-              {!isCreatorAssociate && (
+              {!isCreatorAssociate && !isCreator && (
                 <TouchableOpacity
                   style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
                   onPress={() => handleNavigation('profile')}>

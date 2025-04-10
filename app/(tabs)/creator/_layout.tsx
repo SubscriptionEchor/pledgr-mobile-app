@@ -23,7 +23,7 @@ export default function CreatorTabLayout() {
             <Tabs.Screen
                 name="home"
                 options={{
-                    title: 'Home',
+                    title: 'My Page',
                     tabBarIcon: ({ color }) => <Home size={24} color={color} />
                 }}
             />

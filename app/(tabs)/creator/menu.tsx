@@ -2,9 +2,19 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from '
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { Header } from '@/components/Header';
-import { Megaphone, Users, ChartLine as LineChart, Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX, Shield } from 'lucide-react-native';
+import { Megaphone, Users, ChartLine as LineChart, Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX, Shield, Activity } from 'lucide-react-native';
 import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole } from '@/lib/enums';
+import { useMemberSettings } from '@/hooks/useMemberSettings';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
+
+interface NotificationSetting {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  enabled: boolean;
+}
 
 const MENU_ITEMS = [
     {
@@ -36,6 +46,12 @@ const MENU_ITEMS = [
         icon: Shield,
         label: 'Moderation Hub',
         description: 'Manage content and user reports',
+    },
+    {
+        id: 'activity',
+        icon: Activity,
+        label: 'Activity',
+        description: 'View recent activities and events',
     },
     {
         id: 'help',
@@ -74,6 +90,9 @@ export default function MenuScreen() {
     const handleItemPress = (id: string) => {
         if (id === 'settings') {
             router.push('/screens/creator/settings');
+        }
+        if (id === 'activity') {
+            router.push('/screens/creator/activity');
         }
     };
 

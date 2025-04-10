@@ -1,9 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { Link2, Download, Instagram, Twitter, Facebook, GitBranch as BrandTiktok, Share2, QrCode } from 'lucide-react-native';
+import { Link2, Download, Instagram, Twitter, Facebook, Music2 as BrandTiktok } from 'lucide-react-native';
 import { showToast } from '@/components/Toast';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Dimensions } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function ShareScreen() {
   const { colors, fonts, fontSize } = useTheme();
@@ -28,28 +31,44 @@ export default function ShareScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.previewCard, { backgroundColor: colors.surface }]}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=800' }}
-            style={styles.coverImage}
-            resizeMode="cover"
-          />
-          <View style={styles.overlay}>
+        <View style={[styles.coverCard, { backgroundColor: colors.surface }]}>
+          <View style={[styles.coverSection, { height: SCREEN_HEIGHT * 0.25 }]}>
             <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.8)']}
-              style={styles.gradient}
+              colors={['#4338ca', '#6366f1']}
+              style={styles.coverGradient}
             />
-            <Text style={[
-              styles.pageName,
-              {
-                color: '#fff',
-                fontFamily: fonts.bold,
-                fontSize: fontSize['2xl'],
-                includeFontPadding: false
-              }
-            ]}>
-              Solo Levelling
-            </Text>
+            <View style={styles.coverContent}>
+              <View style={styles.coverProfile}>
+                <Image
+                  source={{ uri: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=400' }}
+                  style={styles.profileImage}
+                />
+                <View style={styles.profileInfo}>
+                  <Text style={[
+                    styles.pageName,
+                    {
+                      color: '#fff',
+                      fontFamily: fonts.bold,
+                      fontSize: fontSize['2xl'],
+                      includeFontPadding: false
+                    }
+                  ]}>
+                    Solo Levelling
+                  </Text>
+                  <Text style={[
+                    styles.profileDescription,
+                    {
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontFamily: fonts.regular,
+                      fontSize: fontSize.md,
+                      includeFontPadding: false
+                    }
+                  ]}>
+                    Only I Level Up is a South Korean portal fantasy web novel
+                  </Text>
+                </View>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -70,9 +89,7 @@ export default function ShareScreen() {
             <TouchableOpacity
               style={[styles.quickShareOption, { backgroundColor: colors.surface }]}
               onPress={handleCopyLink}>
-              <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                <Link2 size={24} color={colors.primary} />
-              </View>
+              <Link2 size={24} color={colors.textPrimary} />
               <Text style={[
                 styles.quickShareText,
                 {
@@ -89,9 +106,7 @@ export default function ShareScreen() {
             <TouchableOpacity
               style={[styles.quickShareOption, { backgroundColor: colors.surface }]}
               onPress={handleDownload}>
-              <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                <Download size={24} color={colors.primary} />
-              </View>
+              <Download size={24} color={colors.textPrimary} />
               <Text style={[
                 styles.quickShareText,
                 {
@@ -102,44 +117,6 @@ export default function ShareScreen() {
                 }
               ]}>
                 Download
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.quickShareOption, { backgroundColor: colors.surface }]}
-              onPress={() => handleShare('System')}>
-              <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                <Share2 size={24} color={colors.primary} />
-              </View>
-              <Text style={[
-                styles.quickShareText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.medium,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Share
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.quickShareOption, { backgroundColor: colors.surface }]}
-              onPress={() => handleShare('QR')}>
-              <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                <QrCode size={24} color={colors.primary} />
-              </View>
-              <Text style={[
-                styles.quickShareText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.medium,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                QR Code
               </Text>
             </TouchableOpacity>
           </View>
@@ -162,9 +139,7 @@ export default function ShareScreen() {
             <TouchableOpacity
               style={[styles.socialOption, { backgroundColor: colors.surface }]}
               onPress={() => handleShare('Instagram')}>
-              <View style={[styles.socialIconContainer, { backgroundColor: '#E1306C15' }]}>
-                <Instagram size={32} color="#E1306C" />
-              </View>
+              <Instagram size={32} color={colors.textPrimary} />
               <Text style={[
                 styles.socialText,
                 {
@@ -174,27 +149,14 @@ export default function ShareScreen() {
                   includeFontPadding: false
                 }
               ]}>
-                Instagram Story
-              </Text>
-              <Text style={[
-                styles.socialDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Share to your Instagram story
+                Share on Instagram
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.socialOption, { backgroundColor: colors.surface }]}
               onPress={() => handleShare('X')}>
-              <View style={[styles.socialIconContainer, { backgroundColor: '#00000015' }]}>
-                <Twitter size={32} color="#000000" />
-              </View>
+              <Twitter size={32} color={colors.textPrimary} />
               <Text style={[
                 styles.socialText,
                 {
@@ -206,25 +168,12 @@ export default function ShareScreen() {
               ]}>
                 Share on X
               </Text>
-              <Text style={[
-                styles.socialDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Post to your X feed
-              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.socialOption, { backgroundColor: colors.surface }]}
               onPress={() => handleShare('Facebook')}>
-              <View style={[styles.socialIconContainer, { backgroundColor: '#1877F215' }]}>
-                <Facebook size={32} color="#1877F2" />
-              </View>
+              <Facebook size={32} color={colors.textPrimary} />
               <Text style={[
                 styles.socialText,
                 {
@@ -236,25 +185,12 @@ export default function ShareScreen() {
               ]}>
                 Share on Facebook
               </Text>
-              <Text style={[
-                styles.socialDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Share with your Facebook friends
-              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.socialOption, { backgroundColor: colors.surface }]}
               onPress={() => handleShare('TikTok')}>
-              <View style={[styles.socialIconContainer, { backgroundColor: '#00000015' }]}>
-                <BrandTiktok size={32} color="#000000" />
-              </View>
+              <BrandTiktok size={32} color={colors.textPrimary} />
               <Text style={[
                 styles.socialText,
                 {
@@ -265,17 +201,6 @@ export default function ShareScreen() {
                 }
               ]}>
                 Share on TikTok
-              </Text>
-              <Text style={[
-                styles.socialDescription,
-                {
-                  color: colors.textSecondary,
-                  fontFamily: fonts.regular,
-                  fontSize: fontSize.sm,
-                  includeFontPadding: false
-                }
-              ]}>
-                Share with your TikTok followers
               </Text>
             </TouchableOpacity>
           </View>
@@ -293,35 +218,51 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
     gap: 32,
+    padding: 20,
   },
-  previewCard: {
+  coverCard: {
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  coverSection: {
     position: 'relative',
   },
-  coverImage: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-  },
-  overlay: {
+  coverGradient: {
     position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    padding: 16,
   },
-  gradient: {
+  coverContent: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '100%',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  coverProfile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  profileInfo: {
+    flex: 1,
   },
   pageName: {
-    textAlign: 'left',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  profileDescription: {
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
@@ -333,23 +274,14 @@ const styles = StyleSheet.create({
   },
   quickShareGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 12,
   },
   quickShareOption: {
     flex: 1,
-    minWidth: '22%',
     alignItems: 'center',
     padding: 16,
     borderRadius: 16,
     gap: 12,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   quickShareText: {
     textAlign: 'center',
@@ -364,17 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     gap: 16,
   },
-  socialIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   socialText: {
     flex: 1,
-  },
-  socialDescription: {
-    flex: 2,
   },
 });

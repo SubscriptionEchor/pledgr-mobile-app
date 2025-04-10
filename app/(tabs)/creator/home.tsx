@@ -2,66 +2,75 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image
 import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 import { useRouter } from 'expo-router';
-import { Library, MessageSquare, Store, Crown, CircleUser as UserCircle, Sparkles, Home, Pencil, Share2, MoreVertical, Palette, Settings } from 'lucide-react-native';
+import { Library, Store, Crown, Pencil, Share2, MoreVertical, Palette, Settings, Compass, FileText, MessageCircle, Info, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CONTENT_PADDING = 20;
-const CARD_GAP = 16;
-const ACTION_BUTTON_SIZE = (SCREEN_WIDTH - (CONTENT_PADDING * 2) - (CARD_GAP * 2)) / 3;
+const CARD_GAP = 8;
 
 interface ActionButton {
     id: string;
     label: string;
     icon: any;
     route: string;
-    color: string;
+    size?: 'small' | 'medium' | 'large';
 }
 
 const ACTION_BUTTONS: ActionButton[] = [
+    // Row 1 - 3 equal cards
     {
-        id: 'home',
-        label: 'Home',
-        icon: Home,
+        id: 'post',
+        label: 'Post',
+        icon: FileText,
         route: '/screens/creator/recent-posts',
-        color: '#1e88e5',
+        size: 'small'
     },
     {
-        id: 'library',
-        label: 'Library',
+        id: 'collection',
+        label: 'Collection',
         icon: Library,
         route: '/screens/creator/library',
-        color: '#43a047',
+        size: 'small'
     },
     {
         id: 'chat',
         label: 'Chat',
-        icon: MessageSquare,
+        icon: MessageCircle,
         route: '/screens/creator/chat',
-        color: '#fb8c00',
+        size: 'small'
+    },
+    // Row 2 - 70/30 split
+    {
+        id: 'membership',
+        label: 'Membership',
+        icon: Crown,
+        route: '/screens/creator/members',
+        size: 'medium'
     },
     {
         id: 'shop',
         label: 'Shop',
         icon: Store,
         route: '/screens/creator/shop',
-        color: '#8e24aa',
+        size: 'small'
     },
+    // Row 3 - 2 equal cards
     {
-        id: 'members',
-        label: 'Members',
-        icon: UserCircle,
-        route: '/screens/creator/members',
-        color: '#e91e63',
-    },
-    {
-        id: 'tiers',
-        label: 'Tiers',
-        icon: Crown,
+        id: 'about',
+        label: 'About',
+        icon: Info,
         route: '/screens/creator/tiers',
-        color: '#039be5',
+        size: 'small'
     },
+    {
+        id: 'recommendation',
+        label: 'Recommendations',
+        icon: Sparkles,
+        route: '/screens/creator/recommendation',
+        size: 'small'
+    }
 ];
 
 export default function HomeScreen() {
@@ -95,44 +104,59 @@ export default function HomeScreen() {
     const renderActionButton = (button: ActionButton) => (
         <TouchableOpacity
             key={button.id}
-            style={[styles.actionButton, { backgroundColor: colors.surface }]}
+            style={[
+                styles.actionButton,
+                styles[`${button.size}Button`],
+                { backgroundColor: colors.surface }
+            ]}
             onPress={() => router.push(button.route)}>
-            <View style={[styles.actionIcon, { backgroundColor: `${button.color}15` }]}>
-                <button.icon size={24} color={button.color} />
+            <View style={styles.buttonContent}>
+                <button.icon size={24} color={colors.textPrimary} />
+                <Text style={[
+                    styles.actionLabel,
+                    {
+                        color: colors.textPrimary,
+                        fontFamily: fonts.medium,
+                        fontSize: fontSize.sm,
+                        includeFontPadding: false
+                    }
+                ]}>
+                    {button.label}
+                </Text>
             </View>
-            <Text style={[
-                styles.actionLabel,
-                {
-                    color: colors.textPrimary,
-                    fontFamily: fonts.medium,
-                    fontSize: fontSize.sm,
-                    includeFontPadding: false
-                }
-            ]}>
-                {button.label}
-            </Text>
         </TouchableOpacity>
     );
+
+    const renderBentoGrid = () => {
+        const row1 = ACTION_BUTTONS.slice(0, 3);
+        const row2 = ACTION_BUTTONS.slice(3, 5);
+        const row3 = ACTION_BUTTONS.slice(5, 7);
+
+        return (
+            <View style={styles.bentoGrid}>
+                <View style={styles.bentoRow}>
+                    {row1.map(renderActionButton)}
+                </View>
+                <View style={styles.bentoRow}>
+                    {row2.map(renderActionButton)}
+                </View>
+                <View style={styles.bentoRow}>
+                    {row3.map(renderActionButton)}
+                </View>
+            </View>
+        );
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Header />
-            {showOptions && (
-                <TouchableWithoutFeedback onPress={() => setShowOptions(false)}>
-                    <View style={styles.overlay} />
-                </TouchableWithoutFeedback>
-            )}
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}>
-                <View style={styles.coverSection}>
-                    <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=800' }}
-                        style={styles.coverImage}
-                    />
+                <View style={[styles.coverSection, { height: SCREEN_HEIGHT * 0.4 }]}>
                     <LinearGradient
-                        colors={['rgba(0,0,0,0.7)', 'transparent']}
+                        colors={['#4338ca', '#6366f1']}
                         style={styles.coverGradient}
                     />
                     <View style={styles.coverActions}>
@@ -242,9 +266,7 @@ export default function HomeScreen() {
                     </View>
                 </View>
 
-                <View style={styles.actionButtons}>
-                    {ACTION_BUTTONS.map(renderActionButton)}
-                </View>
+                {renderBentoGrid()}
             </ScrollView>
         </View>
     );
@@ -254,34 +276,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    overlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
-    },
     scrollView: {
         flex: 1,
     },
     scrollContent: {
-        gap: 24,
+        gap: 0,
     },
     coverSection: {
-        height: 400,
         position: 'relative',
-    },
-    coverImage: {
-        width: '100%',
-        height: '100%',
     },
     coverGradient: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        height: 120,
+        bottom: 0,
     },
     coverActions: {
         position: 'absolute',
@@ -300,11 +309,9 @@ const styles = StyleSheet.create({
     },
     coverContent: {
         position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: 20,
-        gap: 20,
+        bottom: 20,
+        left: 20,
+        right: 20,
     },
     coverProfile: {
         flexDirection: 'row',
@@ -332,27 +339,35 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
     },
-    actionButtons: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: CARD_GAP,
+    bentoGrid: {
         padding: CONTENT_PADDING,
+        gap: CARD_GAP,
+        flex: 1,
+    },
+    bentoRow: {
+        flexDirection: 'row',
+        gap: CARD_GAP,
+        marginBottom: CARD_GAP,
+        width: '100%',
+        height: 100, // Fixed height for all rows
     },
     actionButton: {
-        width: ACTION_BUTTON_SIZE,
-        height: ACTION_BUTTON_SIZE,
         borderRadius: 16,
-        padding: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
+        overflow: 'hidden',
+        height: '100%', // Take full height of parent row
     },
-    actionIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 12,
+    smallButton: {
+        flex: 1,
+    },
+    mediumButton: {
+        flex: 2,
+    },
+    buttonContent: {
+        flex: 1,
+        padding: 16,
         justifyContent: 'center',
         alignItems: 'center',
+        gap: 8,
     },
     actionLabel: {
         textAlign: 'center',
