@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react-native';
@@ -21,7 +21,11 @@ enum CommentAccess {
   DISABLED = 'disabled'
 }
 
-export function PageSettings() {
+interface PageSettingsProps {
+  onInputFocus?: (position: number) => void;
+}
+
+export function PageSettings({ onInputFocus }: PageSettingsProps) {
   const { colors, fonts, fontSize } = useTheme();
   const { creatorSettings, isLoading, updateGeneralSettings } = useCreatorSettings();
   const [form, setForm] = useState({
@@ -39,6 +43,7 @@ export function PageSettings() {
   });
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [initialValues, setInitialValues] = useState({
     firstName: '',
     surname: '',
@@ -49,6 +54,27 @@ export function PageSettings() {
     comments: CommentAccess.ENABLED,
     adultContent: false,
   });
+
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // Update form and settings when creatorSettings changes
   useEffect(() => {
@@ -160,7 +186,7 @@ export function PageSettings() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
           <View style={styles.section}>
             <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold, includeFontPadding: false }]}>
@@ -180,6 +206,7 @@ export function PageSettings() {
                   includeFontPadding: false
                 }
               ]}
+              onFocus={() => onInputFocus?.(100)}
             />
           </View>
 
@@ -201,6 +228,7 @@ export function PageSettings() {
                   includeFontPadding: false
                 }
               ]}
+              onFocus={() => onInputFocus?.(200)}
             />
           </View>
 
@@ -716,41 +744,43 @@ export function PageSettings() {
         onSelect={handleCountrySelect}
       />
       
-      {/* Sticky Save Button */}
-      <View style={[
-        styles.saveButtonContainer, 
-        { 
-          backgroundColor: colors.background,
-          borderTopColor: colors.border
-        }
-      ]}>
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            {
-              backgroundColor: colors.primary,
-              opacity: (!hasChanges || isSaving) ? 0.5 : 1
-            }
-          ]}
-          onPress={handleSaveChanges}
-          disabled={!hasChanges || isSaving}>
-          {isSaving ? (
-            <ActivityIndicator color={colors.buttonText} />
-          ) : (
-            <Text style={[
-              styles.saveButtonText,
+      {/* Sticky Save Button - Hide when keyboard is visible */}
+      {!isKeyboardVisible && (
+        <View style={[
+          styles.saveButtonContainer, 
+          { 
+            backgroundColor: colors.background,
+            borderTopColor: colors.border
+          }
+        ]}>
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
               {
-                color: colors.buttonText,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-                includeFontPadding: false
+                backgroundColor: colors.primary,
+                opacity: (!hasChanges || isSaving) ? 0.5 : 1
               }
-            ]}>
-              Save Changes
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
+            ]}
+            onPress={handleSaveChanges}
+            disabled={!hasChanges || isSaving}>
+            {isSaving ? (
+              <ActivityIndicator color={colors.buttonText} />
+            ) : (
+              <Text style={[
+                styles.saveButtonText,
+                {
+                  color: colors.buttonText,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                  includeFontPadding: false
+                }
+              ]}>
+                Save Changes
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

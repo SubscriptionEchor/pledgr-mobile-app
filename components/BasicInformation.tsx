@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform, ActivityIndicator, Keyboard } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect, useRef } from 'react';
 import { Upload, ChevronDown, Check, X } from 'lucide-react-native';
@@ -29,7 +29,11 @@ declare global {
   }
 }
 
-export function BasicInformation() {
+interface BasicInformationProps {
+  onInputFocus?: (position: number) => void;
+}
+
+export function BasicInformation({ onInputFocus }: BasicInformationProps) {
   const { colors, fonts, fontSize, updateBrandColor } = useTheme();
   const { creatorSettings, isLoading, updateGeneralSettings, updateAboutPage, getAboutPageContent } = useCreatorSettings();
   const { topics = [], fetchTopics } = useUserContext();
@@ -55,6 +59,7 @@ export function BasicInformation() {
   const [colorError, setColorError] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   
   // For about page content and intro video
   const [aboutContent, setAboutContent] = useState('');
@@ -73,6 +78,27 @@ export function BasicInformation() {
     coverPhoto: '',
     brandColor: '',
   });
+
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // Set up communication with BasicInformationAdvanced component
   useEffect(() => {
@@ -378,7 +404,11 @@ useEffect(() => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.content}>
           {/* Basic Information Section */}
           <View style={styles.section}>
@@ -419,6 +449,7 @@ useEffect(() => {
               ]}
               placeholder="Enter page name"
               placeholderTextColor={colors.textSecondary}
+              onFocus={() => onInputFocus?.(100)}
             />
           </View>
 
@@ -518,6 +549,7 @@ useEffect(() => {
               placeholder="Enter a catchy headline (max 100 characters)"
               placeholderTextColor={colors.textSecondary}
               maxLength={100}
+              onFocus={() => onInputFocus?.(200)}
             />
             <Text style={[
               styles.characterCount,
@@ -781,6 +813,7 @@ useEffect(() => {
                     }
                   ]}
                   maxLength={7}
+                  onFocus={() => onInputFocus?.(600)}
                 />
                 {colorError ? (
                   <Text style={[
@@ -844,45 +877,47 @@ useEffect(() => {
           </View>
 
           {/* Advanced Settings Component */}
-          <BasicInformationAdvanced />
+          <BasicInformationAdvanced onInputFocus={onInputFocus} />
         </View>
       </ScrollView>
       
-      {/* Save Changes Button */}
-      <View style={[
-        styles.saveButtonContainer, 
-        { 
-          backgroundColor: colors.background,
-          borderTopColor: colors.border
-        }
-      ]}>
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            {
-              backgroundColor: colors.primary,
-              opacity: (!hasChanges || isSaving) ? 0.5 : 1
-            }
-          ]}
-          onPress={handleSaveChanges}
-          disabled={!hasChanges || isSaving}>
-          {isSaving ? (
-            <ActivityIndicator color={colors.buttonText} />
-          ) : (
-            <Text style={[
-              styles.saveButtonText,
+      {/* Save Changes Button - Hide when keyboard is visible */}
+      {!isKeyboardVisible && (
+        <View style={[
+          styles.saveButtonContainer, 
+          { 
+            backgroundColor: colors.background,
+            borderTopColor: colors.border
+          }
+        ]}>
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
               {
-                color: colors.buttonText,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-                includeFontPadding: false
+                backgroundColor: colors.primary,
+                opacity: (!hasChanges || isSaving) ? 0.5 : 1
               }
-            ]}>
-              Save Changes
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
+            ]}
+            onPress={handleSaveChanges}
+            disabled={!hasChanges || isSaving}>
+            {isSaving ? (
+              <ActivityIndicator color={colors.buttonText} />
+            ) : (
+              <Text style={[
+                styles.saveButtonText,
+                {
+                  color: colors.buttonText,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                  includeFontPadding: false
+                }
+              ]}>
+                Save Changes
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

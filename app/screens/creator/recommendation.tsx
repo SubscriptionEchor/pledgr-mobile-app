@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal, Dimensions, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { Search, X, Info, Pencil } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { showToast } from '@/components/Toast';
 import { Button } from '@/components/Button';
 
@@ -52,6 +52,28 @@ export default function RecommendationScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [recommendationText, setRecommendationText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   const handleSearch = (text: string) => {
     setSearch(text);
@@ -147,7 +169,7 @@ export default function RecommendationScreen() {
             {
               color: colors.textPrimary,
               fontFamily: fonts.bold,
-              fontSize: fontSize['2xl'],
+              fontSize: fontSize.xl,
               includeFontPadding: false
             }
           ]}>
@@ -178,7 +200,7 @@ export default function RecommendationScreen() {
               {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.md,
+                fontSize: fontSize.sm,
                 includeFontPadding: false
               }
             ]}
@@ -302,7 +324,7 @@ export default function RecommendationScreen() {
                         </Text>
                       </View>
                     </View>
-                    <View style={styles.actionButtons}>
+                    <View style={styles.actions}>
                       <TouchableOpacity
                         onPress={() => handleCreatorSelect(creator)}
                         style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
@@ -324,7 +346,7 @@ export default function RecommendationScreen() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.regular,
-                        fontSize: fontSize.md,
+                        fontSize: fontSize.sm,
                         includeFontPadding: false
                       }
                     ]}>
@@ -346,7 +368,10 @@ export default function RecommendationScreen() {
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalOverlay}
+        >
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHeader}>
               <Text style={[
@@ -354,7 +379,7 @@ export default function RecommendationScreen() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.bold,
-                  fontSize: fontSize.xl,
+                  fontSize: fontSize.lg,
                   includeFontPadding: false
                 }
               ]}>
@@ -429,7 +454,7 @@ export default function RecommendationScreen() {
                       {
                         color: colors.textPrimary,
                         fontFamily: fonts.regular,
-                        fontSize: fontSize.md,
+                        fontSize: fontSize.sm,
                         includeFontPadding: false
                       }
                     ]}
@@ -457,7 +482,7 @@ export default function RecommendationScreen() {
               </View>
             )}
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -570,7 +595,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  actionButtons: {
+  actions: {
     flexDirection: 'row',
     gap: 8,
   },
@@ -618,6 +643,7 @@ const styles = StyleSheet.create({
   },
   modalBody: {
     gap: 20,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   modalAvatar: {
     width: 56,

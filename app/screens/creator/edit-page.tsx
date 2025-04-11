@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, ActivityIndicator, KeyboardAvoidingView, Dimensions, Keyboard } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Settings, FileText, MessageSquare, Store, Plus, X } from 'lucide-react-native';
 import { BasicInformation } from '@/components/BasicInformation';
 import { PageSettings } from '@/components/PageSettings';
@@ -9,6 +9,8 @@ import { WelcomeNote } from '@/components/WelcomeNote';
 import { PostAndProduct } from '@/components/PostAndProduct';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 import { useUserContext } from '@/lib/context/UserContext';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type TabType = 'basics' | 'settings' | 'welcome' | 'content';
 
@@ -161,6 +163,8 @@ export default function EditPageScreen() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const { creatorSettings, isLoading: isSettingsLoading, fetchCreatorSettings } = useCreatorSettings();
     const { topics, fetchTopics, isLoading: isTopicsLoading } = useUserContext();
+    const scrollViewRef = useRef<ScrollView>(null);
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
     useEffect(() => {
         fetchCreatorSettings();
@@ -172,6 +176,27 @@ export default function EditPageScreen() {
         }
     }, [topics.length, fetchTopics]);
 
+    // Add keyboard listeners
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            () => {
+                setIsKeyboardVisible(true);
+            }
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => {
+                setIsKeyboardVisible(false);
+            }
+        );
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
     const handleTagSelect = (tags: string[]) => {
         setSelectedTags(tags);
     };
@@ -180,20 +205,31 @@ export default function EditPageScreen() {
         setSelectedTags(prev => prev.filter(tag => tag !== tagToRemove));
     };
 
+    const handleFocus = (inputPosition: number) => {
+        // Wait for the keyboard to appear
+        setTimeout(() => {
+            scrollViewRef.current?.scrollTo({
+                y: inputPosition,
+                animated: true
+            });
+        }, 100);
+    };
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'basics':
-                return <BasicInformation />;
+                return <BasicInformation onInputFocus={handleFocus} />;
             case 'settings':
-                return <PageSettings />;
+                return <PageSettings onInputFocus={handleFocus} />;
             case 'welcome':
-                return <WelcomeNote />;
+                return <WelcomeNote onInputFocus={handleFocus} />;
             case 'content':
                 return (
                     <PostAndProduct
                         onAddTags={() => setShowTagModal(true)}
                         selectedTags={selectedTags}
                         onRemoveTag={handleTagRemove}
+                        onInputFocus={handleFocus}
                     />
                 );
             default:
@@ -268,9 +304,14 @@ export default function EditPageScreen() {
                 </ScrollView>
             </View>
 
-            <View style={styles.content}>
-                {renderTabContent()}
-            </View>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={styles.keyboardAvoidingView}
+            >
+                <View style={styles.content}>
+                    {renderTabContent()}
+                </View>
+            </KeyboardAvoidingView>
 
             <TagModal
                 visible={showTagModal}
@@ -284,6 +325,9 @@ export default function EditPageScreen() {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+    },
+    keyboardAvoidingView: {
         flex: 1,
     },
     loadingContainer: {

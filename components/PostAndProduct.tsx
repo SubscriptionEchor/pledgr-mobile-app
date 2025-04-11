@@ -14,9 +14,10 @@ interface PostAndProductProps {
   onAddTags: () => void;
   selectedTags: string[];
   onRemoveTag: (tag: string) => void;
+  onInputFocus?: (position: number) => void;
 }
 
-export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAndProductProps) {
+export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag, onInputFocus }: PostAndProductProps) {
   const { colors, fonts, fontSize } = useTheme();
   const [featuredTags, setFeaturedTags] = useState<FeaturedTag[]>([]);
   const [allowAudioDownload, setAllowAudioDownload] = useState(false);
@@ -44,6 +45,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Text style={[
               styles.title,
@@ -66,7 +68,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.semibold,
-                  fontSize: fontSize.lg,
+                  fontSize: fontSize.md,
                   includeFontPadding: false
                 }
               ]}>
@@ -83,7 +85,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
             {
               color: colors.textSecondary,
               fontFamily: fonts.regular,
-              fontSize: fontSize.md,
+              fontSize: fontSize.sm,
               includeFontPadding: false
             }
           ]}>
@@ -128,7 +130,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
           {
             color: colors.textSecondary,
             fontFamily: fonts.regular,
-            fontSize: fontSize.md,
+            fontSize: fontSize.sm,
             includeFontPadding: false
           }
         ]}>
@@ -154,7 +156,7 @@ export function PostAndProduct({ onAddTags, selectedTags, onRemoveTag }: PostAnd
               {
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.md,
+                fontSize: fontSize.sm,
                 includeFontPadding: false
               }
             ]}>
@@ -220,6 +222,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 100, // Add padding to account for the save button
   },
   audioSection: {
     padding: 16,
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
   },
   audioDescription: {
     lineHeight: 20,
-    marginBottom: 12,
+    marginVertical: 6,
   },
   header: {
     marginBottom: 8,
@@ -274,6 +277,7 @@ const styles = StyleSheet.create({
   },
   description: {
     marginBottom: 24,
+    marginTop: 6,
   },
   emptyState: {
     padding: 32,

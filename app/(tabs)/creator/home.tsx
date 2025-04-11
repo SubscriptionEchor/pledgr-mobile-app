@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image
 import { useTheme } from '@/hooks/useTheme';
 import { Header } from '@/components/Header';
 import { useRouter } from 'expo-router';
-import { Library, MessageCircle, Store, Crown, Pencil, Share2, MoveVertical as MoreVertical, Palette, Settings, Compass, FileText, Info, Sparkles } from 'lucide-react-native';
+import { Library, MessageCircle, Store, Crown, Pencil, Share2, MoreVertical, Palette, Settings, Compass, FileText, Info, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 

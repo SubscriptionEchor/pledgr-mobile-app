@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { Pencil, ChevronDown, Plus, Check, X } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { showToast } from '@/components/Toast';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const TEXT_INPUT_HEIGHT = SCREEN_HEIGHT * 0.5;
+const TEXT_INPUT_HEIGHT = SCREEN_HEIGHT * 0.35;
 
 export default function AboutScreen() {
   const { colors, fonts, fontSize } = useTheme();
@@ -16,6 +16,29 @@ export default function AboutScreen() {
   );
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState('');
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -38,6 +61,16 @@ export default function AboutScreen() {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditText(aboutText || '');
+  };
+
+  const handleInputFocus = () => {
+    // Scroll to the input when it's focused
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({
+        y: 200,
+        animated: true
+      });
+    }, 100);
   };
 
   const renderAboutContent = () => {
@@ -108,13 +141,14 @@ export default function AboutScreen() {
                 {
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
-                  fontSize: fontSize.md,
+                  fontSize: fontSize.sm,
                   includeFontPadding: false
                 }
               ]}
               placeholder="Write about yourself or your content..."
               placeholderTextColor={colors.textSecondary}
               textAlignVertical="top"
+              onFocus={handleInputFocus}
             />
           </View>
           <View style={styles.editActions}>
@@ -171,7 +205,7 @@ export default function AboutScreen() {
               {
                 color: colors.textPrimary,
                 fontFamily: fonts.regular,
-                fontSize: fontSize.md,
+                fontSize: fontSize.sm,
                 includeFontPadding: false,
                 lineHeight: 24,
                 marginTop: index > 0 ? 16 : 0
@@ -213,47 +247,53 @@ export default function AboutScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SubHeader title="About" />
       
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardAvoidingView}
       >
-        <View style={styles.headerRow}>
-          <Text style={[
-            styles.title,
-            {
-              color: colors.textPrimary,
-              fontFamily: fonts.bold,
-              fontSize: fontSize['2xl'],
-              includeFontPadding: false
-            }
-          ]}>
-            About
-          </Text>
-          {aboutText && !isEditing && (
-            <TouchableOpacity
-              style={[styles.editButton, { backgroundColor: colors.surface }]}
-              onPress={handleEditToggle}
-            >
-              <Pencil size={20} color={colors.textPrimary} />
-              <Text style={[
-                styles.editButtonText,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.medium,
-                  fontSize: fontSize.md,
-                  includeFontPadding: false
-                }
-              ]}>
-                Edit
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.scrollView}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.headerRow}>
+            <Text style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+                fontFamily: fonts.bold,
+                fontSize: fontSize.xl,
+                includeFontPadding: false
+              }
+            ]}>
+              About
+            </Text>
+            {aboutText && !isEditing && (
+              <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: colors.surface }]}
+                onPress={handleEditToggle}
+              >
+                <Pencil size={20} color={colors.textPrimary} />
+                <Text style={[
+                  styles.editButtonText,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.medium,
+                    fontSize: fontSize.md,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Edit
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
-        {renderAboutContent()}
-      </ScrollView>
+          {renderAboutContent()}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -262,11 +302,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 120 : 20, // Extra padding for iOS keyboard
   },
   headerRow: {
     flexDirection: 'row',

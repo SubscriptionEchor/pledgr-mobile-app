@@ -1,13 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 interface WelcomeNoteProps {
   onSave?: (note: string) => void;
+  onInputFocus?: (position: number) => void;
 }
 
-export function WelcomeNote({ onSave }: WelcomeNoteProps) {
+export function WelcomeNote({ onSave, onInputFocus }: WelcomeNoteProps) {
   const { colors, fonts, fontSize } = useTheme();
   const { creatorSettings, isLoading, updateWelcomeNote } = useCreatorSettings();
   
@@ -15,10 +16,32 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
   const [welcomeNote, setWelcomeNote] = useState('Welcome to my page! Thank you for your support.');
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [initialValues, setInitialValues] = useState({
     welcomeType: 'same' as 'same' | 'custom',
     welcomeNote: ''
   });
+
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // Initialize from creatorSettings
   useEffect(() => {
@@ -81,7 +104,7 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
           <Text style={[
             styles.title,
@@ -224,13 +247,14 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
                   backgroundColor: colors.background,
                   color: colors.textPrimary,
                   fontFamily: fonts.regular,
-                  fontSize: fontSize.md,
+                  fontSize: fontSize.sm,
                   includeFontPadding: false
                 }
               ]}
               placeholder="Write your welcome message..."
               placeholderTextColor={colors.textSecondary}
               textAlignVertical="top"
+              onFocus={() => onInputFocus?.(600)}
             />
 
             <Text style={[
@@ -251,41 +275,43 @@ export function WelcomeNote({ onSave }: WelcomeNoteProps) {
         </View>
       </ScrollView>
       
-      {/* Sticky Save Button */}
-      <View style={[
-        styles.saveButtonContainer, 
-        { 
-          backgroundColor: colors.background,
-          borderTopColor: colors.border
-        }
-      ]}>
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            {
-              backgroundColor: colors.primary,
-              opacity: (!hasChanges || isSaving) ? 0.5 : 1
-            }
-          ]}
-          onPress={handleSaveChanges}
-          disabled={!hasChanges || isSaving}>
-          {isSaving ? (
-            <ActivityIndicator color={colors.buttonText} />
-          ) : (
-            <Text style={[
-              styles.saveButtonText,
+      {/* Sticky Save Button - Hide when keyboard is visible */}
+      {!isKeyboardVisible && (
+        <View style={[
+          styles.saveButtonContainer, 
+          { 
+            backgroundColor: colors.background,
+            borderTopColor: colors.border
+          }
+        ]}>
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
               {
-                color: colors.buttonText,
-                fontFamily: fonts.semibold,
-                fontSize: fontSize.md,
-                includeFontPadding: false
+                backgroundColor: colors.primary,
+                opacity: (!hasChanges || isSaving) ? 0.5 : 1
               }
-            ]}>
-              Save Changes
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
+            ]}
+            onPress={handleSaveChanges}
+            disabled={!hasChanges || isSaving}>
+            {isSaving ? (
+              <ActivityIndicator color={colors.buttonText} />
+            ) : (
+              <Text style={[
+                styles.saveButtonText,
+                {
+                  color: colors.buttonText,
+                  fontFamily: fonts.semibold,
+                  fontSize: fontSize.md,
+                  includeFontPadding: false
+                }
+              ]}>
+                Save Changes
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -302,10 +328,10 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 0,
   },
   subtitle: {
-    marginBottom: 24,
+    marginBottom: 0,
   },
   options: {
     gap: 16,

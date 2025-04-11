@@ -5,7 +5,11 @@ import { Instagram, Facebook, Twitter, Youtube, Globe } from 'lucide-react-nativ
 import { SocialPlatforms } from '@/lib/enums';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
-export function BasicInformationAdvanced() {
+interface BasicInformationAdvancedProps {
+  onInputFocus?: (position: number) => void;
+}
+
+export function BasicInformationAdvanced({ onInputFocus }: BasicInformationAdvancedProps) {
   const { colors, fonts, fontSize } = useTheme();
   const { creatorSettings, getAboutPageContent } = useCreatorSettings();
 
@@ -140,6 +144,7 @@ export function BasicInformationAdvanced() {
           ]}
           placeholder="Write about your page..."
           placeholderTextColor={colors.textSecondary}
+          onFocus={() => onInputFocus?.(800)}
         />
       </View>
 
@@ -182,6 +187,7 @@ export function BasicInformationAdvanced() {
               includeFontPadding: false
             }
           ]}
+          onFocus={() => onInputFocus?.(950)}
         />
       </View>
 
@@ -216,7 +222,7 @@ export function BasicInformationAdvanced() {
         </Text>
         
         <View style={styles.socialLinks}>
-          {Object.values(SocialPlatforms).map((platform) => {
+          {Object.values(SocialPlatforms).map((platform, index) => {
             const Icon = getSocialIcon(platform);
             return (
               <View key={platform} style={styles.socialInputContainer}>
@@ -241,6 +247,7 @@ export function BasicInformationAdvanced() {
                       includeFontPadding: false
                     }
                   ]}
+                  onFocus={() => onInputFocus?.(1100 + index * 60)}
                 />
               </View>
             );

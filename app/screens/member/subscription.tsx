@@ -407,6 +407,7 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderRadius: 20,
         borderWidth: 1,
+        alignSelf: 'flex-end',
     },
     premiumBadge: {
         flexDirection: 'row',
