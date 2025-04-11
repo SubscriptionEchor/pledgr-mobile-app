@@ -23,13 +23,13 @@ export default function CollectionScreen() {
   const renderCollectionsTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.headerWithAction}>
-        <FolderOpen size={24} color={colors.textPrimary} />
+        <FolderOpen size={22} color={colors.textPrimary} />
         <Text style={[
           styles.headerTitle,
           {
             color: colors.textPrimary,
             fontFamily: fonts.bold,
-            fontSize: fontSize.xl,
+            fontSize: fontSize.md,
             includeFontPadding: false
           }
         ]}>
@@ -39,17 +39,17 @@ export default function CollectionScreen() {
           style={[styles.createButton, { backgroundColor: colors.primary }]}
           onPress={handleCreateCollection}
         >
-          <Plus size={20} color={colors.buttonText} />
+          <Plus size={16} color={colors.buttonText} />
           <Text style={[
             styles.createButtonText,
             {
               color: colors.buttonText,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.md,
+              fontSize: fontSize.sm,
               includeFontPadding: false
             }
           ]}>
-            Create Collection
+            Create
           </Text>
         </TouchableOpacity>
       </View>
@@ -87,13 +87,13 @@ export default function CollectionScreen() {
   const renderTagsTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.headerWithAction}>
-        <Tag size={24} color={colors.textPrimary} />
+        <Tag size={22} color={colors.textPrimary} />
         <Text style={[
           styles.headerTitle,
           {
             color: colors.textPrimary,
             fontFamily: fonts.bold,
-            fontSize: fontSize.xl,
+            fontSize: fontSize.md,
             includeFontPadding: false
           }
         ]}>
@@ -103,17 +103,17 @@ export default function CollectionScreen() {
           style={[styles.createButton, { backgroundColor: colors.primary }]}
           onPress={handleCreateTagCollection}
         >
-          <Plus size={20} color={colors.buttonText} />
+          <Plus size={16} color={colors.buttonText} />
           <Text style={[
             styles.createButtonText,
             {
               color: colors.buttonText,
               fontFamily: fonts.semibold,
-              fontSize: fontSize.md,
+              fontSize: fontSize.sm,
               includeFontPadding: false
             }
           ]}>
-            Create collection with tags
+            Create
           </Text>
         </TouchableOpacity>
       </View>
@@ -153,11 +153,12 @@ export default function CollectionScreen() {
       <SubHeader title="Collections" />
       
       <View style={styles.tabsContainer}>
-        <View style={[styles.tabs, { backgroundColor: 'white', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 }]}>
+        <View style={[styles.tabs, { backgroundColor: colors.surface, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 }]}>
           <TouchableOpacity
             style={[
               styles.tab,
-              activeTab === 'collections' && styles.activeTab
+              activeTab === 'collections' && styles.activeTab, 
+              {borderBottomColor: colors.primary}
             ]}
             onPress={() => setActiveTab('collections')}
           >
@@ -178,7 +179,8 @@ export default function CollectionScreen() {
           <TouchableOpacity
             style={[
               styles.tab,
-              activeTab === 'tags' && styles.activeTab
+              activeTab === 'tags' && styles.activeTab,
+              {borderBottomColor: colors.primary}
             ]}
             onPress={() => setActiveTab('tags')}
           >
@@ -235,7 +237,6 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: '#1e88e5',
   },
   tabText: {
     fontSize: 16,

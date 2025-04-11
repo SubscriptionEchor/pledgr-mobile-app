@@ -69,7 +69,7 @@ const ACTION_BUTTONS: ActionButton[] = [
         label: 'Recommendations',
         icon: Sparkles,
         route: '/screens/creator/recommendation',
-        size: 'small'
+        size: 'medium'
     }
 ];
 
