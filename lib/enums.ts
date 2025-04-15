@@ -46,3 +46,14 @@ export enum SocialPlatforms {
   YOUTUBE = 'youtube',
   WEBSITE = 'website'
 }
+
+export const PRESET_COLORS = [
+  { name: 'Blue', hex: '#1E88E5' },
+  { name: 'Red', hex: '#E53935' },
+  { name: 'Green', hex: '#43A047' },
+  { name: 'Orange', hex: '#FB8C00' },
+  { name: 'Light Blue', hex: '#29B6F6' },
+  { name: 'Purple', hex: '#8E24AA' },
+  { name: 'Pink', hex: '#D81B60' },
+  { name: 'Gray', hex: '#546E7A' },
+];

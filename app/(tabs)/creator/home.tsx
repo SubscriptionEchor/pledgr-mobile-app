@@ -4,7 +4,9 @@ import { Header } from '@/components/Header';
 import { useRouter } from 'expo-router';
 import { Library, MessageCircle, Store, Crown, Pencil, Share2, MoreVertical, Palette, Settings, Compass, FileText, Info, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ColorPickerModal } from '@/components/ColorPickerModal';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CONTENT_PADDING = 20;
@@ -77,13 +79,22 @@ export default function HomeScreen() {
     const { colors, fonts, fontSize } = useTheme();
     const router = useRouter();
     const [showOptions, setShowOptions] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const { creatorSettings, fetchCreatorSettings } = useCreatorSettings();
+
+    // Fetch creator settings if not available
+    useEffect(() => {
+        if (!creatorSettings) {
+            fetchCreatorSettings();
+        }
+    }, [creatorSettings, fetchCreatorSettings]);
 
     const handleShare = () => {
         router.push('/screens/creator/share');
     };
 
     const handleColorPicker = () => {
-        // Handle color picker action
+        setShowColorPicker(true);
     };
 
     const handleEditPage = () => {
@@ -268,6 +279,12 @@ export default function HomeScreen() {
 
                 {renderBentoGrid()}
             </ScrollView>
+
+            <ColorPickerModal 
+                visible={showColorPicker}
+                onClose={() => setShowColorPicker(false)}
+                initialColor="#4338ca"
+            />
         </View>
     );
 }
@@ -327,7 +344,6 @@ const styles = StyleSheet.create({
     },
     profileInfo: {
         flex: 1,
-        gap: 8,
     },
     profileName: {
         textShadowColor: 'rgba(0, 0, 0, 0.75)',

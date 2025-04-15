@@ -8,18 +8,7 @@ import { useUserContext } from '@/lib/context/UserContext';
 import { showToast } from '@/components/Toast';
 import { uploadImage } from '@/lib/utils/uploadImage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StorageKeys } from '@/lib/enums';
-
-const PRESET_COLORS = [
-  { name: 'Blue', hex: '#1E88E5' },
-  { name: 'Red', hex: '#E53935' },
-  { name: 'Green', hex: '#43A047' },
-  { name: 'Orange', hex: '#FB8C00' },
-  { name: 'Cyan', hex: '#00ACC1' },
-  { name: 'Purple', hex: '#8E24AA' },
-  { name: 'Pink', hex: '#D81B60' },
-  { name: 'Gray', hex: '#546E7A' },
-];
+import { StorageKeys, PRESET_COLORS } from '@/lib/enums';
 
 // Define global window properties for communication with BasicInformationAdvanced
 declare global {
