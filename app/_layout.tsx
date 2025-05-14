@@ -1,3 +1,5 @@
+import React from 'react';
+import 'react-native-reanimated';
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
@@ -13,7 +15,7 @@ import * as SplashScreen from 'expo-splash-screen';
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   useFrameworkReady();
 
   useEffect(() => {
@@ -22,21 +24,29 @@ export default function RootLayout() {
   }, []);
 
   return (
+    <>
+      <StatusBarComponent />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
+      </Stack>
+      <ToastMessage />
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <AuthProvider>
-      <UserProvider>
-        <ThemeProvider>
+      <ThemeProvider>
+        <UserProvider>
           <BottomSheetProvider>
             <ProfileSheetProvider>
-              <StatusBarComponent />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-              </Stack>
-              <ToastMessage />
+              <RootLayoutContent />
             </ProfileSheetProvider>
           </BottomSheetProvider>
-        </ThemeProvider>
-      </UserProvider>
+        </UserProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

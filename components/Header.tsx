@@ -1,11 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { User } from 'lucide-react-native';
 import { useProfileSheet } from '@/lib/context/ProfileSheetContext';
 
 export function Header() {
-  const { colors, fonts, fontSize } = useTheme();
+  const { colors, fonts, fontSize, isDark } = useTheme();
   const { showProfileSheet } = useProfileSheet();
+
+  const logoSource = isDark
+    ? require('../assets/images/pledgr-light.png')
+    : require('../assets/images/pledgr-dark.png');
 
   return (
     <View
@@ -18,17 +22,11 @@ export function Header() {
         },
       ]}>
       <View style={styles.leftContainer}>
-        <Text style={[
-          styles.logoText, 
-          { 
-            color: colors.textPrimary,
-            fontFamily: fonts.bold,
-            fontSize: fontSize['2xl'],
-            includeFontPadding: false,
-          }
-        ]}>
-          Pledgr
-        </Text>
+        <Image
+          source={logoSource}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
       </View>
       <TouchableOpacity
         onPress={showProfileSheet}
@@ -63,9 +61,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  logoText: {
-    fontSize: 24,
-    fontWeight: '700',
+  logoImage: {
+    height: 32,
+    width: 110,
   },
   profileButton: {
     width: 40,
