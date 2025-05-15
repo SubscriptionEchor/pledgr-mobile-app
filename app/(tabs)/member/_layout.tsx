@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Compass, Crown, MessageCircle, Menu } from 'lucide-react-native';
+import { Home, Compass, Crown, Download, Menu } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
@@ -7,7 +7,7 @@ type TabParamList = {
   home: undefined;
   explore: undefined;
   membership: undefined;
-  chat: undefined;
+  downloads: undefined;
   menu: undefined;
 };
 
@@ -17,7 +17,7 @@ export default function MemberTabLayout() {
     const { colors, fonts, fontSize } = useTheme();
 
     return (
-        <Tabs<TabParamList>
+        <Tabs
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
@@ -49,17 +49,10 @@ export default function MemberTabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="membership"
+                name="downloads"
                 options={{
-                    title: 'Membership',
-                    tabBarIcon: ({ color }: { color: string }) => <Crown size={24} color={color} />
-                }}
-            />
-            <Tabs.Screen
-                name="chat"
-                options={{
-                    title: 'Chat',
-                    tabBarIcon: ({ color }: { color: string }) => <MessageCircle size={24} color={color} />
+                    title: 'Downloads',
+                    tabBarIcon: ({ color }: { color: string }) => <Download size={24} color={color} />
                 }}
             />
             <Tabs.Screen

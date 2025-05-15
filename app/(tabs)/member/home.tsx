@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useRouter } from 'expo-router';
+import { MessageCircle } from 'lucide-react-native';
 import { Header } from '@/components/Header';
 import { Feed } from '@/components/Feed';
 
@@ -53,6 +55,7 @@ const mockCreators = [
 
 export default function HomeScreen() {
     const { colors, fonts, fontSize } = useTheme();
+    const router = useRouter();
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -158,6 +161,15 @@ const CARD_HEIGHT = 80;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    headerIconBtn: {
+        padding: 6,
+        borderRadius: 20,
     },
     filtersContainer: {
         paddingVertical: 16,

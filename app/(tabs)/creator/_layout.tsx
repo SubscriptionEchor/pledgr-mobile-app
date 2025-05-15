@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Library, Wallet, MessageSquare, Menu } from 'lucide-react-native';
+import { Home, Library, Wallet, Menu } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 
 export default function CreatorTabLayout() {
@@ -39,13 +39,6 @@ export default function CreatorTabLayout() {
                 options={{
                     title: 'Payout',
                     tabBarIcon: ({ color }) => <Wallet size={24} color={color} />
-                }}
-            />
-            <Tabs.Screen
-                name="chat"
-                options={{
-                    title: 'Chat',
-                    tabBarIcon: ({ color }) => <MessageSquare size={24} color={color} />
                 }}
             />
             <Tabs.Screen

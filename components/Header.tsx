@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { User } from 'lucide-react-native';
+import { User, MessageCircle } from 'lucide-react-native';
 import { useProfileSheet } from '@/lib/context/ProfileSheetContext';
+import { useRouter } from 'expo-router';
 
 export function Header() {
   const { colors, fonts, fontSize, isDark } = useTheme();
   const { showProfileSheet } = useProfileSheet();
+  const router = useRouter();
 
   const logoSource = isDark
     ? require('../assets/images/pledgr-light.png')
@@ -37,6 +39,18 @@ export function Header() {
           },
         ]}>
         <User size={24} color={colors.textPrimary} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)/member/chat')}
+        style={[
+          styles.profileButton,
+          {
+            backgroundColor: colors.surface,
+            marginLeft: 8,
+          },
+        ]}
+      >
+        <MessageCircle size={24} color={colors.primary} />
       </TouchableOpacity>
     </View>
   );
