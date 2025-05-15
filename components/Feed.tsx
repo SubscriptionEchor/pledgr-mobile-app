@@ -8,6 +8,8 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useTheme } from '@/hooks/useTheme';
+import { ShareModal } from './ShareModal';
+import { useDownload } from '@/lib/context/DownloadContext';
 
 // Add PollOption type
 type PollOption = {
@@ -537,9 +539,9 @@ const getFileTypeIcon = (fileName: string, colors: any): { icon: keyof typeof Fe
 
 // Update AttachmentsList component
 const AttachmentsList = ({ attachments }: { attachments: Attachment[] }) => {
-  const [expanded, setExpanded] = useState(false);
+  const { colors } = useTheme();
   const [downloading, setDownloading] = useState<Record<string, boolean>>({});
-  const displayAttachments = expanded ? attachments : attachments.slice(0, 3);
+  const displayAttachments = attachments;
 
   const handleDownload = async (attachment: Attachment) => {
     try {
@@ -566,25 +568,10 @@ const AttachmentsList = ({ attachments }: { attachments: Attachment[] }) => {
         <Text style={styles.attachmentsTitle}>
           Attachments ({attachments.length})
         </Text>
-        {attachments.length > 3 && (
-          <TouchableOpacity 
-            style={styles.expandButton}
-            onPress={() => setExpanded(!expanded)}
-          >
-            <Text style={styles.expandButtonText}>
-              {expanded ? 'Show Less' : `Show ${attachments.length - 3} More`}
-            </Text>
-            <Feather 
-              name={expanded ? "chevron-up" : "chevron-down"} 
-              size={16} 
-              color="#3B82F6" 
-            />
-          </TouchableOpacity>
-        )}
       </View>
       <View style={styles.attachmentsList}>
         {displayAttachments.map((attachment) => {
-          const fileType = getFileTypeIcon(attachment.name);
+          const fileType = getFileTypeIcon(attachment.name, colors);
           const isDownloading = downloading[attachment.id];
           
           return (
@@ -624,7 +611,7 @@ const AttachmentsList = ({ attachments }: { attachments: Attachment[] }) => {
 };
 
 export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.ReactElement | null }) => {
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [showMenu, setShowMenu] = useState<{ visible: boolean; x: number; y: number } | null>(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportPostAuthor, setReportPostAuthor] = useState<string>('');
   const [reportPostId, setReportPostId] = useState<string>('');
@@ -632,8 +619,6 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
   const [blockUserName, setBlockUserName] = useState<string>('');
   const [blockUserId, setBlockUserId] = useState<string>('');
   const [selectedVideo, setSelectedVideo] = useState<{ id: string; videoId: string } | null>(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(100)).current;
   const [currentAudio, setCurrentAudio] = useState<{ id: string; sound: Audio.Sound | null } | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
@@ -653,6 +638,11 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<{ id: string; isReply: boolean } | null>(null);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [unlockedPosts, setUnlockedPosts] = useState<Record<string, boolean>>({});
+  const [currentModalPost, setCurrentModalPost] = useState<any | null>(null);
+  const [showAttachmentsForPost, setShowAttachmentsForPost] = useState<string | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const { downloadItem, isDownloading, downloadProgress } = useDownload();
+  const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Initialize audio
@@ -696,45 +686,10 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
     };
   }, [currentAudio]);
 
-  const handleOpenModal = () => {
-    setModalVisible(true);
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      })
-    ]).start();
-  };
-
-  const handleCloseModal = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 100,
-        duration: 200,
-        useNativeDriver: true,
-      })
-    ]).start(() => {
-      setModalVisible(false);
-    });
-  };
-
   const handleReportPress = (post: any) => {
     setReportPostAuthor(post.creator.name);
     setReportPostId(post.id);
     setShowReportModal(true);
-    handleCloseModal();
   };
 
   const handleReportSubmit = (reason: string, description?: string) => {
@@ -749,7 +704,6 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
     setBlockUserName(post.creator.name);
     setBlockUserId(post.id);
     setShowBlockModal(true);
-    handleCloseModal();
   };
 
   const handleBlockSubmit = (reason: string, description?: string) => {
@@ -764,7 +718,7 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
     try {
       setAudioError(null);
       
-      if (currentAudio?.id === item.id) {
+      if (currentAudio && currentAudio.id === item.id) {
         const sound = currentAudio.sound;
         if (!sound) return;
 
@@ -1007,52 +961,104 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
     }));
   };
 
-  const renderModal = () => (
-    <Modal
-      visible={isModalVisible}
-      transparent={true}
-      onRequestClose={handleCloseModal}
-      animationType="slide"
-    >
-      <Pressable 
-        style={styles.modalOverlay} 
-        onPress={handleCloseModal}
-      >
-        <Animated.View 
-          style={[
-            styles.modalContent,
-            {
-              transform: [{ translateY: slideAnim }]
-            }
-          ]}
-        >
-          <TouchableOpacity 
-            style={styles.modalOption} 
-            onPress={() => {
-              handleReportPress(currentModalPost);
-              handleCloseModal();
-            }}
-          >
-            <Feather name="flag" size={24} color="#EF4444" />
-            <Text style={[styles.modalOptionText, { color: '#EF4444' }]}>Report post</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.modalOption} 
-            onPress={() => {
-              handleBlockPress(currentModalPost);
-              handleCloseModal();
-            }}
-          >
-            <Feather name="user-x" size={24} color="#18181B" />
-            <Text style={styles.modalOptionText}>Block</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </Pressable>
-    </Modal>
-  );
+  const handleDownload = async (post: any) => {
+    if (post.type === 'audio' && post.audioUrl) {
+      await downloadItem({
+        id: `audio_${post.id}`,
+        postId: post.id,
+        type: 'audio',
+        url: post.audioUrl,
+        name: post.title,
+        size: post.duration,
+        creator: {
+          name: post.creator.name,
+          avatar: post.creator.avatar,
+          verified: post.creator.verified
+        }
+      });
+    } else if (post.type === 'image' && post.images?.length > 0) {
+      for (const imageUrl of post.images) {
+        await downloadItem({
+          id: `image_${post.id}_${imageUrl}`,
+          postId: post.id,
+          type: 'image',
+          url: imageUrl,
+          name: `${post.title}_${post.images.indexOf(imageUrl) + 1}`,
+          thumbnail: imageUrl,
+          creator: {
+            name: post.creator.name,
+            avatar: post.creator.avatar,
+            verified: post.creator.verified
+          }
+        });
+      }
+    }
+  };
 
-  // Track which post's menu is open
-  const [currentModalPost, setCurrentModalPost] = useState<any | null>(null);
+  const renderMenu = () => {
+    if (!showMenu) return null;
+
+    const hasDownloadableContent = currentModalPost?.type === 'audio' || 
+      (currentModalPost?.type === 'image' && currentModalPost?.images?.length > 0);
+
+    return (
+      <Modal
+        visible={showMenu.visible}
+        transparent={true}
+        onRequestClose={() => setShowMenu(null)}
+        animationType="none"
+      >
+        <Pressable 
+          style={styles.menuOverlay} 
+          onPress={() => setShowMenu(null)}
+        >
+          <View 
+            style={[
+              styles.menuContent,
+              {
+                position: 'absolute',
+                top: showMenu.y,
+                right: 16,
+              }
+            ]}
+          >
+            {hasDownloadableContent && (
+              <TouchableOpacity 
+                style={styles.menuOption} 
+                onPress={() => {
+                  handleDownload(currentModalPost);
+                  setShowMenu(null);
+                }}
+              >
+                <Feather name="download" size={20} color="#3B82F6" />
+                <Text style={[styles.menuOptionText, { color: '#3B82F6' }]}>Download</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity 
+              style={styles.menuOption} 
+              onPress={() => {
+                handleReportPress(currentModalPost);
+                setShowMenu(null);
+              }}
+            >
+              <Feather name="flag" size={20} color="#EF4444" />
+              <Text style={[styles.menuOptionText, { color: '#EF4444' }]}>Report post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.menuOption} 
+              onPress={() => {
+                handleBlockPress(currentModalPost);
+                setShowMenu(null);
+              }}
+            >
+              <Feather name="user-x" size={20} color="#18181B" />
+              <Text style={styles.menuOptionText}>Block</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
+    );
+  };
 
   function renderPostContent(item: any) {
     const handleVideoPress = (videoUrl: string) => {
@@ -1077,12 +1083,29 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
 
     const renderContent = () => {
       switch (item.type) {
-        case 'text':
+        case 'text': {
+          const charLimit = 180;
+          const isExpanded = expandedPosts[item.id];
+          const shouldTruncate = item.content.length > charLimit;
+          const displayContent = !shouldTruncate || isExpanded
+            ? item.content
+            : item.content.slice(0, charLimit) + '...';
           return (
             <View style={styles.textContent}>
-              <Text style={styles.content}>{item.content}</Text>
+              <Text style={styles.content}>{displayContent}</Text>
+              {shouldTruncate && (
+                <TouchableOpacity
+                  onPress={() => setExpandedPosts(prev => ({ ...prev, [item.id]: !isExpanded }))}
+                  style={{ marginTop: 4 }}
+                >
+                  <Text style={{ color: '#3B82F6', fontWeight: '600' }}>
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           );
+        }
         case 'audio':
           const isCurrentAudio = currentAudio?.id === item.id;
           return (
@@ -1226,14 +1249,7 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
       }
     };
 
-    return (
-      <>
-        {renderLockedContent(renderContent(), item.id)}
-        {item.attachments && item.attachments.length > 0 && (
-          <AttachmentsList attachments={item.attachments} />
-        )}
-      </>
-    );
+    return renderLockedContent(renderContent(), item.id);
   }
 
   return (
@@ -1243,9 +1259,6 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
         keyExtractor={item => item.id}
         contentContainerStyle={[styles.feedContainer]}
         renderItem={({ item }) => {
-          // Set current post ID when rendering
-          setCurrentPostId(item.id);
-          
           const isLiked = likedPosts[item.id];
           const postComments = comments[item.id] || [];
           const isCommentsVisible = showComments[item.id];
@@ -1268,19 +1281,37 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
                   <Text style={styles.timeText}>{item.time}</Text>
                 </View>
                 <View style={{ flex: 1 }} />
-                <TouchableOpacity onPress={() => { setCurrentModalPost(item); handleOpenModal(); }}>
+                <TouchableOpacity 
+                  onPress={(event) => {
+                    const { pageY } = event.nativeEvent;
+                    setCurrentModalPost(item);
+                    setShowMenu({ visible: true, x: 0, y: pageY });
+                  }}
+                >
                   <Feather name="more-vertical" size={20} color="#A1A1AA" />
                 </TouchableOpacity>
               </View>
 
               {/* Title */}
-              <Text style={styles.title}>{item.title}</Text>
+              <Text style={[styles.title, { marginLeft: 56 }]}>{item.title}</Text>
 
               {/* Content (type-based) */}
-              {renderPostContent(item)}
+              <View style={{ marginLeft: 56 }}>
+                {renderPostContent(item)}
+              </View>
+
+              {/* Attachments Button */}
+              {item.attachments && item.attachments.length > 0 && (
+                <TouchableOpacity
+                  style={{ alignSelf: 'flex-start', backgroundColor: '#F1F5F9', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, marginLeft: 56, marginBottom: 8 }}
+                  onPress={() => setShowAttachmentsForPost(item.id)}
+                >
+                  <Text style={{ color: '#3B82F6', fontWeight: '600' }}>Show Attachments ({item.attachments.length})</Text>
+                </TouchableOpacity>
+              )}
 
               {/* Footer */}
-              <View style={styles.footerRow}>
+              <View style={[styles.footerRow, { marginLeft: 56 }]}>
                 <TouchableOpacity 
                   style={styles.footerItem} 
                   onPress={() => handleLike(item.id)}
@@ -1305,15 +1336,18 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
                   <Feather name="message-circle" size={20} color="#52525B" />
                   <Text style={styles.footerText}>{formatCount(item.comments)}</Text>
                 </TouchableOpacity>
-                <View style={styles.footerItem}>
+                <TouchableOpacity
+                  style={styles.footerItem}
+                  onPress={() => setShowShareModal(true)}
+                >
                   <Feather name="share-2" size={20} color="#52525B" />
                   <Text style={styles.footerText}>{formatCount(item.shares)}</Text>
-                </View>
+                </TouchableOpacity>
               </View>
 
               {/* Comments Section */}
               {isCommentsVisible && (
-                <View style={styles.commentsSection}>
+                <View style={[styles.commentsSection, { marginTop: 16 }]}>
                   {/* Comments List */}
                   {postComments.map(comment => {
                     const isCommentLiked = likedComments[comment.id];
@@ -1532,7 +1566,7 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={ListHeaderComponent || null}
       />
-      {renderModal()}
+      {renderMenu()}
       <ReportPostModal
         visible={showReportModal}
         onClose={() => setShowReportModal(false)}
@@ -1586,6 +1620,41 @@ export const Feed = ({ ListHeaderComponent }: { ListHeaderComponent?: React.Reac
           </View>
         </View>
       </Modal>
+      {/* Attachments Bottom Sheet/Modal */}
+      <Modal
+        visible={!!showAttachmentsForPost}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAttachmentsForPost(null)}
+      >
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' }} onPress={() => setShowAttachmentsForPost(null)}>
+          <Pressable style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '60%' }} onPress={(e) => e.stopPropagation()}>
+            <TouchableOpacity style={{ alignSelf: 'flex-end', marginBottom: 8 }} onPress={() => setShowAttachmentsForPost(null)}>
+              <Text style={{ color: '#3B82F6', fontWeight: '600', fontSize: 16 }}>Close</Text>
+            </TouchableOpacity>
+            {showAttachmentsForPost && (
+              <AttachmentsList attachments={mockPosts.find(p => p.id === showAttachmentsForPost)?.attachments as Attachment[] || []} />
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+      <ShareModal
+        visible={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        onShare={(type) => {
+          // Implement your share logic here
+          if (type === 'copy') {
+            // Copy link to clipboard
+          } else if (type === 'twitter') {
+            // Share to Twitter
+          } else if (type === 'facebook') {
+            // Share to Facebook
+          } else if (type === 'whatsapp') {
+            // Share to WhatsApp
+          }
+          setShowShareModal(false);
+        }}
+      />
     </>
   );
 };
@@ -1601,7 +1670,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingVertical: 20,
     paddingHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   headerRow: {
     flexDirection: 'row',
@@ -1635,12 +1704,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     color: '#18181B',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   content: {
     color: '#18181B',
     fontSize: 16,
-    marginBottom: 18,
+    marginBottom: 8,
     lineHeight: 24,
   },
   audioPlayer: {
@@ -1730,7 +1799,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginTop: 8,
+    marginTop: 4,
     gap: 24,
   },
   footerItem: {
@@ -1816,7 +1885,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   textContent: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   errorText: {
     color: '#EF4444',
@@ -2322,5 +2391,35 @@ const styles = StyleSheet.create({
   },
   downloadButton: {
     padding: 8,
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  menuContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 8,
+    width: 200,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  menuOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  menuOptionText: {
+    marginLeft: 12,
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#18181B',
   },
 }); 

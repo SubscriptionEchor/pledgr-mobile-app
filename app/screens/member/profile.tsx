@@ -1,4 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ScrollView, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
@@ -9,8 +10,9 @@ import { showToast } from '@/components/Toast';
 import { useUserContext } from '@/lib/context/UserContext';
 import { useMemberSettings } from '@/hooks/useMemberSettings';
 import { useAuth } from '@/lib/context/AuthContext';
-import { Camera } from 'lucide-react-native';
+import { Camera, ChevronDown } from 'lucide-react-native';
 import { uploadImage } from '@/lib/utils/uploadImage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface User {
   id: string;
@@ -30,6 +32,8 @@ export default function ProfileScreen() {
   const { updateMemberSettings, fetchMemberSettings, isLoading: isSettingsLoading } = useMemberSettings();
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [pendingProfilePhoto, setPendingProfilePhoto] = useState<string | null>(null);
+  const [showImageActions, setShowImageActions] = useState(false);
   
   const [form, setForm] = useState({
     name: memberSettings?.profile.display_name || '',
@@ -37,6 +41,10 @@ export default function ProfileScreen() {
     state: locationInfo?.stateName || '',
     profilePhoto: memberSettings?.profile.profile_photo || '',
   });
+
+  // Track initial state for cancel
+  const [initialForm, setInitialForm] = useState(form);
+  const [initialProfilePhoto, setInitialProfilePhoto] = useState(form.profilePhoto);
 
   useEffect(() => {
     fetchMemberSettings();
@@ -81,20 +89,39 @@ export default function ProfileScreen() {
     }
   }, [form, memberSettings, locationInfo]);
 
+  useEffect(() => {
+    setInitialForm(form);
+    setInitialProfilePhoto(form.profilePhoto);
+  }, [memberSettings, locationInfo]);
+
+  // Determine if there are unsaved changes
+  const hasUnsavedChanges =
+    form.name !== initialForm.name ||
+    form.country !== initialForm.country ||
+    form.state !== initialForm.state ||
+    (pendingProfilePhoto !== null && pendingProfilePhoto !== initialProfilePhoto);
+
   const handleImageUpload = async () => {
     const imageUri = await uploadImage({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
     });
-
     if (!imageUri) return;
+    setPendingProfilePhoto(imageUri);
+    setShowImageActions(true);
+  };
 
-    // Store the image URI in form state instead of immediately uploading
-    setForm(prev => ({
-      ...prev,
-      profilePhoto: imageUri
-    }));
+  const handleImageSave = async () => {
+    setForm(prev => ({ ...prev, profilePhoto: pendingProfilePhoto || prev.profilePhoto }));
+    setPendingProfilePhoto(null);
+    setShowImageActions(false);
+    // Optionally, trigger save logic here or let user press the main Save button
+  };
+
+  const handleImageCancel = () => {
+    setPendingProfilePhoto(null);
+    setShowImageActions(false);
   };
 
   const generatePageUrl = (name: string) => {
@@ -126,6 +153,24 @@ export default function ProfileScreen() {
     if (form.country) {
       setShowStatePicker(true);
     }
+  };
+
+  // Save all changes
+  const handleSaveAll = async () => {
+    if (pendingProfilePhoto) {
+      setForm(prev => ({ ...prev, profilePhoto: pendingProfilePhoto }));
+      setPendingProfilePhoto(null);
+    }
+    setInitialForm(form);
+    setInitialProfilePhoto(pendingProfilePhoto || form.profilePhoto);
+    // Call your save logic here (existing handleSave)
+    await handleSave();
+  };
+
+  // Cancel all changes
+  const handleCancelAll = () => {
+    setForm(initialForm);
+    setPendingProfilePhoto(null);
   };
 
   const handleSave = async () => {
@@ -169,9 +214,28 @@ export default function ProfileScreen() {
     return country?.iso2;
   };
 
+  // Split name into first and last for display
+  const [firstName, ...lastNameArr] = form.name.split(' ');
+  const lastName = lastNameArr.join(' ');
+  // Get username and email safely
+  const username = memberSettings && memberSettings.profile && 'username' in memberSettings.profile ? memberSettings.profile.username : '';
+  const email = memberSettings && memberSettings.profile && 'email' in memberSettings.profile ? memberSettings.profile.email : '';
+  const emailInitial = email ? email[0].toUpperCase() : '';
+
+  // Get theme values
+  const avatarBg = colors.surface;
+  const avatarInitialColor = colors.primary;
+  const avatarBorder = colors.background;
+  const labelColor = colors.textSecondary;
+  const valueColor = colors.textPrimary;
+  const fieldLabelFont = fonts.regular;
+  const fieldValueFont = fonts.medium;
+  const fieldLabelSize = fontSize.md;
+  const fieldValueSize = fontSize.lg;
+
   if (isContextLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <SubHeader title="Profile" />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -188,175 +252,257 @@ export default function ProfileScreen() {
             Loading profile...
           </Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <SubHeader title="Profile" />
-      {isSaving && (
-        <View style={styles.updatingOverlay}>
-          <View style={[styles.updatingContainer, { backgroundColor: colors.surface }]}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={[
-              styles.updatingText,
-              {
-                color: colors.textPrimary,
-                fontFamily: fonts.medium,
-                fontSize: fontSize.sm,
-                includeFontPadding: false,
-                marginLeft: 8
-              }
-            ]}>
-              Saving changes...
-            </Text>
-          </View>
-        </View>
-      )}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.keyboardAvoidingView}
-      >
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <View style={styles.content}>
-            <View style={styles.imageSection}>
-              <View style={[styles.imageContainer, { backgroundColor: colors.surface }]}>
-                <Image
-                  source={{ uri: form.profilePhoto }}
-                  style={styles.profileImage}
-                />
-                <TouchableOpacity
-                  onPress={handleImageUpload}
-                  style={[styles.uploadButton, { backgroundColor: colors.primary }]}>
-                  <Camera size={20} color={colors.buttonText} />
-                </TouchableOpacity>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
+        {/* Cover and avatar */}
+        <LinearGradient
+          colors={[colors.primary, colors.primaryLight]}
+          style={[styles.headerBg, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}
+        >
+          <View style={styles.avatarContainer}>
+            {(pendingProfilePhoto || form.profilePhoto) ? (
+              <Image
+                source={{ uri: pendingProfilePhoto || form.profilePhoto }}
+                style={[styles.avatar, { borderColor: avatarBorder }]}
+              />
+            ) : (
+              <View style={[styles.avatarDefault, { backgroundColor: avatarBg, borderColor: avatarBorder }] }>
+                <Text style={[styles.avatarInitial, { color: avatarInitialColor, fontFamily: fonts.bold, fontSize: 48 }]}>{emailInitial}</Text>
               </View>
-            </View>
-
-            <View style={styles.formSection}>
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
-                  Name
-                </Text>
-                <TextInput
-                  value={form.name}
-                  onChangeText={handlePageNameChange}
-                  placeholder="Enter your name"
-                  placeholderTextColor={colors.textSecondary}
-                  style={[
-                    styles.input,
-                    {
-                      backgroundColor: colors.surface,
-                      color: colors.textPrimary,
-                      fontFamily: fonts.regular
-                    }
-                  ]}
-                  editable={!isSaving}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
-                  Country of residence
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setShowCountryPicker(true)}
-                  style={[
-                    styles.input,
-                    styles.countrySelector,
-                    { backgroundColor: colors.surface }
-                  ]}
-                  disabled={isSaving}>
-                  <Text style={[
-                    styles.countryText,
-                    {
-                      color: form.country ? colors.textPrimary : colors.textSecondary,
-                      fontFamily: fonts.regular
-                    }
-                  ]}>
-                    {form.country || 'Select a country'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
-                  State/Province
-                </Text>
-                <TouchableOpacity
-                  onPress={() => handleStatePickerOpen()}
-                  style={[
-                    styles.input,
-                    styles.countrySelector,
-                    { 
-                      backgroundColor: colors.surface,
-                      opacity: !form.country ? 0.5 : 1 
-                    }
-                  ]}
-                  disabled={isSaving || !form.country}>
-                  <Text style={[
-                    styles.countryText,
-                    {
-                      color: form.state ? colors.textPrimary : colors.textSecondary,
-                      fontFamily: fonts.regular
-                    }
-                  ]}>
-                    {form.state || 'Select a state'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.saveButton,
-                {
-                  backgroundColor: colors.primary,
-                  opacity: (!hasChanges || isSaving) ? 0.5 : 1
-                }
-              ]}
-              onPress={handleSave}
-              disabled={!hasChanges || isSaving}>
-              {isSaving ? (
-                <ActivityIndicator color={colors.buttonText} />
-              ) : (
-                <Text style={[
-                  styles.saveButtonText,
-                  {
-                    color: colors.buttonText,
-                    fontFamily: fonts.semibold,
-                    fontSize: fontSize.md
-                  }
-                ]}>
-                  Save Changes
-                </Text>
-              )}
+            )}
+            <TouchableOpacity style={[styles.avatarCameraBtn, { backgroundColor: colors.primary }]} onPress={handleImageUpload}>
+              <Camera size={24} color={colors.buttonText} />
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-
+          {showImageActions && (
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 16 }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.primary,
+                  paddingHorizontal: 24,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                  marginRight: 12,
+                }}
+                onPress={handleImageSave}
+              >
+                <Text style={{ color: colors.buttonText, fontFamily: fonts.bold, fontSize: fontSize.md }}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.surface,
+                  paddingHorizontal: 24,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+                onPress={handleImageCancel}
+              >
+                <Text style={{ color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.md }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </LinearGradient>
+        {/* Profile fields */}
+        <View style={[styles.content, { marginTop: 40 }]}>
+          {/* Name field with character limit */}
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: labelColor, fontFamily: fieldLabelFont, fontSize: fieldLabelSize, marginBottom: 6 }]}>Name</Text>
+            <TextInput
+              value={form.name}
+              onChangeText={text => {
+                if (text.length <= 30) setForm(prev => ({ ...prev, name: text }));
+              }}
+              placeholder="Enter your name"
+              placeholderTextColor={labelColor}
+              style={[
+                styles.input,
+                { color: valueColor, fontFamily: fieldValueFont, fontSize: fieldValueSize, backgroundColor: colors.surface }
+              ]}
+              maxLength={30}
+            />
+            <Text style={{ color: labelColor, fontFamily: fieldLabelFont, fontSize: fontSize.sm, alignSelf: 'flex-end' }}>{form.name.length}/30</Text>
+          </View>
+          {/* Email field (read-only) */}
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: labelColor, fontFamily: fieldLabelFont, fontSize: fieldLabelSize, marginBottom: 6 }]}>Email</Text>
+            <View style={[
+              styles.input,
+              { backgroundColor: colors.surface, justifyContent: 'center' }
+            ]}>
+              <Text style={{ color: valueColor, fontFamily: fieldValueFont, fontSize: fieldValueSize }}>{email}</Text>
+            </View>
+          </View>
+          {/* Country picker */}
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: labelColor, fontFamily: fieldLabelFont, fontSize: fieldLabelSize, marginBottom: 6 }]}>Country</Text>
+            <TouchableOpacity
+              style={[
+                styles.input,
+                { backgroundColor: colors.surface, flexDirection: 'row', alignItems: 'center', paddingRight: 8 }
+              ]}
+              onPress={() => setShowCountryPicker(true)}
+            >
+              <Text style={{ color: form.country ? valueColor : labelColor, fontFamily: fieldValueFont, fontSize: fieldValueSize, flex: 1 }}>
+                {form.country || 'Select country'}
+              </Text>
+              <ChevronDown size={20} color={labelColor} />
+            </TouchableOpacity>
+          </View>
+          {/* State/Province picker */}
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: labelColor, fontFamily: fieldLabelFont, fontSize: fieldLabelSize, marginBottom: 6 }]}>State/Province</Text>
+            <TouchableOpacity
+              style={[
+                styles.input,
+                { backgroundColor: colors.surface, flexDirection: 'row', alignItems: 'center', opacity: form.country ? 1 : 0.5, paddingRight: 8 }
+              ]}
+              onPress={form.country ? () => setShowStatePicker(true) : undefined}
+              disabled={!form.country}
+            >
+              <Text style={{ color: form.state ? valueColor : labelColor, fontFamily: fieldValueFont, fontSize: fieldValueSize, flex: 1 }}>
+                {form.state || 'Select state'}
+              </Text>
+              <ChevronDown size={20} color={labelColor} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Save/Cancel at bottom if there are unsaved changes */}
+        {hasUnsavedChanges && (
+          <View style={{ flexDirection: 'row', marginTop: 32, marginBottom: 16, paddingHorizontal: 20, gap: 16 }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: colors.primary,
+                paddingVertical: 16,
+                borderRadius: 8,
+                flex: 1,
+                alignItems: 'center',
+              }}
+              onPress={handleSaveAll}
+            >
+              <Text style={{ color: colors.buttonText, fontFamily: fonts.bold, fontSize: fontSize.md }}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                backgroundColor: colors.surface,
+                paddingVertical: 16,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: colors.border,
+                flex: 1,
+                alignItems: 'center',
+              }}
+              onPress={handleCancelAll}
+            >
+              <Text style={{ color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.md }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+      {/* Country and State pickers */}
       <CountryPicker
         visible={showCountryPicker}
         onClose={() => setShowCountryPicker(false)}
-        onSelect={handleCountrySelect}
+        onSelect={country => {
+          setForm(prev => ({ ...prev, country, state: '' }));
+          setShowCountryPicker(false);
+        }}
       />
-
       <StatePicker
         visible={showStatePicker}
         onClose={() => setShowStatePicker(false)}
-        onSelect={handleStateSelect}
+        onSelect={state => {
+          setForm(prev => ({ ...prev, state }));
+          setShowStatePicker(false);
+        }}
         countryCode={getCountryCode(form.country)}
         selectedState={form.state}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  headerBg: {
+    height: 220,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  headerCameraBtn: {
+    position: 'absolute',
+    top: 32,
+    right: 24,
+    backgroundColor: '#000',
+    borderRadius: 24,
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginTop: 32,
+    marginBottom: -48,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+  avatarDefault: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitial: {
+    // fontSize, color, fontFamily set inline
+  },
+  avatarCameraBtn: {
+    position: 'absolute',
+    bottom: 0,
+    right: -8,
+    borderRadius: 24,
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  fieldsContainer: {
+    marginTop: 32,
+    paddingHorizontal: 32,
+  },
+  fieldGroup: {
+    marginBottom: 28,
+  },
+  fieldLabel: {
+    flex: 1,
+    // color, fontFamily, fontSize set inline
+  },
+  fieldValue: {
+    flex: 2,
+    textAlign: 'left',
+    // color, fontFamily, fontSize set inline
   },
   loadingContainer: {
     flex: 1,
@@ -401,7 +547,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    gap: 32,
+    gap: 0,
   },
   imageSection: {
     alignItems: 'center',

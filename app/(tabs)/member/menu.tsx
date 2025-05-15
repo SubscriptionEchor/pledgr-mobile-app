@@ -1,219 +1,171 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
-import { Bell, Settings, CircleHelp as HelpCircle, Download, History, Heart, Wallet, UserX, ChevronRight, MapPin, Gift, Info, HelpCircle as HelpCircleIcon, LogOut, Facebook, Instagram, X as XIcon, Home as HomeIcon, CreditCard, FileText, Crown } from 'lucide-react-native';
+import { ChevronLeft, Wifi, Fingerprint, PlayCircle, Circle, Flag, MessageCircle, HelpCircle, Shield, ChevronDown, ChevronUp, FileText, Lock, Info, Users, CreditCard, Crown, Gift, UserX, Settings, LogOut, User, Globe } from 'lucide-react-native';
+import { useState } from 'react';
 
-const MENU_ITEMS = [
-    {
-        id: 'settings',
-        icon: Settings,
-        label: 'Settings',
-        description: '',
-    },
-    {
-        id: 'memberships',
-        icon: Crown,
-        label: 'Memberships',
-        description: '',
-    },
-    {
-        id: 'referral',
-        icon: Gift,
-        label: 'Referral',
-        description: '',
-    },
-    {
-        id: 'blocked',
-        icon: UserX,
-        label: 'Blocked users',
-        description: '',
-    },
+const SETTINGS_ITEMS = [
+  { id: 'profile', icon: User, label: 'Profile' },
+  { id: 'memberships', icon: Crown, label: 'Memberships' },
+  { id: 'preferences', icon: Globe, label: 'Preferences' },
+  { id: 'security', icon: Shield, label: 'Security' },
+  { id: 'referral', icon: Gift, label: 'Referral' },
+  { id: 'blocked', icon: UserX, label: 'Blocked users' },
+  { id: 'help', icon: HelpCircle, label: 'Help' },
 ];
 
-const SECONDARY_LINKS = [
-    { id: 'help-faq', label: 'Help & FAQ', icon: HelpCircle },
-    { id: 'feature-request', label: 'Feature Request', icon: Info },
-    { id: 'privacy-policy', label: 'Privacy Policy', icon: Info },
-    { id: 'terms', label: 'Terms of Service', icon: Info },
+const TERMS_ITEMS = [
+  { id: 'terms', label: 'Terms of Service', icon: FileText },
+  { id: 'privacy', label: 'Privacy Policy', icon: Lock },
+  { id: 'manage-privacy', label: 'Manage account privacy', icon: Users },
 ];
 
-const POINTS = 506;
-const MEMBER_STATUS = 'MEMBER';
-const MEMBER_YEAR = '2025-2026 STATUS';
-const USER_NAME = 'ALEX!';
-const USER_EMAIL = 'alex@email.com';
-const USER_AVATAR = 'https://randomuser.me/api/portraits/men/22.jpg';
-const APP_QUOTE = 'Welcome to Pledgr! Empowering your giving journey.';
+export default function SettingsScreen() {
+  const { colors, fonts, fontSize } = useTheme();
+  const router = useRouter();
+  const [termsOpen, setTermsOpen] = useState(true);
 
-export default function MenuScreen() {
-    const { colors, fonts, fontSize } = useTheme();
-    const router = useRouter();
+  const handleBack = () => router.back();
 
-    // Navigation handlers for menu items
-    const handleMenuPress = (id: string) => {
-        switch (id) {
-            case 'settings':
-                router.push('/screens/member/settings');
-                break;
-            case 'memberships':
-                router.push('/(tabs)/member/membership');
-                break;
-            case 'referral':
-                router.push('/screens/member/referral');
-                break;
-            case 'blocked':
-                router.push('/screens/member/blocked-users');
-                break;
-            default:
-                break;
-        }
-    };
+  const handleSettingPress = (id: string) => {
+    switch (id) {
+      case 'security':
+        router.push('/screens/member/security');
+        break;
+      case 'profile':
+        router.push('/screens/member/profile');
+        break;
+      case 'memberships':
+        router.push('/screens/member/subscription');
+        break;
+      case 'preferences':
+        router.push('/screens/member/preferences');
+        break;
+      case 'referral':
+        router.push('/screens/member/referral');
+        break;
+      case 'blocked':
+        router.push('/screens/member/blocked-users');
+        break;
+      case 'help':
+        router.push('/screens/member/help');
+        break;
+      default:
+        break;
+    }
+  };
 
-    const handleSecondaryLinkPress = (id: string) => {
-        switch (id) {
-            case 'help-faq':
-                // TODO: Create help & faq screen
-                router.push('/screens/member/placeholder');
-                break;
-            case 'feature-request':
-                router.push('/screens/member/feature-request');
-                break;
-            case 'privacy-policy':
-                router.push('/screens/common/privacy');
-                break;
-            case 'terms':
-                router.push('/screens/common/terms');
-                break;
-            default:
-                break;
-        }
-    };
+  const handleTermsPress = (id: string) => {
+    // TODO: Implement navigation for each terms/privacy item
+  };
 
-    return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
-            {/* Top Section */}
-            <View style={[styles.topSection, { backgroundColor: colors.primary }]}> 
-                <Text style={{ color: colors.buttonText, fontFamily: fonts.regular, fontSize: fontSize.md, marginTop: 8, marginBottom: 8, textAlign: 'center' }}>{APP_QUOTE}</Text>
-                <View style={[styles.profileCard, { backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1, shadowColor: colors.textPrimary }]}> 
-                    <Image source={{ uri: USER_AVATAR }} style={styles.profileAvatar} />
-                    <View style={{ flex: 1, marginLeft: 16 }}>
-                        <Text style={{ color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.lg }}>{USER_NAME}</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                            <Text style={{ color: colors.textPrimary, fontFamily: fonts.regular, fontSize: fontSize.md }}>{USER_EMAIL}</Text>
-                            <TouchableOpacity style={styles.editBtn}>
-                                <Text style={{ color: colors.primaryDark, fontFamily: fonts.bold, fontSize: fontSize.md, marginLeft: 8 }}>Edit</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+          <ChevronLeft size={28} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.xl }]}>Settings</Text>
+        <View style={{ width: 40 }} />
+      </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Settings List */}
+        <View style={styles.section}>
+          {SETTINGS_ITEMS.map((item, idx) => (
+            <View key={item.id}>
+              <TouchableOpacity style={styles.row} onPress={() => handleSettingPress(item.id)}>
+                <item.icon size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
+                <Text style={{ color: colors.textPrimary, fontFamily: fonts.regular, fontSize: fontSize.lg, flex: 1 }}>{item.label}</Text>
+              </TouchableOpacity>
+              <View style={styles.divider} />
             </View>
-
-            {/* Menu List */}
-            <View style={[styles.menuCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-                {MENU_ITEMS.map((item, idx) => (
-                    <TouchableOpacity key={item.id} style={[styles.menuItemRow, idx === MENU_ITEMS.length - 1 ? { borderBottomWidth: 0 } : {}]} onPress={() => handleMenuPress(item.id)}>
-                        <item.icon size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
-                        <Text style={{ color: colors.textPrimary, fontFamily: fonts.semibold, fontSize: fontSize.lg, flex: 1 }}>{item.label}</Text>
-                        <ChevronRight size={22} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                ))}
+          ))}
+        </View>
+        {/* Terms and Privacy Collapsible */}
+        <View style={styles.section}>
+          <TouchableOpacity style={styles.row} onPress={() => setTermsOpen(!termsOpen)}>
+            <Shield size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
+            <Text style={{ color: colors.textPrimary, fontFamily: fonts.regular, fontSize: fontSize.lg, flex: 1 }}>Terms and Privacy</Text>
+            {termsOpen ? <ChevronUp size={22} color={colors.textSecondary} /> : <ChevronDown size={22} color={colors.textSecondary} />}
+          </TouchableOpacity>
+          {termsOpen && (
+            <View style={styles.termsSection}>
+              {TERMS_ITEMS.map((item, idx) => (
+                <TouchableOpacity key={item.id} style={styles.termsRow} onPress={() => handleTermsPress(item.id)}>
+                  <Text style={{ color: colors.textSecondary, fontFamily: fonts.regular, fontSize: fontSize.md }}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
-
-            {/* Secondary Links */}
-            <View style={styles.secondaryLinksPlain}>
-                {SECONDARY_LINKS.map((link, idx) => (
-                    <TouchableOpacity
-                        key={link.id}
-                        style={[styles.secondaryLinkPlain, idx !== SECONDARY_LINKS.length - 1 && { marginBottom: 10 }]}
-                        onPress={() => handleSecondaryLinkPress(link.id)}
-                        activeOpacity={0.7}
-                    >
-                        <Text style={{ color: colors.textSecondary, fontFamily: fonts.regular, fontSize: fontSize.md, textDecorationLine: 'underline' }}>{link.label}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
-            {/* Logout */}
-            <TouchableOpacity style={[styles.logoutRow, { marginTop: 32 }]}>
-                <LogOut size={22} color={colors.error} style={{ marginRight: 8 }} />
-                <Text style={{ color: colors.error, fontFamily: fonts.bold, fontSize: fontSize.md }}>Log out</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-    );
+          )}
+        </View>
+        {/* Sign Out Button */}
+        <TouchableOpacity style={styles.logoutRow} onPress={() => { /* TODO: Implement sign out */ }}>
+          <LogOut size={22} color={colors.error} style={{ marginRight: 8 }} />
+          <Text style={{ color: colors.error, fontFamily: fonts.bold, fontSize: fontSize.md }}>Sign out</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    topSection: {
-        paddingTop: 24,
-        paddingBottom: 24,
-        paddingHorizontal: 0,
-        alignItems: 'center',
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
-        marginBottom: 16,
-    },
-    profileCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 18,
-        padding: 18,
-        marginTop: 4,
-        width: '90%',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.10,
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    profileAvatar: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: '#eee',
-    },
-    editBtn: {
-        marginLeft: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 8,
-    },
-    menuCard: {
-        marginTop: 18,
-        marginHorizontal: 16,
-        borderRadius: 18,
-        borderWidth: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 2,
-        marginBottom: 18,
-    },
-    menuItemRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 18,
-        paddingHorizontal: 24,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-        backgroundColor: 'transparent',
-    },
-    logoutRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 8,
-        marginBottom: 16,
-    },
-    secondaryLinksPlain: {
-        marginHorizontal: 24,
-        marginBottom: 18,
-        marginTop: 8,
-    },
-    secondaryLinkPlain: {
-        paddingVertical: 2,
-    },
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+    marginBottom: 8,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  section: {
+    backgroundColor: 'transparent',
+    marginHorizontal: 0,
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    backgroundColor: 'transparent',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginLeft: 62,
+  },
+  termsSection: {
+    marginLeft: 62,
+    backgroundColor: 'transparent',
+  },
+  termsRow: {
+    paddingVertical: 12,
+  },
+  logoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+    paddingVertical: 14,
+    borderRadius: 8,
+  },
 });

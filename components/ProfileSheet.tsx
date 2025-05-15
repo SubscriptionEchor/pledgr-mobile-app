@@ -108,17 +108,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     }
   };
 
-  const handleSignOutConfirm = async () => {
-    try {
-      await logout();
-      setShowSignOutConfirmation(false);
-      onClose();
-      showToast.success('Signed out successfully', 'See you next time!');
-    } catch (error) {
-      showToast.error('Sign out failed', 'Please try again');
-    }
-  };
-
   const handleClose = () => {
     Animated.timing(translateY, {
       toValue: SCREEN_HEIGHT,
@@ -199,6 +188,17 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
     }
   };
 
+  const handleSignOutConfirm = async () => {
+    try {
+      await logout();
+      setShowSignOutConfirmation(false);
+      onClose();
+      showToast.success('Signed out successfully', 'See you next time!');
+    } catch (error) {
+      showToast.error('Sign out failed', 'Please try again');
+    }
+  };
+
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>
       <Pressable style={styles.backdrop} onPress={handleClose} />
@@ -275,13 +275,13 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 style={[styles.roleSwitcher, { backgroundColor: colors.surface }]}
                 onPress={() => setShowRoleDropdown(!showRoleDropdown)}>
                 <View style={styles.roleSwitcherContent}>
-                  <View style={[styles.roleIcon, { backgroundColor: `${colors.primary}15` }]}>
+                  <View style={[styles.roleIcon, { backgroundColor: `${colors.primary}30` }]}>
                     {currentUser.role === UserRole.CREATOR ? (
-                      <Crown size={20} color={colors.primary} />
+                      <Crown size={24} color={colors.primary} />
                     ) : currentUser.role === UserRole.CREATOR_ASSOCIATE ? (
-                      <Users size={20} color={colors.primary} />
+                      <Users size={24} color={colors.primary} />
                     ) : (
-                      <Sparkles size={20} color={colors.primary} />
+                      <Sparkles size={24} color={colors.primary} />
                     )}
                   </View>
                   <Text style={[
@@ -308,12 +308,24 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       key={option.id}
                       style={[
                         styles.roleOption,
-                        currentUser.role === option.id && { backgroundColor: `${colors.primary}15` }
+                        currentUser.role === option.id && { backgroundColor: `${colors.primary}20` }
                       ]}
                       onPress={() => handleRoleSelect(option)}>
                       <View style={styles.roleOptionContent}>
-                        <View style={[styles.roleIcon, { backgroundColor: `${option.color}15` }]}>
-                          <option.icon size={20} color={option.color} />
+                        <View style={[
+                          styles.roleIcon, 
+                          { 
+                            backgroundColor: currentUser.role === option.id 
+                              ? `${colors.primary}40` 
+                              : `${colors.primary}20`
+                          }
+                        ]}>
+                          <option.icon 
+                            size={24} 
+                            color={currentUser.role === option.id 
+                              ? colors.primary 
+                              : colors.textSecondary} 
+                          />
                         </View>
                         <View style={styles.roleText}>
                           <Text style={[
@@ -467,32 +479,6 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {!isCreatorAssociate && (
-              <TouchableOpacity
-                style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-                onPress={() => handleNavigation('settings')}>
-                <View style={styles.settingsContent}>
-                  <View style={[styles.settingsIcon, { backgroundColor: `${colors.primary}15` }]}>
-                    <Settings size={20} color={colors.primary} />
-                  </View>
-                  <Text style={[
-                    styles.settingsText,
-                    {
-                      color: colors.textPrimary,
-                      fontFamily: fonts.medium,
-                      fontSize: fontSize.md,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    Settings
-                  </Text>
-                </View>
-                <View style={styles.chevronContainer}>
-                  <ChevronRight size={20} color={colors.textSecondary} />
-                </View>
-              </TouchableOpacity>
-            )}
 
             <TouchableOpacity
               style={[styles.signOutButton, { backgroundColor: `${colors.error}15` }]}
@@ -691,35 +677,6 @@ const styles = StyleSheet.create({
   themeText: {
     fontSize: 15,
     fontWeight: '600',
-  },
-  settingsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
-  },
-  settingsContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  settingsIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  settingsText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  chevronContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   signOutButton: {
     flexDirection: 'row',

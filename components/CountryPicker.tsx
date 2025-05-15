@@ -67,7 +67,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
             styles.countryItem,
             { 
               borderBottomColor: colors.border,
-              backgroundColor: `${colors.primary}15`,
+              backgroundColor: `${colors.primary}20`,
               marginTop: 8,
             }
           ]}
@@ -193,7 +193,7 @@ export function CountryPicker({ visible, onClose, onSelect, selectedCountry }: C
                       styles.countryItem,
                       { 
                         borderBottomColor: colors.border,
-                        backgroundColor: isSelected ? `${colors.primary}15` : 'transparent'
+                        backgroundColor: isSelected ? `${colors.primary}20` : 'transparent'
                       }
                     ]}
                     onPress={() => handleSelect(item)}>

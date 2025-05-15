@@ -10,6 +10,7 @@ import { BottomSheetProvider } from '@/lib/context/BottomSheetContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { ProfileSheetProvider } from '@/lib/context/ProfileSheetContext';
 import { UserProvider } from '@/lib/context/UserContext';
+import { DownloadProvider } from '@/lib/context/DownloadContext';
 import * as SplashScreen from 'expo-splash-screen';
 
 // Keep the splash screen visible while we fetch resources
@@ -42,7 +43,9 @@ export default function RootLayout() {
         <UserProvider>
           <BottomSheetProvider>
             <ProfileSheetProvider>
-              <RootLayoutContent />
+              <DownloadProvider>
+                <RootLayoutContent />
+              </DownloadProvider>
             </ProfileSheetProvider>
           </BottomSheetProvider>
         </UserProvider>

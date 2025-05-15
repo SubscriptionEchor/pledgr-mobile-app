@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { User, MessageCircle } from 'lucide-react-native';
+import { User, MessageCircle, Bell } from 'lucide-react-native';
 import { useProfileSheet } from '@/lib/context/ProfileSheetContext';
 import { useRouter } from 'expo-router';
 
@@ -12,6 +12,14 @@ export function Header() {
   const logoSource = isDark
     ? require('../assets/images/pledgr-light.png')
     : require('../assets/images/pledgr-dark.png');
+
+  const handleChatPress = () => {
+    router.push('/(tabs)/member/chat');
+  };
+
+  const handleNotificationPress = () => {
+    router.push('/(tabs)/member/notifications');
+  };
 
   return (
     <View
@@ -30,28 +38,38 @@ export function Header() {
           resizeMode="contain"
         />
       </View>
-      <TouchableOpacity
-        onPress={showProfileSheet}
-        style={[
-          styles.profileButton,
-          {
-            backgroundColor: colors.surface,
-          },
-        ]}>
-        <User size={24} color={colors.textPrimary} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => router.push('/(tabs)/member/chat')}
-        style={[
-          styles.profileButton,
-          {
-            backgroundColor: colors.surface,
-            marginLeft: 8,
-          },
-        ]}
-      >
-        <MessageCircle size={24} color={colors.primary} />
-      </TouchableOpacity>
+      <View style={styles.rightContainer}>
+        <TouchableOpacity
+          onPress={handleChatPress}
+          style={[
+            styles.iconButton,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}>
+          <MessageCircle size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleNotificationPress}
+          style={[
+            styles.iconButton,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}>
+          <Bell size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={showProfileSheet}
+          style={[
+            styles.iconButton,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}>
+          <User size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -75,16 +93,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   logoImage: {
     height: 32,
     width: 110,
   },
-  profileButton: {
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 16,
   },
 });

@@ -96,7 +96,7 @@ export function StatePicker({ visible, onClose, onSelect, countryCode, selectedS
             styles.stateItem,
             { 
               borderBottomColor: colors.border,
-              backgroundColor: `${colors.primary}15`,
+              backgroundColor: `${colors.primary}20`,
               marginTop: 8,
             }
           ]}
@@ -210,7 +210,7 @@ export function StatePicker({ visible, onClose, onSelect, countryCode, selectedS
                       styles.stateItem,
                       { 
                         borderBottomColor: colors.border,
-                        backgroundColor: isSelected ? `${colors.primary}15` : 'transparent'
+                        backgroundColor: isSelected ? `${colors.primary}20` : 'transparent'
                       }
                     ]}
                     onPress={() => handleSelect(item)}>

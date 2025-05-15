@@ -108,11 +108,12 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
             styles.languageItem,
             { 
               borderBottomColor: colors.border,
-              backgroundColor: `${colors.primary}15`,
+              backgroundColor: `${colors.primary}20`,
               marginTop: 8,
             }
           ]}
-          onPress={() => handleSelect(selected)}>
+          onPress={() => handleSelect(selected)}
+          disabled={isLoading}>
           <Text style={[
             styles.languageName,
             {
@@ -225,7 +226,7 @@ export function LanguagePicker({ visible, onClose, onSelect, selectedCode }: Lan
                     styles.languageItem,
                     { 
                       borderBottomColor: colors.border,
-                      backgroundColor: isSelected ? `${colors.primary}15` : 'transparent'
+                      backgroundColor: isSelected ? `${colors.primary}20` : 'transparent'
                     }
                   ]}
                   onPress={() => handleSelect(language)}

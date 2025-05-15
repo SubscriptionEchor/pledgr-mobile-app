@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SubHeader } from '@/components/SubHeader';
 import { useTheme } from '@/hooks/useTheme';
-import { AlertCircle, Filter, ChevronDown, UserX } from 'lucide-react-native';
+import { AlertCircle, Filter, ChevronDown, UserX, Search, MoreVertical } from 'lucide-react-native';
+import { BlockedUsersFilterSheet } from '@/components/BlockedUsersFilterSheet';
 
 const MOCK_BLOCKED_USERS = [
   {
@@ -46,113 +47,180 @@ const MOCK_BLOCKED_USERS = [
 export default function BlockedUsersScreen() {
   const { colors, fonts, fontSize } = useTheme();
   const [search, setSearch] = useState('');
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [selectedReason, setSelectedReason] = useState('All reasons');
   const [sortNewest, setSortNewest] = useState(true);
   const [users, setUsers] = useState(MOCK_BLOCKED_USERS);
+  const [menuUserId, setMenuUserId] = useState<string | null>(null);
+  const [unblockModalUser, setUnblockModalUser] = useState<null | { id: string; name: string }>(null);
 
-  const filteredUsers = users.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase())
+  // Filter and sort users
+  let filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(search.toLowerCase()) &&
+    (selectedReason === 'All reasons' || (u.reason && u.reason.toLowerCase() === selectedReason.toLowerCase()))
   );
+  if (!sortNewest) {
+    filteredUsers = [...filteredUsers].reverse();
+  }
+
+  const handleUnblock = (userId: string, userName: string) => {
+    setUnblockModalUser({ id: userId, name: userName });
+    setMenuUserId(null);
+  };
+
+  const confirmUnblock = () => {
+    if (unblockModalUser) {
+      setUsers(prev => prev.filter(u => u.id !== unblockModalUser.id));
+      setUnblockModalUser(null);
+      // Show a themed toast or message here if you have a Toast component
+      // showToast.success('User unblocked', 'The user has been unblocked.');
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SubHeader title="Blocked Users" />
-      <View style={styles.infoBoxWrapper}>
-        <View style={[styles.infoBox, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <AlertCircle size={20} color={colors.primary} style={{ marginRight: 8 }} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.infoTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>About blocking users</Text>
-            <Text style={[styles.infoText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>When you block someone, they won't be able to follow you, view your content, or interact with you. They won't be notified that you've blocked them.</Text>
+      <SubHeader title="Blocked Users">
+        <View style={styles.subHeaderRow}> 
+          <View style={[styles.searchBox, { borderColor: colors.border, backgroundColor: colors.surface, flex: 1 }]}> 
+            <Search size={20} color={colors.textSecondary} style={{ marginRight: 8 }} />
+            <TextInput
+              placeholder="Search blocked users..."
+              placeholderTextColor={colors.textSecondary}
+              value={search}
+              onChangeText={setSearch}
+              style={{ flex: 1, height: '100%', color: colors.textPrimary, fontFamily: fonts.regular, fontSize: fontSize.md, paddingVertical: 0 }}
+              accessibilityLabel="Search blocked users"
+            />
           </View>
+          <TouchableOpacity
+            style={{ marginLeft: 12, borderRadius: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setFilterSheetOpen(true)}
+          >
+            <Filter size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.searchRow}>
-        <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <TextInput
-            placeholder="Search blocked users..."
-            placeholderTextColor={colors.textSecondary}
-            value={search}
-            onChangeText={setSearch}
-            style={{ flex: 1, color: colors.textPrimary, fontFamily: fonts.regular, fontSize: fontSize.md }}
-            accessibilityLabel="Search blocked users"
+      </SubHeader>
+      <View style={{ flex: 1 }}>
+        {/* Overlay to close kebab menu when clicking outside */}
+        {menuUserId && (
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+            activeOpacity={1}
+            onPress={() => setMenuUserId(null)}
           />
-        </View>
-        <TouchableOpacity style={[styles.filterBtn, { borderColor: colors.border }]}>
-          <Filter size={18} color={colors.textPrimary} />
-          <Text style={[styles.filterText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>Filter</Text>
-          <ChevronDown size={16} color={colors.textSecondary} style={{ marginLeft: 2 }} />
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.sortBtn, { borderColor: colors.border }]} onPress={() => setSortNewest(s => !s)}>
-          <Text style={[styles.sortText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>{sortNewest ? 'Newest first' : 'Oldest first'}</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={filteredUsers}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <Text style={{ color: colors.textSecondary, fontFamily: fonts.regular, textAlign: 'center', marginTop: 48 }}>
-            No blocked users found.
-          </Text>
-        }
-        renderItem={({ item }) => (
-          <View style={[styles.userCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
-            <View style={styles.userInfo}>
-              <Text style={[styles.userName, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>{item.name}</Text>
-              <Text style={[styles.blockedOn, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{item.blockedOn}</Text>
-            </View>
-            <View style={styles.reasonPillWrapper}>
-              <Text style={[styles.reasonPill, { backgroundColor: colors.background, color: colors.textSecondary, fontFamily: fonts.medium }]}>{item.reason}</Text>
-            </View>
-            <TouchableOpacity style={[styles.unblockBtn, { backgroundColor: colors.primary }]}>
-              <UserX size={18} color={colors.buttonText} />
-              <Text style={[styles.unblockText, { color: colors.buttonText, fontFamily: fonts.bold }]}>Unblock</Text>
-            </TouchableOpacity>
-          </View>
         )}
+        <FlatList
+          data={filteredUsers}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <Text style={{ color: colors.textSecondary, fontFamily: fonts.regular, textAlign: 'center', marginTop: 48 }}>
+              No blocked users found.
+            </Text>
+          }
+          renderItem={({ item }) => (
+            <View style={[styles.userCard, { backgroundColor: colors.background, borderColor: colors.border }]}> 
+              <Image source={{ uri: item.avatar }} style={styles.avatar} />
+              <View style={styles.userInfo}>
+                <Text style={[styles.userName, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>{item.name}</Text>
+                {item.reason && (
+                  <Text style={{
+                    color: colors.textSecondary,
+                    fontFamily: fonts.medium,
+                    fontSize: 13,
+                    backgroundColor: colors.surface + '33',
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                    alignSelf: 'flex-start',
+                    marginTop: 2,
+                    overflow: 'hidden',
+                  }}>{item.reason}</Text>
+                )}
+              </View>
+              <TouchableOpacity
+                style={{ padding: 8, marginLeft: 8 }}
+                onPress={() => setMenuUserId(menuUserId === item.id ? null : item.id)}
+              >
+                <MoreVertical size={22} color={colors.textSecondary} />
+              </TouchableOpacity>
+              {/* Kebab menu popover */}
+              {menuUserId === item.id && (
+                <View style={{ position: 'absolute', top: 54, right: 16, backgroundColor: colors.surface, borderRadius: 8, borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 4, zIndex: 100 }}>
+                  <TouchableOpacity
+                    style={{ paddingVertical: 12, paddingHorizontal: 24 }}
+                    onPress={() => handleUnblock(item.id, item.name)}
+                  >
+                    <Text style={{ color: colors.error, fontFamily: fonts.medium, fontSize: 15 }}>Unblock</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+        />
+      </View>
+      {/* Custom unblock modal */}
+      <Modal
+        visible={!!unblockModalUser}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setUnblockModalUser(null)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.18)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: colors.background, borderRadius: 16, padding: 28, alignItems: 'center', width: '80%', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 4 }}>
+            <Text style={{ color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.lg, marginBottom: 12, textAlign: 'center' }}>Unblock {unblockModalUser?.name}?</Text>
+            <Text style={{ color: colors.textSecondary, fontFamily: fonts.regular, fontSize: fontSize.md, marginBottom: 24, textAlign: 'center' }}>
+              Are you sure you want to unblock this user?
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+              <TouchableOpacity
+                style={{ flex: 1, backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginRight: 4 }}
+                onPress={() => setUnblockModalUser(null)}
+              >
+                <Text style={{ color: colors.textPrimary, fontFamily: fonts.bold, fontSize: fontSize.md }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flex: 1, backgroundColor: colors.error, borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginLeft: 4 }}
+                onPress={confirmUnblock}
+              >
+                <Text style={{ color: colors.buttonText, fontFamily: fonts.bold, fontSize: fontSize.md }}>Unblock</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <BlockedUsersFilterSheet
+        visible={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        selectedReason={selectedReason}
+        onSelectReason={reason => setSelectedReason(reason)}
+        sortNewest={sortNewest}
+        onToggleSort={() => setSortNewest(s => !s)}
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  infoBoxWrapper: {
-    paddingHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 14,
-    gap: 8,
-  },
-  infoTitle: {
-    fontSize: 15,
-    marginBottom: 2,
-  },
-  infoText: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  searchRow: {
+  subHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     paddingHorizontal: 16,
-    marginBottom: 8,
+    paddingVertical: 8,
+    // visually connects to header
+    // no border here, handled by headerContainer if needed
   },
   searchBox: {
-    flex: 1,
     borderRadius: 10,
     borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 0,
     flexDirection: 'row',
     alignItems: 'center',
+    marginRight: 8,
+    height: 44,
   },
   filterBtn: {
     flexDirection: 'row',
@@ -161,8 +229,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    gap: 4,
     backgroundColor: 'transparent',
+    marginRight: 8,
   },
   filterText: {
     fontSize: 14,
@@ -174,14 +242,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     backgroundColor: 'transparent',
-    marginLeft: 2,
   },
   sortText: {
     fontSize: 14,
   },
   listContent: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     paddingBottom: 24,
+    marginTop: 16,
   },
   userCard: {
     flexDirection: 'row',
@@ -190,13 +258,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 14,
     marginBottom: 10,
-    gap: 10,
   },
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     backgroundColor: '#eee',
+    marginRight: 10,
   },
   userInfo: {
     flex: 1,
@@ -226,7 +294,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginLeft: 4,
-    gap: 4,
   },
   unblockText: {
     fontSize: 14,

@@ -72,7 +72,7 @@ interface ThemeContextType {
 const getBaseColors = (isDark: boolean, primaryColor: string = DEFAULT_PRIMARY_COLOR): ThemeColors => ({
   primary: primaryColor,
   primaryHover: isDark ? '#2563eb' : '#1976d2',
-  primaryLight: isDark ? '#60a5fa' : '#bbdefb',
+  primaryLight: isDark ? '#3b82f6' : '#e3f2fd',
   primaryDark: isDark ? '#1d4ed8' : '#1565c0',
   secondary: isDark ? '#a855f7' : '#9c27b0',
   background: isDark ? '#0f1011' : '#ffffff',
