@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'rea
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { Filter, Info } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Notification {
   id: string;
@@ -10,7 +11,7 @@ interface Notification {
     avatar: string;
     verified?: boolean;
   };
-  type: 'like' | 'membership_cancel' | 'new_member' | 'comment' | 'system' | 'weekly_summary';
+  type: 'like' | 'membership_cancel' | 'new_member' | 'comment' | 'system' | 'weekly_summary' | 'creator_request';
   content: string;
   timestamp: string;
 }
@@ -78,6 +79,17 @@ const NOTIFICATIONS: Notification[] = [
     type: 'weekly_summary',
     content: 'Weekly summary: 1 new welcome survey response.',
     timestamp: '3w'
+  },
+  {
+    id: '8',
+    user: {
+      name: 'Priya Sharma',
+      avatar: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=400',
+      verified: false
+    },
+    type: 'creator_request',
+    content: 'requested to become a creator.',
+    timestamp: '1d'
   }
 ];
 
@@ -95,7 +107,8 @@ export default function NotificationsScreen() {
           style={styles.avatar}
         />
       ) : (
-        <View style={[styles.systemIcon, { backgroundColor: `${colors.primary}15` }]}>\n          <Info size={20} color={colors.primary} />
+        <View style={[styles.systemIcon, { backgroundColor: `${colors.primary}15` }]}> 
+          <Info size={20} color={colors.primary} />
         </View>
       )}
 
@@ -115,18 +128,9 @@ export default function NotificationsScreen() {
                 {notification.user.name}
               </Text>
               {notification.user.verified && (
-                <View style={[styles.verifiedBadge, { backgroundColor: colors.success }]}>\n                  <Text style={[
-                    styles.verifiedText,
-                    {
-                      color: colors.buttonText,
-                      fontFamily: fonts.medium,
-                      fontSize: fontSize.xs,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    Verified
-                  </Text>
-                </View>
+                <Text style={{ color: colors.success, marginLeft: 4, fontFamily: fonts.medium, fontSize: fontSize.xs, includeFontPadding: false }}>
+                  Verified
+                </Text>
               )}
             </View>
           )}
@@ -153,6 +157,19 @@ export default function NotificationsScreen() {
           }
         ]}>
           {notification.content}
+          {notification.type === 'creator_request' && (
+            <Text style={[
+              styles.linkText,
+              {
+                color: colors.primary,
+                fontFamily: fonts.medium,
+                fontSize: fontSize.md,
+                includeFontPadding: false
+              }
+            ]}>
+              {' '}Review request
+            </Text>
+          )}
           {notification.type === 'system' && (
             <Text style={[
               styles.linkText,
@@ -167,20 +184,26 @@ export default function NotificationsScreen() {
             </Text>
           )}
         </Text>
+        {notification.type === 'creator_request' && (
+          <View style={styles.requestActions}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]}
+              onPress={() => { /* handle accept */ }}>
+              <Text style={[styles.actionButtonText, { color: colors.buttonText }]}>Accept</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.surface }]}
+              onPress={() => { /* handle reject */ }}>
+              <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>Reject</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>\n      <View style={styles.headerContainer}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+      <View style={styles.headerContainer}>
         <SubHeader title="Notifications" />
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.surface }]}
-          >
-            <Filter size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
-        </View>
       </View>
 
       <ScrollView
@@ -190,7 +213,7 @@ export default function NotificationsScreen() {
       >
         {NOTIFICATIONS.map(renderNotification)}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -200,27 +223,15 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: 'relative',
-  },
-  headerActions: {
-    position: 'absolute',
-    top: 54,
-    right: 20,
-    flexDirection: 'row',
-    gap: 12,
-    zIndex: 10,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    minHeight: 56,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   scrollView: {
     flex: 1,
   },
   content: {
     paddingTop: 12,
+    paddingBottom: 32,
   },
   notificationItem: {
     flexDirection: 'row',
@@ -257,16 +268,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
   },
-  verifiedBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  verifiedText: {
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
   timestamp: {
     fontSize: 14,
   },
@@ -277,4 +278,19 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 15,
   },
+  requestActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+  }
 }); 

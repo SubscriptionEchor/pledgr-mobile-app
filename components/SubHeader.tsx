@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 interface SubHeaderProps { 
-  title: string;
+  title: React.ReactNode;
   children?: React.ReactNode;
   showBackButton?: boolean;
 }

@@ -6,11 +6,11 @@ interface StatusBarComponentProps {
 }
 
 export function StatusBarComponent({ barStyle }: StatusBarComponentProps) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   return (
     <RNStatusBar
-      barStyle={barStyle}
+      barStyle={barStyle ?? (isDark ? 'light-content' : 'dark-content')}
       backgroundColor={colors.background}
       translucent
     />

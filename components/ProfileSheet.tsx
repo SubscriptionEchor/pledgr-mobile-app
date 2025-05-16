@@ -11,6 +11,8 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { UserRole, StorageKeys } from '@/lib/enums';
 import { memberAPI } from '@/lib/api/member';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MotiImage, AnimatePresence } from 'moti';
+import { Easing } from 'react-native-reanimated';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_SHEET_HEIGHT = SCREEN_HEIGHT * 0.8;
@@ -69,6 +71,19 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
   };
 
   const currentUser = user || mockUser;
+
+  const creatorImages = [
+    'https://cdn.midjourney.com/1b5ae338-2a67-44ce-aa22-0d1c994260cd/0_0.png',
+    'https://cdn.midjourney.com/9e1db248-5e90-45ad-84c2-d1f4dce89acc/0_2.png',
+    'https://cdn.midjourney.com/6d7c3cf8-78e2-475f-865e-1d0fbe099b6d/0_2.png',
+  ];
+  const [creatorImageIdx, setCreatorImageIdx] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCreatorImageIdx(idx => (idx + 1) % creatorImages.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   if (!visible) {
     return null;
@@ -219,44 +234,46 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
           bounces={false}
         >
           <View style={styles.content}>
-            <View style={[styles.profileSection, { backgroundColor: colors.surface }]}>
-              <View style={styles.profileLeft}>
-                <Image
-                  source={{ uri: currentUser.profile_photo || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
-                  style={[styles.avatar, { backgroundColor: `${colors.primary}15` }]}
-                />
-                <View style={styles.profileInfo}>
-                  <Text style={[
-                    styles.profileName,
-                    {
-                      color: colors.textPrimary,
-                      fontFamily: fonts.semibold,
-                      fontSize: fontSize.lg,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    {currentUser.name || 'User'}
-                  </Text>
-                  <Text style={[
-                    styles.profileEmail,
-                    {
-                      color: colors.textSecondary,
-                      fontFamily: fonts.regular,
-                      fontSize: fontSize.sm,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    {currentUser.email || 'user@gmail.com'}
-                  </Text>
+            <View style={styles.sheetGroupCard}>
+              <View style={[styles.profileSection, { backgroundColor: 'transparent' }]}>
+                <View style={styles.profileLeft}>
+                  <Image
+                    source={{ uri: currentUser.profile_photo || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400' }}
+                    style={[styles.avatar, { backgroundColor: `${colors.primary}15` }]}
+                  />
+                  <View style={styles.profileInfo}>
+                    <Text style={[
+                      styles.profileName,
+                      {
+                        color: colors.textPrimary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.lg,
+                        includeFontPadding: false
+                      }
+                    ]}>
+                      {currentUser.name || 'User'}
+                    </Text>
+                    <Text style={[
+                      styles.profileEmail,
+                      {
+                        color: colors.textSecondary,
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.sm,
+                        includeFontPadding: false
+                      }
+                    ]}>
+                      {currentUser.email || 'user@gmail.com'}
+                    </Text>
+                  </View>
                 </View>
+                {!isCreatorAssociate && !isCreator && (
+                  <TouchableOpacity
+                    style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
+                    onPress={() => handleNavigation('profile')}>
+                    <Pencil size={20} color={colors.primary} />
+                  </TouchableOpacity>
+                )}
               </View>
-              {!isCreatorAssociate && !isCreator && (
-                <TouchableOpacity
-                  style={[styles.editButton, { backgroundColor: `${colors.primary}15` }]}
-                  onPress={() => handleNavigation('profile')}>
-                  <Pencil size={20} color={colors.primary} />
-                </TouchableOpacity>
-              )}
             </View>
 
             <View style={styles.section}>
@@ -369,119 +386,105 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
                       )}
                     </TouchableOpacity>
                   ))}
-
-                  {!hasCreatorToken && (
-                    <TouchableOpacity
-                      style={styles.creatorCardWrapper}
-                      onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}
-                      disabled={isCreatorLoading}>
-                      <LinearGradient
-                        colors={['#1E88E5', '#9333EA']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.creatorCard}>
-                        <View style={styles.creatorContent}>
-                          <View style={styles.creatorLeft}>
-                            <View style={styles.creatorIconGroup}>
-                              <View style={styles.creatorMainIcon}>
-                                <Crown size={24} color="#fff" />
-                              </View>
-                              <View style={styles.creatorSecondaryIcon}>
-                                <Sparkles size={16} color="#fff" />
-                              </View>
-                            </View>
-                            <View style={styles.creatorText}>
-                              <Text style={[
-                                styles.creatorTitle,
-                                {
-                                  color: '#fff',
-                                  fontFamily: fonts.semibold,
-                                  fontSize: fontSize.lg,
-                                  includeFontPadding: false
-                                }
-                              ]}>
-                                Become a Creator
-                              </Text>
-                              <Text style={[
-                                styles.creatorDescription,
-                                {
-                                  color: 'rgba(255, 255, 255, 0.9)',
-                                  fontFamily: fonts.regular,
-                                  fontSize: fontSize.sm,
-                                  includeFontPadding: false
-                                }
-                              ]}>
-                                Share your content with the world
-                              </Text>
-                            </View>
-                          </View>
-                          {isCreatorLoading ? (
-                            <ActivityIndicator color="#fff" size="small" />
-                          ) : (
-                            <ChevronRight size={20} color="#fff" />
-                          )}
-                        </View>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  )}
                 </View>
               )}
             </View>
 
-            <View style={styles.section}>
-              <Text style={[
-                styles.sectionTitle,
-                {
-                  color: colors.textPrimary,
-                  fontFamily: fonts.semibold,
-                  fontSize: fontSize.md,
-                  includeFontPadding: false
-                }
-              ]}>
-                Appearance
-              </Text>
-              <View style={[styles.themeSelector, { backgroundColor: colors.surface }]}>
+            {/* Standalone Become a Creator Section */}
+            {!hasCreatorToken && (
+              <View style={styles.section}>
                 <TouchableOpacity
-                  style={[
-                    styles.themeOption,
-                    { backgroundColor: !isDark ? `${colors.primary}15` : 'transparent' }
-                  ]}
-                  onPress={() => !isDark || toggleTheme()}>
-                  <Text style={[
-                    styles.themeText,
-                    {
-                      color: !isDark ? colors.primary : colors.textSecondary,
-                      fontFamily: fonts.semibold,
-                      fontSize: fontSize.md,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    Light
-                  </Text>
+                  style={styles.creatorCardHost}
+                  onPress={() => handleRoleSelect({ id: 'creator_onboard' } as any)}
+                  disabled={isCreatorLoading}>
+                  <View style={styles.creatorCardHostContent}>
+                    {/* Left: Text and Button */}
+                    <View style={styles.creatorCardHostLeft}>
+                      <Text style={styles.creatorCardHostTitle}>Become a creator</Text>
+                      <Text style={styles.creatorCardHostSubtitle}>Share your passion, build your audience, and earn doing what you love.</Text>
+                      <View style={styles.creatorCardHostButtonWrapper}>
+                        <View style={[styles.creatorCardHostButton, { backgroundColor: colors.primary }]}>
+                          <Text style={styles.creatorCardHostButtonText}>Start journey</Text>
+                        </View>
+                      </View>
+                    </View>
+                    {/* Right: Image */}
+                    <View style={styles.creatorCardHostGrid}>
+                      <View style={styles.creatorCardHostGridRow}>
+                        <Image source={{ uri: 'https://cdn.midjourney.com/1b5ae338-2a67-44ce-aa22-0d1c994260cd/0_0.png' }} style={styles.creatorCardHostGridImage} />
+                        <Image source={{ uri: 'https://cdn.midjourney.com/9e1db248-5e90-45ad-84c2-d1f4dce89acc/0_2.png' }} style={styles.creatorCardHostGridImage} />
+                      </View>
+                      <View style={styles.creatorCardHostGridRow}>
+                        <Image source={{ uri: 'https://cdn.midjourney.com/6d7c3cf8-78e2-475f-865e-1d0fbe099b6d/0_2.png' }} style={styles.creatorCardHostGridImage} />
+                        <Image source={{ uri: 'https://cdn.midjourney.com/a809c8c0-c74d-4168-8380-add29c0ca09c/0_1.png' }} style={styles.creatorCardHostGridImage} />
+                      </View>
+                    </View>
+                  </View>
+                  {isCreatorLoading && (
+                    <ActivityIndicator color="#5B2EFF" size="small" style={{ marginTop: 8 }} />
+                  )}
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeOption,
-                    { backgroundColor: isDark ? `${colors.primary}15` : 'transparent' }
-                  ]}
-                  onPress={() => isDark || toggleTheme()}>
-                  <Text style={[
-                    styles.themeText,
-                    {
-                      color: isDark ? colors.primary : colors.textSecondary,
-                      fontFamily: fonts.semibold,
-                      fontSize: fontSize.md,
-                      includeFontPadding: false
-                    }
-                  ]}>
-                    Dark
-                  </Text>
-                </TouchableOpacity>
+              </View>
+            )}
+
+            <View style={styles.sheetGroupCard}>
+              <View style={styles.section}>
+                <Text style={[
+                  styles.sectionTitle,
+                  {
+                    color: colors.textPrimary,
+                    fontFamily: fonts.semibold,
+                    fontSize: fontSize.md,
+                    includeFontPadding: false
+                  }
+                ]}>
+                  Appearance
+                </Text>
+                <View style={[styles.themeSelector, { backgroundColor: colors.surface }]}>
+                  <TouchableOpacity
+                    style={[
+                      styles.themeOption,
+                      { backgroundColor: !isDark ? `${colors.primary}15` : 'transparent' }
+                    ]}
+                    onPress={() => !isDark || toggleTheme()}>
+                    <Text style={[
+                      styles.themeText,
+                      {
+                        color: !isDark ? colors.primary : colors.textSecondary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.md,
+                        includeFontPadding: false
+                      }
+                    ]}>
+                      Light
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.themeOption,
+                      { backgroundColor: isDark ? `${colors.primary}15` : 'transparent' }
+                    ]}
+                    onPress={() => isDark || toggleTheme()}>
+                    <Text style={[
+                      styles.themeText,
+                      {
+                        color: isDark ? colors.primary : colors.textSecondary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.md,
+                        includeFontPadding: false
+                      }
+                    ]}>
+                      Dark
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
 
+            {/* Divider and extra spacing before Sign Out */}
+            <View style={styles.signOutDivider} />
             <TouchableOpacity
-              style={[styles.signOutButton, { backgroundColor: `${colors.error}15` }]}
+              style={[styles.signOutButton, { marginTop: 10 }]}
               onPress={() => setShowSignOutConfirmation(true)}>
               <LogOut size={20} color={colors.error} />
               <Text style={[
@@ -569,7 +572,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 20,
   },
   profileLeft: {
     flexDirection: 'row',
@@ -690,56 +693,85 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  creatorCardWrapper: {
-    margin: 12,
+  creatorCardHost: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    overflow: 'visible',
+    marginHorizontal: 2,
+    marginTop: 2,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#ececec',
+  },
+  creatorCardHostContent: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    width: '100%',
+    minHeight: 140,
+  },
+  creatorCardHostLeft: {
+    flex: 1.2,
+    justifyContent: 'center',
+  },
+  creatorCardHostTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 8,
+  },
+  creatorCardHostSubtitle: {
+    fontSize: 15,
+    color: '#444',
+    fontWeight: '400',
+    marginBottom: 18,
+  },
+  creatorCardHostButtonWrapper: {
+    flexDirection: 'row',
+  },
+  creatorCardHostButton: {
+    backgroundColor: '#5B2EFF',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  creatorCardHostButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  creatorCardHostGrid: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginLeft: 12,
+  },
+  creatorCardHostGridRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  creatorCardHostGridImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    backgroundColor: '#f3f3f3',
+  },
+  signOutDivider: {
+    height: 1,
+    backgroundColor: '#ececec',
+    marginVertical: 10,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  sheetGroupCard: {
+    backgroundColor: '#fafbfc',
     borderRadius: 16,
+    padding: 0,
+    marginBottom: 18,
     overflow: 'hidden',
-  },
-  creatorCard: {
-    padding: 14,
-  },
-  creatorContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  creatorLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flex: 1,
-  },
-  creatorIconGroup: {
-    position: 'relative',
-    width: 48,
-    height: 48,
-  },
-  creatorMainIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  creatorSecondaryIcon: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  creatorText: {
-    flex: 1,
-  },
-  creatorTitle: {
-    marginBottom: 4,
-  },
-  creatorDescription: {
-    lineHeight: 20,
   },
 });

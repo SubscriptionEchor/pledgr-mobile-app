@@ -19,14 +19,17 @@ export default function MemberTabLayout() {
 
     return (
         <Tabs
-            screenOptions={{
+            screenOptions={({ route }) => ({
                 headerShown: false,
-                tabBarStyle: {
-                    backgroundColor: colors.background,
-                    borderTopColor: colors.border,
-                    height: 60,
-                    paddingBottom: 8,
-                },
+                tabBarStyle: [
+                    {
+                        backgroundColor: colors.background,
+                        borderTopColor: colors.border,
+                        height: 60,
+                        paddingBottom: 8,
+                    },
+                    route.name === 'chat' ? { display: 'none' } : {},
+                ],
                 tabBarActiveTintColor: colors.primary,
                 tabBarInactiveTintColor: colors.textSecondary,
                 tabBarLabelStyle: {
@@ -34,7 +37,7 @@ export default function MemberTabLayout() {
                     fontSize: 10,
                     marginTop: 4,
                 },
-            }}
+            })}
             initialRouteName="home"
         >
             <Tabs.Screen

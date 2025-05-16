@@ -14,11 +14,11 @@ export function Header() {
     : require('../assets/images/pledgr-dark.png');
 
   const handleChatPress = () => {
-    router.push('/(tabs)/member/chat');
+    router.push('/screens/common/chat');
   };
 
   const handleNotificationPress = () => {
-    router.push('/(tabs)/member/notifications');
+    router.push('/screens/member/notifications');
   };
 
   return (
