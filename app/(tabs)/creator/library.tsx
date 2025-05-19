@@ -20,6 +20,26 @@ export default function LibraryScreen() {
                 ]}>
                     Library
                 </Text>
+                {/* Empty state */}
+                <View style={{ alignItems: 'center', marginTop: 32 }}>
+                    <Text style={{
+                        color: colors.textSecondary,
+                        fontFamily: fonts.semibold,
+                        fontSize: fontSize.xl,
+                        marginBottom: 8,
+                    }}>
+                        No collection yet
+                    </Text>
+                    <Text style={{
+                        color: colors.textSecondary,
+                        fontFamily: fonts.regular,
+                        fontSize: fontSize.md,
+                        textAlign: 'center',
+                        maxWidth: 260,
+                    }}>
+                        Create your first collection to organize your content
+                    </Text>
+                </View>
             </View>
         </View>
     );
