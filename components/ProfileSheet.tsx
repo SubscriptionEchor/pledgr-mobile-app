@@ -142,6 +142,20 @@ export function ProfileSheet({ visible, onClose }: ProfileSheetProps) {
       icon: Sparkles,
       color: colors.primary
     },
+    {
+      id: UserRole.CREATOR,
+      label: 'Creator',
+      description: 'Manage your creator profile',
+      icon: Crown,
+      color: colors.primary
+    },
+    // ...(hasCreatorToken ? [{
+    //   id: UserRole.CREATOR,
+    //   label: 'Creator',
+    //   description: 'Manage your creator profile',
+    //   icon: Crown,
+    //   color: colors.primary
+    // }] : []),
     ...(hasCreatorToken ? [{
       id: UserRole.CREATOR,
       label: 'Creator',

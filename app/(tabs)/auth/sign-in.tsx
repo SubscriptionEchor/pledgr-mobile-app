@@ -24,6 +24,13 @@ export default function SignInScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  // Need to remove this after Api is ready:
+  useEffect(() => {
+    (async()=>{
+      router.replace('/member/home');
+    })()
+  }, []);
+
   // Check for remembered credentials on mount
   useEffect(() => {
     const checkRememberedCredentials = async () => {
