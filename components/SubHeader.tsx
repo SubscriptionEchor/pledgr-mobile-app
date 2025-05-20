@@ -7,9 +7,10 @@ interface SubHeaderProps {
   title: React.ReactNode;
   children?: React.ReactNode;
   showBackButton?: boolean;
+  titleAlignment?: 'center' | 'left';
 }
 
-export function SubHeader({ title, children, showBackButton = true }: SubHeaderProps) {
+export function SubHeader({ title, children, showBackButton = true, titleAlignment = 'center' }: SubHeaderProps) {
   const { colors, fonts, fontSize } = useTheme();
 
   return (
@@ -26,18 +27,25 @@ export function SubHeader({ title, children, showBackButton = true }: SubHeaderP
             <ChevronLeft size={24} color={colors.textPrimary} /> 
           </TouchableOpacity>
         ) : (
-          <View style={{ width: 34 }} />
+          <View style={{ width: 16 }} />
         )}
         <Text style={[
           styles.title, 
-          { color: colors.textPrimary, fontFamily: fonts.semibold, fontSize: fontSize.xl, includeFontPadding: false }
+          { 
+            color: colors.textPrimary, 
+            fontFamily: fonts.semibold, 
+            fontSize: fontSize.xl, 
+            includeFontPadding: false,
+            textAlign: titleAlignment,
+            ...(titleAlignment === 'left' ? { paddingLeft: 4 } : {})
+          }
         ]}>
           {title}
         </Text>
         {showBackButton ? (
           <View style={{ width: 34 }} />
         ) : (
-          <View style={{ width: 34 }} />
+          <View style={{ width: 16 }} />
         )}
       </View>
       {children && (
