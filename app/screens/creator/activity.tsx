@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { UserPlus, Settings, FileText } from 'lucide-react-native';
+import { UserPlus, Settings, FileText, Search } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBarComponent } from '@/components/StatusBarComponent';
+import React, { useState, useMemo } from 'react';
 
 interface Activity {
   id: string;
@@ -49,6 +52,20 @@ const RECENT_ACTIVITIES: Activity[] = [
 
 export default function ActivityScreen() {
   const { colors, fonts, fontSize } = useTheme();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredActivities = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return RECENT_ACTIVITIES;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return RECENT_ACTIVITIES.filter(activity => 
+      activity.user.name.toLowerCase().includes(query) || 
+      activity.action.toLowerCase().includes(query) ||
+      activity.timestamp.toLowerCase().includes(query)
+    );
+  }, [searchQuery, RECENT_ACTIVITIES]);
 
   const renderActivity = (activity: Activity) => (
     <View 
@@ -98,29 +115,56 @@ export default function ActivityScreen() {
           </Text>
         </View>
       </View>
-      <View style={[
-        styles.iconContainer,
-        { backgroundColor: `${colors.primary}15` }
-      ]}>
-        <activity.icon size={20} color={colors.primary} />
-      </View>
     </View>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <StatusBarComponent />
       <SubHeader title="Recent Activity" />
+      
+      <View style={[styles.searchContainer, { backgroundColor: colors.surface }]}>
+        <Search size={20} color={colors.textSecondary} />
+        <TextInput
+          style={[styles.searchInput, { 
+            color: colors.textPrimary,
+            fontFamily: fonts.regular,
+            fontSize: fontSize.md,
+          }]}
+          placeholder="Search activities..."
+          placeholderTextColor={colors.textSecondary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Text style={{ color: colors.primary, fontFamily: fonts.medium }}>Clear</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.activitiesList}>
-          {RECENT_ACTIVITIES.map(renderActivity)}
-        </View>
+        {filteredActivities.length > 0 ? (
+          <View style={styles.activitiesList}>
+            {filteredActivities.map(renderActivity)}
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={[styles.emptyStateText, { 
+              color: colors.textSecondary,
+              fontFamily: fonts.medium,
+              fontSize: fontSize.lg,
+            }]}>
+              No activities found
+            </Text>
+          </View>
+        )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -128,11 +172,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    height: 48,
+    borderRadius: 12,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    padding: 0,
+  },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
+    paddingTop: 12,
   },
   activitiesList: {
     gap: 12,
@@ -140,7 +200,6 @@ const styles = StyleSheet.create({
   activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 16,
     borderRadius: 16,
   },
@@ -173,12 +232,12 @@ const styles = StyleSheet.create({
   action: {
     fontSize: 15,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    justifyContent: 'center',
+  emptyState: {
     alignItems: 'center',
-    marginLeft: 12,
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    textAlign: 'center',
   },
 });

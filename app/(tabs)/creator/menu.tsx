@@ -20,24 +20,18 @@ export default function MenuScreen() {
   const handleBack = () => router.back();
 
   const handleItemPress = (id: string) => {
-    switch (id) {
-      case 'audience':
-        router.push('/screens/creator/audience');
-        break;
-      case 'moderation':
-        router.push('/screens/creator/moderation');
-        break;
-      case 'activity':
-        router.push('/screens/creator/activity');
-        break;
-      case 'settings':
-        router.push('/screens/creator/settings');
-        break;
-      case 'help':
-        router.push('/screens/creator/help');
-        break;
-      default:
-        break;
+    // Navigate to the appropriate screen based on ID
+    if (id === 'moderation') {
+      // Use direct navigation to the moderation screen
+      router.push('/screens/creator/moderation' as any);
+    } else if (id === 'activity') {
+      router.push('/screens/creator/activity' as any);
+    } else if (id === 'settings') {
+      router.push('/screens/creator/settings' as any);
+    } else if (id === 'help') {
+      router.push('/screens/creator/help' as any);
+    } else if (id === 'audience') {
+      router.push('/screens/creator/audience' as any);
     }
   };
 

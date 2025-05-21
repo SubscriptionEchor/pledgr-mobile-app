@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, RefreshControl, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, RefreshControl, Animated, Image, Modal } from 'react-native';
+import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useState, useCallback, useRef } from 'react';
-import { BarChart2, TrendingUp, DollarSign, Users, Calendar, Filter, ChevronDown, Info, ChevronRight } from 'lucide-react-native';
+import { BarChart2, TrendingUp, DollarSign, Users, Calendar, Filter, ChevronDown, Info, ChevronRight, MoreVertical, Eye, Edit } from 'lucide-react-native';
 import { StatusBarComponent } from '@/components/StatusBarComponent';
 import { LineChart, PieChart, BarChart } from 'react-native-chart-kit';
 
@@ -130,6 +131,216 @@ const MIGRATION_TRENDS_DATA = {
   legend: ['Upgrades', 'Downgrades'],
 };
 
+// Mock data for shop analytics
+interface ProductData {
+  id: string;
+  title: string;
+  type: string;
+  thumbnail: string;
+  price: string;
+  sales: number;
+  revenue: number;
+  collection: string;
+}
+
+const SHOP_ANALYTICS = {
+  totalEarnings: '$12,560',
+  totalSales: 456,
+  topSellingProducts: [
+    {
+      id: '1',
+      title: 'Creator Studio Masterclass',
+      type: 'Course',
+      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      price: '$29.99',
+      sales: 85,
+      revenue: 2549.15,
+      collection: 'Creator Essentials'
+    },
+    {
+      id: '2',
+      title: 'Premium Design Templates Bundle',
+      type: 'Bundle',
+      thumbnail: 'https://images.unsplash.com/photo-1544731612-de7f96afe55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      price: '$19.99',
+      sales: 142,
+      revenue: 2838.58,
+      collection: 'Design Resources'
+    },
+    {
+      id: '3',
+      title: 'Content Creator\'s Toolkit',
+      type: 'Digital Product',
+      thumbnail: 'https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      price: '$14.99',
+      sales: 76,
+      revenue: 1139.24,
+      collection: 'Creator Essentials'
+    },
+    {
+      id: '4',
+      title: 'Social Media Strategy Guide',
+      type: 'E-Book',
+      thumbnail: 'https://images.unsplash.com/photo-1661956602926-db6b25f75947?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      price: '$9.99',
+      sales: 128,
+      revenue: 1278.72,
+      collection: 'Marketing Resources'
+    },
+    {
+      id: '5',
+      title: 'Photography Preset Collection',
+      type: 'Presets',
+      thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      price: '$12.99',
+      sales: 94,
+      revenue: 1221.06,
+      collection: 'Visual Content'
+    }
+  ]
+};
+
+// Mock data for earnings analytics
+interface MonthlyEarningData {
+  id: string;
+  month: string;
+  grossRevenue: number;
+  platformFee: number;
+  earnings: number;
+}
+
+const EARNINGS_ANALYTICS = {
+  totalEarnings: '$24,860',
+  earningsData: [
+    { month: 'Jan', amount: 1450 },
+    { month: 'Feb', amount: 1820 },
+    { month: 'Mar', amount: 2340 },
+    { month: 'Apr', amount: 2760 },
+    { month: 'May', amount: 3120 },
+    { month: 'Jun', amount: 3680 }
+  ],
+  monthlyDetails: [
+    {
+      id: '1',
+      month: 'June 2024',
+      grossRevenue: 4600,
+      platformFee: 920,
+      earnings: 3680
+    },
+    {
+      id: '2',
+      month: 'May 2024',
+      grossRevenue: 3900,
+      platformFee: 780,
+      earnings: 3120
+    },
+    {
+      id: '3',
+      month: 'April 2024',
+      grossRevenue: 3450,
+      platformFee: 690,
+      earnings: 2760
+    },
+    {
+      id: '4',
+      month: 'March 2024',
+      grossRevenue: 2925,
+      platformFee: 585,
+      earnings: 2340
+    },
+    {
+      id: '5',
+      month: 'February 2024',
+      grossRevenue: 2275,
+      platformFee: 455,
+      earnings: 1820
+    },
+    {
+      id: '6',
+      month: 'January 2024',
+      grossRevenue: 1812.50,
+      platformFee: 362.50,
+      earnings: 1450
+    }
+  ]
+};
+
+// Mock data for posts analytics with properly formatted dates
+interface PostImpressionData {
+  day: string;
+  impressions: number;
+}
+
+interface RecentPostData {
+  id: string;
+  title: string;
+  timestamp: string;
+  thumbnail: string;
+  impressions: number;
+  likes: number;
+  comments: number;
+}
+
+const POSTS_ANALYTICS = {
+  totalImpressions: '45.2K',
+  impressionData: [
+    { day: 'Mon', impressions: 2450 },
+    { day: 'Tue', impressions: 3200 },
+    { day: 'Wed', impressions: 2800 },
+    { day: 'Thu', impressions: 4100 },
+    { day: 'Fri', impressions: 3750 },
+    { day: 'Sat', impressions: 5400 },
+    { day: 'Sun', impressions: 4800 }
+  ],
+  recentPosts: [
+    {
+      id: '1',
+      title: 'How to Optimize Your Content for Better Reach',
+      timestamp: 'June 15, 2024 at 9:45 AM',
+      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      impressions: 3650,
+      likes: 246,
+      comments: 48
+    },
+    {
+      id: '2',
+      title: 'Latest Platform Updates for Creators',
+      timestamp: 'June 12, 2024 at 2:30 PM',
+      thumbnail: 'https://images.unsplash.com/photo-1544731612-de7f96afe55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      impressions: 4820,
+      likes: 315,
+      comments: 72
+    },
+    {
+      id: '3',
+      title: 'Behind the Scenes of My Creative Process',
+      timestamp: 'June 10, 2024 at 11:15 AM',
+      thumbnail: 'https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      impressions: 5130,
+      likes: 427,
+      comments: 96
+    },
+    {
+      id: '4',
+      title: 'Q&A Session: Answering Your Top Questions',
+      timestamp: 'June 5, 2024 at 4:20 PM',
+      thumbnail: 'https://images.unsplash.com/photo-1661956602926-db6b25f75947?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      impressions: 6240,
+      likes: 518,
+      comments: 142
+    },
+    {
+      id: '5',
+      title: 'Five Essential Tools Every Creator Should Use',
+      timestamp: 'June 1, 2024 at 10:00 AM',
+      thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80',
+      impressions: 7380,
+      likes: 624,
+      comments: 87
+    }
+  ]
+};
+
 const windowWidth = Dimensions.get('window').width;
 
 // Types for component props
@@ -158,6 +369,10 @@ export default function InsightsScreen() {
   const [timeframe, setTimeframe] = useState('Monthly');
   const [showTimeframeOptions, setShowTimeframeOptions] = useState(false);
   const [expandedTiers, setExpandedTiers] = useState<number[]>([]);
+  
+  // State for Posts tab
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   
   const tabs = ['Memberships', 'Shop', 'Earnings', 'Posts', 'Traffic'];
   
@@ -279,6 +494,8 @@ export default function InsightsScreen() {
   
   // New simple stat card matching the reference design
   const StatCard = ({ title, value, paidCount, freeCount }: StatCardProps) => {
+    const showCounts = paidCount || freeCount;
+    
     return (
       <View style={[styles.statCard, { backgroundColor: colors.background }]}>
         {/* Title and count group */}
@@ -291,28 +508,37 @@ export default function InsightsScreen() {
           </Text>
         </View>
         
-        {/* Visual divider */}
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-        
-        {/* Paid/Free counts group */}
-        <View style={styles.countsContainer}>
-          <View style={styles.countRow}>
-            <Text style={[styles.countLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              Paid
-            </Text>
-            <Text style={[styles.countValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
-              {paidCount}
-            </Text>
-          </View>
-          <View style={styles.countRow}>
-            <Text style={[styles.countLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              Free
-            </Text>
-            <Text style={[styles.countValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
-              {freeCount}
-            </Text>
-          </View>
-        </View>
+        {/* Only render divider and counts if there's content */}
+        {showCounts && (
+          <>
+            {/* Visual divider */}
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            
+            {/* Paid/Free counts group */}
+            <View style={styles.countsContainer}>
+              {paidCount && (
+                <View style={styles.countRow}>
+                  <Text style={[styles.countLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                    Paid
+                  </Text>
+                  <Text style={[styles.countValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                    {paidCount}
+                  </Text>
+                </View>
+              )}
+              {freeCount && (
+                <View style={styles.countRow}>
+                  <Text style={[styles.countLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                    Free
+                  </Text>
+                  <Text style={[styles.countValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                    {freeCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </>
+        )}
       </View>
     );
   };
@@ -765,6 +991,457 @@ export default function InsightsScreen() {
     );
   }, [colors, timeframe, showTimeframeOptions, expandedTiers, getLineChartData, toggleTierExpansion, isTierExpanded, fonts]);
   
+  // Move the renderShopTab function before renderTabContent
+  const renderShopTab = useCallback(() => {
+    return (
+      <View style={{ width: '100%' }}>
+        {/* Top metric cards */}
+        <View style={styles.metricsRow}>
+          <StatCard 
+            title="Total Earnings" 
+            value={SHOP_ANALYTICS.totalEarnings} 
+            paidCount=""
+            freeCount=""
+          />
+          <StatCard 
+            title="Total Sales" 
+            value={SHOP_ANALYTICS.totalSales.toString()} 
+            paidCount=""
+            freeCount=""
+          />
+        </View>
+
+        {/* Top Selling Products Section */}
+        <View style={[styles.sectionCard, { backgroundColor: colors.background, borderColor: colors.border, marginTop: 16 }]}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+              Top Selling Products
+            </Text>
+          </View>
+          
+          <View style={styles.productsContainer}>
+            {SHOP_ANALYTICS.topSellingProducts.map((product, index) => (
+              <View 
+                key={product.id} 
+                style={[
+                  styles.productCard,
+                  index < SHOP_ANALYTICS.topSellingProducts.length - 1 && 
+                    { borderBottomWidth: 1, borderBottomColor: colors.border }
+                ]}
+              >
+                <View style={styles.productImageContainer}>
+                  <Image 
+                    source={{ uri: product.thumbnail }} 
+                    style={styles.productThumbnail} 
+                    resizeMode="cover"
+                  />
+                </View>
+                
+                <View style={styles.productContent}>
+                  <View style={styles.productHeader}>
+                    <Text 
+                      style={[styles.productTitle, { fontFamily: fonts.medium, color: colors.textPrimary }]}
+                      numberOfLines={1}
+                    >
+                      {product.title}
+                    </Text>
+                    
+                    <View style={styles.productTypeContainer}>
+                      <Text 
+                        style={[styles.productType, { fontFamily: fonts.regular, color: colors.textSecondary }]} 
+                        numberOfLines={1}
+                      >
+                        {product.collection}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.productStats}>
+                    <View style={styles.productStat}>
+                      <Text style={[styles.productStatLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                        Sales
+                      </Text>
+                      <Text style={[styles.productStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                        {product.sales}
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.productStat}>
+                      <Text style={[styles.productStatLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                        Earnings
+                      </Text>
+                      <Text style={[styles.productStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                        ${product.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }, [colors, fonts]);
+
+  // Add renderEarningsTab function before renderTabContent
+  const renderEarningsTab = useCallback(() => {
+    const screenWidth = Dimensions.get('window').width - 60; // Account for padding
+    
+    // Data for line chart
+    const lineChartData = {
+      labels: EARNINGS_ANALYTICS.earningsData.map(item => item.month),
+      datasets: [
+        {
+          data: EARNINGS_ANALYTICS.earningsData.map(item => item.amount),
+          color: (opacity = 1) => `rgba(71, 117, 234, ${opacity})`,
+          strokeWidth: 2,
+        }
+      ],
+      legend: ['Earnings']
+    };
+    
+    // Chart configuration
+    const chartConfig = {
+      backgroundGradientFrom: colors.background,
+      backgroundGradientTo: colors.background,
+      decimalPlaces: 0,
+      color: (opacity = 1) => `rgba(71, 117, 234, ${opacity})`,
+      labelColor: (opacity = 1) => colors.textSecondary,
+      style: {
+        borderRadius: 16,
+      },
+      propsForDots: {
+        r: '6',
+        strokeWidth: '2',
+        stroke: colors.background,
+      },
+    };
+    
+    return (
+      <View style={{ width: '100%' }}>
+        {/* Total Earnings card */}
+        <View style={styles.metricsRow}>
+          <StatCard 
+            title="Total Earnings" 
+            value={EARNINGS_ANALYTICS.totalEarnings} 
+            paidCount=""
+            freeCount=""
+          />
+        </View>
+        
+        {/* Earnings Overview Section */}
+        <View style={[styles.sectionCard, { backgroundColor: colors.background, borderColor: colors.border, marginTop: 16 }]}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+              Earnings Overview
+            </Text>
+          </View>
+          
+          <View style={styles.graphContainer}>
+            <LineChart
+              data={lineChartData}
+              width={screenWidth}
+              height={220}
+              chartConfig={chartConfig}
+              bezier
+              fromZero
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+              }}
+            />
+          </View>
+        </View>
+        
+        {/* Monthly Earnings Details Section */}
+        <View style={[styles.sectionCard, { backgroundColor: colors.background, borderColor: colors.border, marginTop: 16 }]}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+              Monthly Earnings Details
+            </Text>
+          </View>
+          
+          <View style={styles.monthlyEarningsContainer}>
+            {EARNINGS_ANALYTICS.monthlyDetails.map((item, index) => (
+              <View 
+                key={item.id} 
+                style={[
+                  styles.monthlyEarningCard,
+                  index < EARNINGS_ANALYTICS.monthlyDetails.length - 1 && 
+                    { borderBottomWidth: 1, borderBottomColor: colors.border }
+                ]}
+              >
+                <View style={styles.monthlyEarningHeader}>
+                  <Text 
+                    style={[styles.monthlyEarningTitle, { fontFamily: fonts.medium, color: colors.textPrimary }]}
+                    numberOfLines={1}
+                  >
+                    {item.month}
+                  </Text>
+                </View>
+                
+                <View style={styles.monthlyEarningStats}>
+                  <View style={styles.monthlyEarningStat}>
+                    <Text style={[styles.monthlyEarningStatLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                      Gross Revenue
+                    </Text>
+                    <Text style={[styles.monthlyEarningStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                      ${item.grossRevenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.monthlyEarningStat}>
+                    <Text style={[styles.monthlyEarningStatLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                      Platform Fee
+                    </Text>
+                    <Text style={[styles.monthlyEarningStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                      ${item.platformFee.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.monthlyEarningStat}>
+                    <Text style={[styles.monthlyEarningStatLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                      Your Earnings
+                    </Text>
+                    <Text style={[styles.monthlyEarningStatValue, { color: colors.primary, fontFamily: fonts.semibold }]}>
+                      ${item.earnings.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }, [colors, fonts]);
+
+  // Update the renderPostsTab function structure
+  const renderPostsTab = useCallback(() => {
+    const screenWidth = Dimensions.get('window').width - 60; // Account for padding
+    
+    // Data for line chart
+    const impressionsChartData = {
+      labels: POSTS_ANALYTICS.impressionData.map(item => item.day),
+      datasets: [
+        {
+          data: POSTS_ANALYTICS.impressionData.map(item => item.impressions),
+          color: (opacity = 1) => `rgba(71, 117, 234, ${opacity})`,
+          strokeWidth: 2,
+        }
+      ],
+      legend: ['Impressions']
+    };
+    
+    // Chart configuration
+    const chartConfig = {
+      backgroundGradientFrom: colors.background,
+      backgroundGradientTo: colors.background,
+      decimalPlaces: 0,
+      color: (opacity = 1) => `rgba(71, 117, 234, ${opacity})`,
+      labelColor: (opacity = 1) => colors.textSecondary,
+      style: {
+        borderRadius: 16,
+      },
+      propsForDots: {
+        r: '6',
+        strokeWidth: '2',
+        stroke: colors.background,
+      },
+    };
+    
+    // Handle opening the kebab menu
+    const handleOpenMenu = (postId: string) => {
+      setSelectedPostId(postId);
+      setBottomSheetVisible(true);
+    };
+    
+    // Handle closing the bottom sheet
+    const handleCloseBottomSheet = () => {
+      setBottomSheetVisible(false);
+    };
+    
+    return (
+      <View style={{ width: '100%', height: '100%' }}>
+        <View style={{ flex: 1, width: '100%' }}>
+          {/* Total Impressions card */}
+          <View style={styles.metricsRow}>
+            <StatCard 
+              title="Total Impressions" 
+              value={POSTS_ANALYTICS.totalImpressions} 
+              paidCount=""
+              freeCount=""
+            />
+          </View>
+          
+          {/* Impressions by Day Section */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.background, borderColor: colors.border, marginTop: 16 }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+                Impressions by Day
+              </Text>
+            </View>
+            
+            <View style={styles.graphContainer}>
+              <LineChart
+                data={impressionsChartData}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                bezier
+                fromZero
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+              />
+            </View>
+          </View>
+          
+          {/* Recent Posts Section */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.background, borderColor: colors.border, marginTop: 16 }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary, fontFamily: fonts.semibold }]}>
+                Recent Posts
+              </Text>
+            </View>
+            
+            <View style={styles.recentPostsContainer}>
+              {POSTS_ANALYTICS.recentPosts.map((post, index) => (
+                <View 
+                  key={post.id} 
+                  style={[
+                    styles.recentPostCard,
+                    index < POSTS_ANALYTICS.recentPosts.length - 1 && 
+                      { borderBottomWidth: 1, borderBottomColor: colors.border }
+                  ]}
+                >
+                  <View style={styles.postImageContainer}>
+                    <Image 
+                      source={{ uri: post.thumbnail }} 
+                      style={styles.postThumbnail} 
+                      resizeMode="cover"
+                    />
+                  </View>
+                  
+                  <View style={styles.postContent}>
+                    <View style={styles.postHeader}>
+                      <Text 
+                        style={[styles.postTitle, { fontFamily: fonts.medium, color: colors.textPrimary }]}
+                        numberOfLines={2}
+                      >
+                        {post.title}
+                      </Text>
+                      
+                      <Text 
+                        style={[styles.postTimestamp, { fontFamily: fonts.regular, color: colors.textSecondary }]}
+                        numberOfLines={1}
+                      >
+                        {post.timestamp}
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.postStats}>
+                      <View style={styles.postStat}>
+                        <View style={styles.postStatIcon}>
+                          <Eye size={14} color={colors.textSecondary} />
+                        </View>
+                        <Text style={[styles.postStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                          {post.impressions.toLocaleString()}
+                        </Text>
+                      </View>
+                      
+                      <View style={styles.postStat}>
+                        <Text style={[styles.postStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                          {post.likes.toLocaleString()} likes
+                        </Text>
+                      </View>
+                      
+                      <View style={styles.postStat}>
+                        <Text style={[styles.postStatValue, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                          {post.comments.toLocaleString()} comments
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  
+                  <TouchableOpacity 
+                    style={styles.postMenuButton}
+                    onPress={() => handleOpenMenu(post.id)}
+                  >
+                    <MoreVertical size={22} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+        
+        {/* Bottom Sheet for post actions - using Modal */}
+        {bottomSheetVisible && (
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={bottomSheetVisible}
+            onRequestClose={handleCloseBottomSheet}
+          >
+            <View style={{ flex: 1 }}>
+              <TouchableOpacity
+                style={styles.bottomSheetOverlay}
+                activeOpacity={0.7}
+                onPress={handleCloseBottomSheet}
+              />
+              <View style={[styles.bottomSheet, { backgroundColor: colors.background }]}>
+                <View style={styles.bottomSheetHandle} />
+                
+                <TouchableOpacity 
+                  style={styles.bottomSheetOption}
+                  onPress={() => {
+                    console.log('View more insights for post', selectedPostId);
+                    handleCloseBottomSheet();
+                  }}
+                >
+                  <BarChart2 size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
+                  <Text style={[styles.bottomSheetOptionText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                    View More Insights
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.bottomSheetOption}
+                  onPress={() => {
+                    console.log('View post', selectedPostId);
+                    handleCloseBottomSheet();
+                  }}
+                >
+                  <Eye size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
+                  <Text style={[styles.bottomSheetOptionText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                    View Post
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.bottomSheetOption}
+                  onPress={() => {
+                    console.log('Edit post', selectedPostId);
+                    handleCloseBottomSheet();
+                  }}
+                >
+                  <Edit size={22} color={colors.textPrimary} style={{ marginRight: 16 }} />
+                  <Text style={[styles.bottomSheetOptionText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
+                    Edit Post
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        )}
+      </View>
+    );
+  }, [colors, fonts, selectedPostId, bottomSheetVisible]);
+
+  // Now that renderShopTab is defined, we can use it in renderTabContent
   const renderTabContent = useCallback(() => {
     try {
       console.log('Rendering tab:', activeTab);
@@ -772,41 +1449,11 @@ export default function InsightsScreen() {
         case 'Memberships':
           return renderMembershipsTab();
         case 'Shop':
-          return (
-            <View style={styles.comingSoonContainer}>
-              <BarChart2 size={48} color={colors.textSecondary} />
-              <Text style={[styles.comingSoonText, { color: colors.textSecondary, fontFamily: fonts.semibold }]}>
-                Shop Analytics
-              </Text>
-              <Text style={[styles.comingSoonSubtext, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                Track your product sales and performance
-              </Text>
-            </View>
-          );
+          return renderShopTab();
         case 'Earnings':
-          return (
-            <View style={styles.comingSoonContainer}>
-              <DollarSign size={48} color={colors.textSecondary} />
-              <Text style={[styles.comingSoonText, { color: colors.textSecondary, fontFamily: fonts.semibold }]}>
-                Earnings Dashboard
-              </Text>
-              <Text style={[styles.comingSoonSubtext, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                Track your revenue streams and payment history
-              </Text>
-            </View>
-          );
+          return renderEarningsTab();
         case 'Posts':
-          return (
-            <View style={styles.comingSoonContainer}>
-              <BarChart2 size={48} color={colors.textSecondary} />
-              <Text style={[styles.comingSoonText, { color: colors.textSecondary, fontFamily: fonts.semibold }]}>
-                Content Performance
-              </Text>
-              <Text style={[styles.comingSoonSubtext, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                Analyze engagement across your posts
-              </Text>
-            </View>
-          );
+          return renderPostsTab();
         case 'Traffic':
           return (
             <View style={styles.comingSoonContainer}>
@@ -836,7 +1483,7 @@ export default function InsightsScreen() {
         </View>
       );
     }
-  }, [activeTab, colors, fonts, renderMembershipsTab]);
+  }, [activeTab, colors, fonts, renderMembershipsTab, renderShopTab, renderEarningsTab, renderPostsTab]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -933,20 +1580,22 @@ export default function InsightsScreen() {
       </View>
       
       {/* Main Content */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-          />
-        }
-      >
-        {renderTabContent()}
-      </ScrollView>
+      <View style={[styles.mainContent, { flex: 1, position: 'relative' }]}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+            />
+          }
+        >
+          {renderTabContent()}
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -1360,5 +2009,186 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 8,
+  },
+  // Product card related styles
+  productsContainer: {
+    marginTop: 4,
+  },
+  productCard: {
+    flexDirection: 'row',
+    paddingVertical: 16,
+  },
+  productImageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 12,
+  },
+  productThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  productContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  productHeader: {
+    marginBottom: 8,
+  },
+  productTitle: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  productTypeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  productType: {
+    fontSize: 14,
+  },
+  productStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  productStat: {
+    flex: 1,
+    paddingHorizontal: 8,
+  },
+  productStatLabel: {
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  productStatValue: {
+    fontSize: 14,
+  },
+  // Monthly earnings related styles
+  monthlyEarningsContainer: {
+    marginTop: 4,
+  },
+  monthlyEarningCard: {
+    paddingVertical: 16,
+  },
+  monthlyEarningHeader: {
+    marginBottom: 12,
+  },
+  monthlyEarningTitle: {
+    fontSize: 16,
+  },
+  monthlyEarningStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  monthlyEarningStat: {
+    flex: 1,
+    paddingHorizontal: 8,
+  },
+  monthlyEarningStatLabel: {
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  monthlyEarningStatValue: {
+    fontSize: 14,
+  },
+  // Recent posts related styles
+  recentPostsContainer: {
+    marginTop: 4,
+  },
+  recentPostCard: {
+    flexDirection: 'row',
+    paddingVertical: 16,
+  },
+  postImageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 12,
+  },
+  postThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  postContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  postHeader: {
+    marginBottom: 8,
+  },
+  postTitle: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  postTimestamp: {
+    fontSize: 12,
+  },
+  postStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  postStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  postStatIcon: {
+    marginRight: 4,
+  },
+  postStatValue: {
+    fontSize: 13,
+  },
+  postMenuButton: {
+    paddingHorizontal: 8,
+    height: 40,
+    justifyContent: 'center',
+  },
+  
+  // Bottom sheet styles
+  bottomSheetOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 999,
+  },
+  bottomSheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    paddingTop: 10,
+    paddingBottom: 30,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 20,
+    zIndex: 1001,
+  },
+  bottomSheetHandle: {
+    width: 40,
+    height: 5,
+    backgroundColor: '#DDD',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  bottomSheetOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  bottomSheetOptionText: {
+    fontSize: 16,
+  },
+  mainContent: {
+    flex: 1,
+    position: 'relative',
   },
 }); 
