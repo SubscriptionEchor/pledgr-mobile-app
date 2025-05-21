@@ -2,13 +2,15 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
 import { useState } from 'react';
-import { Search, Users, Crown, MoreVertical, Bell, MessageCircle } from 'lucide-react-native';
+import { Search, Users, Crown, MoreVertical, Bell, MessageCircle, User } from 'lucide-react-native';
 import { TextInput } from 'react-native';
 import { showToast } from '@/components/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { UserRole } from '@/lib/enums';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBarComponent } from '@/components/StatusBarComponent';
 
 // Mock creators data
 const MOCK_CREATORS = [
@@ -87,23 +89,36 @@ export default function CreatorAssociateOnboardScreen() {
     router.push('/screens/creator-associate/notifications');
   };
 
+  const handleNavigateToProfile = () => {
+    router.push('/screens/member/profile');
+  };
+
+  const headerActions = (
+    <View style={styles.headerRightContent}>
+      <TouchableOpacity
+        style={[styles.headerButton, { backgroundColor: colors.surface }]}
+        onPress={handleNavigateToChat}>
+        <MessageCircle size={20} color={colors.textPrimary} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.headerButton, { backgroundColor: colors.surface }]}
+        onPress={handleNavigateToNotifications}>
+        <Bell size={20} color={colors.textPrimary} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.headerButton, { backgroundColor: colors.surface }]}
+        onPress={handleNavigateToProfile}>
+        <User size={20} color={colors.textPrimary} />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.headerContainer}>
-        <SubHeader title="Associate Management" />
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.surface }]}
-            onPress={handleNavigateToChat}>
-            <MessageCircle size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.surface }]}
-            onPress={handleNavigateToNotifications}>
-            <Bell size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <StatusBarComponent />
+      <SubHeader title="Associate">
+        {headerActions}
+      </SubHeader>
       
       <ScrollView 
         style={styles.scrollView}
@@ -250,7 +265,7 @@ export default function CreatorAssociateOnboardScreen() {
         confirmLabel="Revoke Access"
         confirmVariant="error"
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -258,21 +273,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerContainer: {
-    position: 'relative',
-  },
-  headerActions: {
-    position: 'absolute',
-    top: 54,
-    right: 20,
+  headerRightContent: {
     flexDirection: 'row',
-    gap: 12,
-    zIndex: 10,
+    gap: 8,
+    marginRight: 8,
   },
   headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },

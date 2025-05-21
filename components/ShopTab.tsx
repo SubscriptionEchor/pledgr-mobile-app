@@ -41,7 +41,7 @@ export const ShopTab: React.FC = () => {
   }
 
   const handleAddProduct = () => {
-    router.push('/screens/shop/CreateProductScreen');
+    router.push('/screens/creator/create-product');
   };
   
   const handleEditProduct = (productId: string) => {

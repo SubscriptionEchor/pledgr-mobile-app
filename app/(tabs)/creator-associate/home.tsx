@@ -7,7 +7,9 @@ export default function HomeScreen() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Header />
+            <View style={styles.headerContainer}>
+                <Header />
+            </View>
             <View style={styles.content}>
                 <Text style={[
                     styles.title,
@@ -27,12 +29,19 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        position: 'relative',
+    },
+    headerContainer: {
+        zIndex: 1000,
+        elevation: 1000,
+        position: 'relative',
     },
     content: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 20,
+        zIndex: 1,
     },
     title: {
         marginBottom: 20,

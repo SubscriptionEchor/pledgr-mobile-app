@@ -3,9 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Keyboard
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { SubHeader } from '@/components/SubHeader';
-import { Search, Filter, Users } from 'lucide-react-native';
+import { Search, Filter, Users, Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuth } from '@/lib/context/AuthContext';
+import { UserRole } from '@/lib/enums';
 
 interface Group {
   id: string;
@@ -28,11 +30,14 @@ interface DirectMessage {
 
 export default function ChatScreen() {
   const { colors, fonts, fontSize } = useTheme();
+  const { user } = useAuth();
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'groups' | 'direct'>('groups');
   const [filterSheetVisible, setFilterSheetVisible] = useState(false);
   const [filterOption, setFilterOption] = useState<'all' | 'unread'>('all');
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+
+  const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
 
   // Placeholder data for groups and direct messages
   const groups: Group[] = [
@@ -147,29 +152,6 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSend = () => {
-    if (!input.trim() && !selectedImage) return;
-    setChatMessages(prevMsgs => [
-      ...prevMsgs,
-      {
-        id: (prevMsgs.length + 1).toString(),
-        user: {
-          name: 'You',
-          avatar: 'https://placehold.co/40x40?text=Me',
-        },
-        text: input,
-        isMe: true,
-        reactions: [],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        edited: false,
-        deleted: false,
-        image: selectedImage || null,
-      }
-    ]);
-    setInput('');
-    setSelectedImage(null);
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <KeyboardAvoidingView
@@ -233,6 +215,20 @@ export default function ChatScreen() {
               <Text style={{ color: colors.error, fontSize: 13 }}>Remove</Text>
             </TouchableOpacity>
           </View>
+        )}
+        
+        {/* Floating Action Button - only visible for creators */}
+        {isCreator && (
+          <TouchableOpacity
+            style={[styles.fab, { backgroundColor: colors.primary }]}
+            activeOpacity={0.8}
+            onPress={() => {
+              // Navigate to create group chat screen or show options
+              router.push('/screens/creator/create-group' as any);
+            }}
+          >
+            <Plus size={24} color="#fff" />
+          </TouchableOpacity>
         )}
       </KeyboardAvoidingView>
       {/* Filter Bottom Sheet Modal */}
@@ -373,5 +369,21 @@ const styles = StyleSheet.create({
   },
   footerIcon: {
     padding: 8,
+  },
+  fab: {
+    position: 'absolute',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20,
+    bottom: 20,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    zIndex: 10,
   },
 }); 

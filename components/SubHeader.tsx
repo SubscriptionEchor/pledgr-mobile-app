@@ -42,17 +42,12 @@ export function SubHeader({ title, children, showBackButton = true, titleAlignme
         ]}>
           {title}
         </Text>
-        {showBackButton ? (
-          <View style={{ width: 34 }} />
+        {children ? (
+          children
         ) : (
-          <View style={{ width: 16 }} />
+          <View style={{ width: showBackButton ? 34 : 16 }} />
         )}
       </View>
-      {children && (
-        <View style={styles.subHeaderContent}>
-          {children}
-        </View>
-      )}
     </View>
   );
 }

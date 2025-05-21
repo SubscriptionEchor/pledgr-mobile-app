@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, TextInput, Switch, StatusBar, Platform, TouchableWithoutFeedback, Alert, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Switch, StatusBar, Platform, TouchableWithoutFeedback, Alert, Image } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, DollarSign, Tag, Info, ChevronDown, FilePlus, FileText, X, Eye, Video, Music, Image as ImageIcon, File } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Stack, useRouter } from 'expo-router';
+import { ArrowLeft, DollarSign, Tag, Info, ChevronDown, FilePlus, FileText, X, Eye, Video, Music, Image as ImageIcon, File, Upload } from 'lucide-react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 
 // Simple dropdown component
 interface ProductTypeDropdownProps {
@@ -102,6 +103,342 @@ const ProductTypeDropdown = ({
               </View>
             </TouchableOpacity>
           ))}
+        </View>
+      )}
+    </View>
+  );
+};
+
+// Define document asset type
+interface DocumentAsset {
+  uri: string;
+  name?: string;
+  mimeType?: string;
+  size?: number;
+}
+
+const fileTypeOptions = [
+  { label: 'Video', value: 'video' },
+  { label: 'Audio', value: 'audio' },
+  { label: 'Images', value: 'images' },
+  { label: 'Other files', value: 'other' },
+];
+
+// Definition of the renderFileUploadSection function
+const renderFileUploadSection = (
+  productType: string, 
+  videoUrl: string, 
+  setVideoUrl: React.Dispatch<React.SetStateAction<string>>, 
+  videoPreviewUrl: string, 
+  setVideoPreviewUrl: React.Dispatch<React.SetStateAction<string>>, 
+  audioFile: string | null, 
+  setAudioFile: React.Dispatch<React.SetStateAction<string | null>>, 
+  audioPreview: string | null, 
+  setAudioPreview: React.Dispatch<React.SetStateAction<string | null>>, 
+  imagesToUpload: string[], 
+  setImagesToUpload: React.Dispatch<React.SetStateAction<string[]>>, 
+  filesToUpload: string[], 
+  setFilesToUpload: React.Dispatch<React.SetStateAction<string[]>>, 
+  pickAudio: (setter: React.Dispatch<React.SetStateAction<string | null>>) => void, 
+  pickImages: () => void, 
+  pickDocuments: (setter: React.Dispatch<React.SetStateAction<string[]>>) => void, 
+  removeFile: (uri: string, fileList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => void,
+  colors: any,
+  fonts: any,
+  fontSize: any
+) => {
+  if (!productType) return null;
+
+  return (
+    <View style={{ marginBottom: 20 }}>
+      <Text style={{ 
+        fontFamily: fonts.medium, 
+        fontSize: fontSize.md,
+        color: colors.textPrimary,
+        marginBottom: 8
+      }}>
+        Add the file you want to sell. You can sell videos, audio, images or other digital files, like PDFs.
+      </Text>
+      
+      {productType === 'Video' && (
+        <View>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8,
+            marginTop: 16
+          }}>
+            Video URL
+          </Text>
+          <TextInput
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 12,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+              color: colors.textPrimary,
+              marginBottom: 16
+            }}
+            placeholder="Enter video URL"
+            placeholderTextColor={colors.textSecondary}
+            value={videoUrl}
+            onChangeText={setVideoUrl}
+          />
+          
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Video preview URL
+          </Text>
+          <TextInput
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 12,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+              color: colors.textPrimary
+            }}
+            placeholder="Enter video preview URL"
+            placeholderTextColor={colors.textSecondary}
+            value={videoPreviewUrl}
+            onChangeText={setVideoPreviewUrl}
+          />
+        </View>
+      )}
+      
+      {productType === 'Audio' && (
+        <View>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8,
+            marginTop: 16
+          }}>
+            Upload audio file
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 16,
+              backgroundColor: audioFile ? colors.primary + '10' : '#f9fafb',
+              height: 80
+            }}
+            onPress={() => pickAudio(setAudioFile)}
+          >
+            {audioFile ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ 
+                  fontFamily: fonts.medium, 
+                  fontSize: fontSize.md,
+                  color: colors.primary
+                }} numberOfLines={1} ellipsizeMode="middle">
+                  Audio file selected
+                </Text>
+              </View>
+            ) : (
+              <View style={{ alignItems: 'center' }}>
+                <Music size={24} color="#9ca3af" />
+                <Text style={{ 
+                  fontFamily: fonts.medium, 
+                  fontSize: fontSize.sm,
+                  color: colors.textSecondary,
+                  marginTop: 8
+                }}>
+                  Upload audio file
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Audio preview
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: audioPreview ? colors.primary + '10' : '#f9fafb',
+              height: 80
+            }}
+            onPress={() => pickAudio(setAudioPreview)}
+          >
+            {audioPreview ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ 
+                  fontFamily: fonts.medium, 
+                  fontSize: fontSize.md,
+                  color: colors.primary
+                }} numberOfLines={1} ellipsizeMode="middle">
+                  Preview audio selected
+                </Text>
+              </View>
+            ) : (
+              <View style={{ alignItems: 'center' }}>
+                <Music size={24} color="#9ca3af" />
+                <Text style={{ 
+                  fontFamily: fonts.medium, 
+                  fontSize: fontSize.sm,
+                  color: colors.textSecondary,
+                  marginTop: 8
+                }}>
+                  Upload audio preview
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      {productType === 'Images' && (
+        <View>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8,
+            marginTop: 16
+          }}>
+            Upload image files
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#f9fafb',
+              height: 80,
+              marginBottom: 12
+            }}
+            onPress={pickImages}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <Upload size={24} color="#9ca3af" />
+              <Text style={{ 
+                fontFamily: fonts.medium, 
+                fontSize: fontSize.sm,
+                color: colors.textSecondary,
+                marginTop: 8
+              }}>
+                Upload image files
+              </Text>
+            </View>
+          </TouchableOpacity>
+          
+          {imagesToUpload.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {imagesToUpload.map((uri, index) => (
+                <View key={index} style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden' }}>
+                  <Image source={{ uri }} style={{ width: '100%', height: '100%' }} />
+                  <TouchableOpacity
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      backgroundColor: 'rgba(0,0,0,0.6)',
+                      borderRadius: 12,
+                      padding: 4
+                    }}
+                    onPress={() => removeFile(uri, imagesToUpload, setImagesToUpload)}
+                  >
+                    <X size={16} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
+      
+      {productType === 'Other files' && (
+        <View>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8,
+            marginTop: 16
+          }}>
+            Upload files
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#f9fafb',
+              height: 80,
+              marginBottom: 12
+            }}
+            onPress={() => pickDocuments(setFilesToUpload)}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <FilePlus size={24} color="#9ca3af" />
+              <Text style={{ 
+                fontFamily: fonts.medium, 
+                fontSize: fontSize.sm,
+                color: colors.textSecondary,
+                marginTop: 8
+              }}>
+                Upload files
+              </Text>
+            </View>
+          </TouchableOpacity>
+          
+          {filesToUpload.length > 0 && (
+            <View style={{ gap: 8 }}>
+              {filesToUpload.map((uri, index) => (
+                <View key={index} style={{ 
+                  flexDirection: 'row', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  backgroundColor: colors.primary + '10',
+                  padding: 12,
+                  borderRadius: 8
+                }}>
+                  <Text style={{ 
+                    fontFamily: fonts.regular, 
+                    fontSize: fontSize.sm,
+                    color: colors.textPrimary,
+                    flex: 1
+                  }} numberOfLines={1} ellipsizeMode="middle">
+                    {uri.split('/').pop()}
+                  </Text>
+                  <TouchableOpacity onPress={() => removeFile(uri, filesToUpload, setFilesToUpload)}>
+                    <X size={18} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -218,15 +555,27 @@ export default function CreateProductScreen() {
     setFilesToUpload(filesToUpload.filter(f => f !== file));
   };
 
-  const handleAddAttachment = () => {
-    // In a real app, this would use document picker
-    console.log('Adding attachment...');
-    const newAttachment = { 
-      id: Date.now().toString(), 
-      name: `attachment-${Date.now()}.pdf`, 
-      type: 'document' 
-    };
-    setAttachments([...attachments, newAttachment]);
+  const handleAddAttachment = async () => {
+    try {
+      // Use image picker to select files
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsMultipleSelection: true,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const newAttachments = result.assets.map(asset => ({
+          id: Date.now().toString() + Math.random().toString(),
+          name: asset.uri.split('/').pop() || 'Unknown file',
+          type: 'document',
+          uri: asset.uri
+        }));
+        setAttachments([...attachments, ...newAttachments]);
+      }
+    } catch (error) {
+      console.error("Error picking documents:", error);
+    }
   };
 
   const handleRemoveAttachment = (id: string) => {
@@ -655,86 +1004,537 @@ export default function CreateProductScreen() {
     return "Continue";
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
+  const handleCreateProduct = () => {
+    // Here you would handle the actual creation of the product
+    // Then navigate back or to a success screen
+    router.back();
+  };
+
+  const toggleDropdown = () => {
+    setShowProductTypeDropdown(!showProductTypeDropdown);
+  };
+
+  const selectFileType = (fileType: string) => {
+    setProductType(fileType);
+    setShowProductTypeDropdown(false);
+  };
+
+  const pickImage = async (setter: React.Dispatch<React.SetStateAction<string | null>>) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setter(result.assets[0].uri);
+    }
+  };
+
+  const pickAudio = async (setter: React.Dispatch<React.SetStateAction<string | null>>) => {
+    try {
+      // For audio files, we'll use the image picker but only allow audio files
+      // Note: On many devices this may not work perfectly due to limitations
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setter(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking audio file:", error);
+    }
+  };
+
+  const pickImages = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const newImageUris = result.assets.map(asset => asset.uri);
+      setImagesToUpload([...imagesToUpload, ...newImageUris]);
+    }
+  };
+
+  const pickDocuments = async (setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    try {
+      // For documents, we'll use the image picker with all media types
+      // This is a limitation but will work for the UI demo
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsMultipleSelection: true,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const newFileUris = result.assets.map(asset => asset.uri);
+        setter(prevFiles => [...prevFiles, ...newFileUris]);
+      }
+    } catch (error) {
+      console.error("Error picking documents:", error);
+    }
+  };
+
+  const removeFile = (uri: string, fileList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setter(fileList.filter(fileUri => fileUri !== uri));
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      {showProductTypeDropdown && (
-        <TouchableWithoutFeedback onPress={() => setShowProductTypeDropdown(false)}>
-          <View style={styles.overlay} />
-        </TouchableWithoutFeedback>
-      )}
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={[styles.header, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
-          <TouchableOpacity 
-            onPress={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : router.back()}
-            style={styles.backButton}
-          >
-            <ArrowLeft size={24} color={colors.textPrimary} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.textPrimary, fontFamily: fonts.bold }]}>
-            Create Product {currentStep > 1 ? `(${currentStep}/2)` : ''}
+      <Stack.Screen options={{ 
+        headerShown: false,
+      }} />
+
+      <View style={{ 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border
+      }}>
+        <TouchableOpacity onPress={handleCancel}>
+          <ArrowLeft size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <Text style={{ 
+          marginLeft: 16, 
+          fontFamily: fonts.bold, 
+          fontSize: fontSize.xl,
+          color: colors.textPrimary
+        }}>
+          Add Product
+        </Text>
+      </View>
+
+      <ScrollView style={{ flex: 1, padding: 20 }}>
+        {/* Product Name Input */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Product name
           </Text>
+          <TextInput
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 12,
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+              color: colors.textPrimary
+            }}
+            placeholder="Enter product name"
+            placeholderTextColor={colors.textSecondary}
+            value={title}
+            onChangeText={setTitle}
+            maxLength={100}
+          />
+          <Text style={{ 
+            alignSelf: 'flex-end', 
+            marginTop: 4,
+            fontFamily: fonts.regular,
+            fontSize: fontSize.sm,
+            color: colors.textSecondary
+          }}>
+            {title.length}/100
+          </Text>
+        </View>
+
+        {/* Price Section */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Price (USD)
+          </Text>
+          <View style={{ 
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+          }}>
+            <Text style={{ 
+              fontFamily: fonts.medium,
+              fontSize: fontSize.md,
+              color: colors.textPrimary,
+              marginRight: 8
+            }}>
+              $
+            </Text>
+            <TextInput
+              style={{ 
+                flex: 1,
+                padding: 12,
+                fontFamily: fonts.regular,
+                fontSize: fontSize.md,
+                color: colors.textPrimary
+              }}
+              placeholder="0.00"
+              placeholderTextColor={colors.textSecondary}
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="decimal-pad"
+            />
+          </View>
+        </View>
+
+        {/* Pricing Options Button */}
+        <View style={{ marginBottom: 20 }}>
           <TouchableOpacity 
-            style={[styles.clearButton, { borderColor: colors.border }]}
-            onPress={handleClearAll}
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.primary,
+              borderRadius: 8,
+              padding: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'transparent'
+            }}
+            onPress={handlePricingOptions}
           >
-            <Text style={[styles.clearText, { color: colors.error || '#ff4747', fontFamily: fonts.medium }]}>
-              Clear
+            <Text style={{ 
+              fontFamily: fonts.medium, 
+              fontSize: fontSize.md,
+              color: colors.primary
+            }}>
+              Pricing Options
             </Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          style={{ flex: 1 }} 
-          contentContainerStyle={[styles.container, { paddingBottom: 80 }]}
-        >
-          {renderStepContent()}
-        </ScrollView>
+        {/* Description Input */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Description
+          </Text>
+          <TextInput
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 12,
+              height: 150,
+              textAlignVertical: 'top',
+              fontFamily: fonts.regular,
+              fontSize: fontSize.md,
+              color: colors.textPrimary
+            }}
+            placeholder="Enter product description"
+            placeholderTextColor={colors.textSecondary}
+            multiline
+            value={description}
+            onChangeText={setDescription}
+            maxLength={2000}
+          />
+          <Text style={{ 
+            alignSelf: 'flex-end', 
+            marginTop: 4,
+            fontFamily: fonts.regular,
+            fontSize: fontSize.sm,
+            color: colors.textSecondary
+          }}>
+            {description.length}/2000
+          </Text>
+        </View>
 
-        {/* Fixed Footer */}
-        <View style={[
-          styles.footer, 
-          { 
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            paddingBottom: insets.bottom > 0 ? insets.bottom : 16 
-          }
-        ]}>
+        {/* Product File Section */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Product file type
+          </Text>
           <TouchableOpacity 
-            style={[
-              styles.iconButton, 
-              { 
-                borderColor: colors.border,
-                backgroundColor: colors.surfaceHover
-              }
-            ]}
-            onPress={() => console.log('Preview product')}
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+            onPress={toggleDropdown}
           >
-            <Eye size={22} color={colors.textPrimary} />
+            <Text style={{ 
+              fontFamily: fonts.regular, 
+              fontSize: fontSize.md,
+              color: productType ? colors.textPrimary : colors.textSecondary
+            }}>
+              {productType ? productTypes.find(option => option === productType)?.toUpperCase() : 'Select file type'}
+            </Text>
+            <ChevronDown size={20} color={colors.textSecondary} />
           </TouchableOpacity>
           
-          <View style={styles.rightButtons}>
-            <TouchableOpacity 
-              style={[styles.footerButton, { borderColor: colors.border, height: 44 }]}
-              onPress={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : router.back()}
-            >
-              <Text style={[styles.cancelText, { color: colors.textPrimary, fontFamily: fonts.medium }]}>
-                {currentStep > 1 ? 'Back' : 'Cancel'}
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.publishButton, { backgroundColor: colors.primary, height: 44 }]}
-              onPress={handleContinue}
-            >
-              <Text style={[styles.publishText, { color: '#FFFFFF', fontFamily: fonts.medium }]}>
-                {getButtonText()}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {showProductTypeDropdown && (
+            <View style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              marginTop: 4,
+              backgroundColor: colors.background,
+            }}>
+              {productTypes.map(option => (
+                <TouchableOpacity 
+                  key={option}
+                  style={{ 
+                    padding: 14,
+                  }}
+                  onPress={() => selectFileType(option)}
+                >
+                  <Text style={{ 
+                    fontFamily: fonts.regular, 
+                    fontSize: fontSize.md,
+                    color: colors.textPrimary
+                  }}>
+                    {option.toUpperCase()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
-      </SafeAreaView>
-    </View>
+
+        {/* File Upload Section */}
+        {renderFileUploadSection(
+          productType, 
+          videoUrl, 
+          setVideoUrl, 
+          videoPreviewUrl, 
+          setVideoPreviewUrl, 
+          audioFile, 
+          setAudioFile, 
+          audioPreview, 
+          setAudioPreview, 
+          imagesToUpload, 
+          setImagesToUpload, 
+          filesToUpload, 
+          setFilesToUpload, 
+          pickAudio, 
+          pickImages, 
+          pickDocuments, 
+          removeFile, 
+          colors, 
+          fonts, 
+          fontSize
+        )}
+        
+        {/* Attachments Section */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Attachments
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#f9fafb',
+              height: 80,
+              marginBottom: 12
+            }}
+            onPress={handleAddAttachment}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <FilePlus size={24} color="#9ca3af" />
+              <Text style={{ 
+                fontFamily: fonts.medium, 
+                fontSize: fontSize.sm,
+                color: colors.textSecondary,
+                marginTop: 8
+              }}>
+                Add attachments
+              </Text>
+            </View>
+          </TouchableOpacity>
+          
+          {attachments.length > 0 && (
+            <View style={{ gap: 8 }}>
+              {attachments.map((file) => (
+                <View key={file.id} style={{ 
+                  flexDirection: 'row', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  backgroundColor: colors.primary + '10',
+                  padding: 12,
+                  borderRadius: 8
+                }}>
+                  <Text style={{ 
+                    fontFamily: fonts.regular, 
+                    fontSize: fontSize.sm,
+                    color: colors.textPrimary,
+                    flex: 1
+                  }} numberOfLines={1} ellipsizeMode="middle">
+                    {file.name}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleRemoveAttachment(file.id)}>
+                    <X size={18} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+        
+        {/* Preview Section */}
+        <View style={{ marginBottom: 60 }}>
+          <Text style={{ 
+            fontFamily: fonts.medium, 
+            fontSize: fontSize.md,
+            color: colors.textPrimary,
+            marginBottom: 8
+          }}>
+            Preview
+          </Text>
+          <Text style={{ 
+            fontFamily: fonts.regular, 
+            fontSize: fontSize.sm,
+            color: colors.textSecondary,
+            marginBottom: 12
+          }}>
+            Upload the main image for your product details page and in your shop. Recommended dimensions
+          </Text>
+          <TouchableOpacity 
+            style={{ 
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              height: 200,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#f9fafb',
+              overflow: 'hidden'
+            }}
+            onPress={() => pickImage(setPreviewImage)}
+          >
+            {previewImage ? (
+              <Image 
+                source={{ uri: previewImage }} 
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={{ alignItems: 'center' }}>
+                <FilePlus size={40} color="#9ca3af" />
+                <Text style={{ 
+                  fontFamily: fonts.medium, 
+                  fontSize: fontSize.sm,
+                  color: colors.textSecondary,
+                  marginTop: 8
+                }}>
+                  Upload preview image
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* Footer */}
+      <View style={{ 
+        flexDirection: 'row', 
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: colors.border,
+        backgroundColor: colors.background,
+        justifyContent: 'space-between'
+      }}>
+        <TouchableOpacity 
+          style={{ 
+            width: 48,
+            height: 48,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 8
+          }}
+        >
+          <Eye size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+        
+        <View style={{ flex: 1, flexDirection: 'row', marginLeft: 12 }}>
+          <TouchableOpacity 
+            style={{ 
+              flex: 1,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 8,
+              padding: 14,
+              marginRight: 8,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+            onPress={handleCancel}
+          >
+            <Text style={{ 
+              fontFamily: fonts.medium, 
+              fontSize: fontSize.md,
+              color: colors.textPrimary
+            }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={{ 
+              flex: 1,
+              backgroundColor: title.length > 0 ? colors.primary : '#9ca3af',
+              borderRadius: 8,
+              padding: 14,
+              marginLeft: 8,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+            onPress={handleCreateProduct}
+            disabled={title.length === 0}
+          >
+            <Text style={{ 
+              fontFamily: fonts.medium, 
+              fontSize: fontSize.md,
+              color: colors.buttonText
+            }}>
+              Create
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 

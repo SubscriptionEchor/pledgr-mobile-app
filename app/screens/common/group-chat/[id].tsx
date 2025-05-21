@@ -4,8 +4,10 @@ import { useLocalSearchParams } from 'expo-router';
 import { SubHeader } from '@/components/SubHeader';
 import { useTheme } from '@/hooks/useTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Users, Info, Image as ImageIcon, Send, MoreVertical, Smile, CornerUpLeft, X, Search, LogOut } from 'lucide-react-native';
+import { Users, Info, Image as ImageIcon, Send, MoreVertical, Smile, CornerUpLeft, X, Search, LogOut, Plus } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuth } from '@/lib/context/AuthContext';
+import { UserRole } from '@/lib/enums';
 
 type Reaction = { emoji: string; users: string[] };
 type ChatMessage = {
@@ -85,6 +87,7 @@ const messages: ChatMessage[] = [
 export default function GroupChatScreen() {
   const { id, group } = useLocalSearchParams();
   const { colors, fonts, fontSize } = useTheme();
+  const { user } = useAuth();
   const [input, setInput] = React.useState('');
   const [selectedMessageId, setSelectedMessageId] = React.useState<string | null>(null);
   const [emojiPickerFor, setEmojiPickerFor] = React.useState<string | null>(null);
@@ -138,6 +141,8 @@ export default function GroupChatScreen() {
     { id: '2', name: 'Alex', avatar: 'https://placehold.co/40x40?text=A', role: 'Member' },
     { id: '3', name: 'You', avatar: 'https://placehold.co/40x40?text=Me', role: 'Member' },
   ];
+
+  const isCreator = user?.role === UserRole.CREATOR || user?.role === UserRole.CREATOR_ASSOCIATE;
 
   // Handle emoji reaction
   const handleReact = (messageId: string, emoji: string) => {
